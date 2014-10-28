@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SQS Scanner</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="scan_lbl">Prev Scan:</string>
+    <string name="pull_lbl">Pull:</string>
+    <string name="qty_lbl">Qty:</string>
+    <string name="date_lbl">Date:</string>
+    <string name="count_lbl">Record Count:</string>
+    <string name="done_btn">Done</string>
+    <string name="review_btn">Review</string>
+    <string name="initCount">0</string>
+    <string name="title_activity_edit_record">Edit Record</string>
+    <string name="title_activity_scan_config">Scan Config</string>
+    <string name="title_activity_scan_review">Review Scans</string>
+    <string name="title_activity_pull_review">Review Pulls</string>
+    <string name="admin">Admin</string>
+    <string name="err_scan">"***ERR: NOT FOUND***"</string>
+    <string name="err">ERR_</string>
+    <string name="startScan">Start Scanning</string>
+    <string name="checkDefaults">Reminder: Check config before scanning!</string>
+    <string name="instrTitle">Instructions:</string>
+    <string name="instrBody">1. Scan Pull Number barcode on pull sheet.\n2. Begin Scanning titles.\n3. Multiple Pulls can be done on one scan session.\n4. Depending on configuration UPC will need quantities entered.\n5. When finished review Pull.\n6. Commit when in range of WIFI.</string>
+
+    <!-- CONFIG SETTINGS -->
+    <string name="sameScanCheck">2</string>
+    <string name="qtyCheckNum">2</string>
+    <string name="adminPass">6029zjb5</string>
+    <string name="DBX_APP_KEY">nau5nnk7gnhddc0</string>
+    <string name="DBX_SECRET_KEY">mwkurdz74x9pang</string>
+    <string name="BACKUP_DIR">backups</string>
+    <string name="adminCode">admin-6029</string>
+    <string name="troubleShooting">Trouble Shooting</string>
+    <string name="tsText">        If scanner does not work try these steps:\n
+	    	1. Restart scanner using small button.\n
+	    	    \tWait for beep and try to scan.\n
+	    	2. Exit and restart app\n  
+	    	    \tWait for beep and try to scan\n
+	    	3. Contact Manager\n</string>
+    <string name="tsText_restart">1.Restart device using small button</string>
+    <string name="tsText_scan">2. Scan above barcode</string>
+    <string name="tsText_app">3. Exit and restart app </string>
+    <string name="tsText_finally">4. Contact Manager</string>
+    <string name="tsText_beep">Wait for beep and try to scan</string>
+
+    <!-- record layout -->
+    <string name="pullIdx">0</string>
+    <string name="scanIdx">1</string>
+    <string name="qtyIdx">2</string>
+    <string name="dateIdx">3</string>
+    <string name="title">Title:</string>
+    <string name="scan">Scan</string>
+    <string name="linesForThisPull">Scans for this Pull:</string>
+    <string name="totalScanCount">Total Count for this Pull:</string>
+    <string name="totalTitleCount">Total Count for this Title:</string>
+
+    <!-- Regular Expression -->
+    <string name="sqsRegEx">^SQS[0-9]+$</string>
+    <string name="upcRegEx">^[0-9]{12}(-N)?$</string>
+    <string name="scanModeLBL">Auto Quantity</string>
+
+    <!-- Auto Quantity Counts -->
+    <string name="count1">1</string>
+    <string name="count14">14</string>
+    <string name="count21">21</string>
+    <string name="count24">24</string>
+    <string name="count28">28</string>
+    <string name="count30">30</string>
+    <string name="count35">35</string>
+    <string name="count70">70</string>
+    <string name="count140">140</string>
+    <string name="count210">210</string>
+    <string name="count280">280</string>
+    <string name="custom">…</string>
+    <string name="countCust">Custom</string>
+    <string name="msgTimeLbl">Box Qty</string>
+    <string name="gridLbl">Grid</string>
+    <string name="configLbl">Config</string>
+    <string name="scanLbl">Scan</string>
+    <string name="pull_num_header">Pull#</string>
+    <string name="pull_lines_header">Records</string>
+    <string name="pull_count_header">Pieces</string>
+    <string name="scan_id_header">ScanId</string>
+    <string name="scan_qty_header">Pieces</string>
+    <string name="title_activity_admin">Admin</string>
+    <string name="commitScan">Commit</string>
+    <string name="dbx">DropBox</string>
+    <string name="sdCard">SD Card</string>
+    <string name="exportLbl">Export Method:</string>
+	<string name = "backButton">Back Button</string>
+	<string name = "file">File</string>
+	<string name = "date">Date</string>
+	<string name = "size">Size</string>
+	<string name = "massDelete">Del All</string>
+	
+    <!-- ScanApi -->
+    <string name="scanner_NoDevice">No Scanner Connected!</string>
+    <string name="title_activity_check_dbx">CheckDBX</string>
+    <string name="title_activity_dbtest">DBTest</string>
+    <string name="title_activity_init">InitActivity</string>
+    <string name="markSet">Skid Set</string>
+    <string name="noMark">No Skid</string>
+    <string name="title_activity_mark_scan">MarkScanActivity</string>
+    <string name="title_activity_load">LoadActivity</string>
+
+    <string name="ERR_WIFI">Must be connected to WiFi to start scan!</string>
+    <string name = "ERR_DROPBOX">Error connecting to DropBox!</string>
+    
+</resources>

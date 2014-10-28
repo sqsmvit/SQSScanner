@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
+    android:orientation="horizontal" 
+    android:descendantFocusability="blocksDescendants"
+    android:background= "@color/Silver">
+	
+    <HorizontalScrollView
+    android:layout_width="175dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/radTopMar">
+
+             <TextView
+                 android:id="@+id/scanTitle"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:scrollHorizontally="true"
+                 android:scrollbarAlwaysDrawHorizontalTrack="true"
+                 android:scrollbars="horizontal"
+                 android:singleLine="true"
+                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
+     </HorizontalScrollView>
+    
+    <TextView
+        android:id="@+id/Scan_qty"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:padding="@dimen/listMar"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    <!-- 
+    <com.example.sqsscanner.ListViewButton
+        android:id="@+id/editBtn"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:onClick="clickGoToEdit"
+        android:src="@drawable/ic_pen" />
+    -->
+    <com.example.sqsscanner.ListViewButton
+        android:id="@+id/delBtn"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:onClick="delRow"
+        android:src="@drawable/ic_trash"/>
+
+</LinearLayout>

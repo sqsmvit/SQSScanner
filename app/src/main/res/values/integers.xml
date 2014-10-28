@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="int30">30</integer>
+    <integer name="int35">35</integer>
+    <integer name="int70">70</integer>
+    <integer name="int140">140</integer>
+    <integer name="int210">210</integer>
+    <integer name="int280">280</integer>
+    <integer name="int0">0</integer>
+    <integer name="int1">1</integer>
+	  
+    <integer name="EXPORT_SD">0</integer>
+    <integer name="EXPORT_DBX">1</integer>
+    
+</resources>

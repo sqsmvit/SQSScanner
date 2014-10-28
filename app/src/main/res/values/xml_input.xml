@@ -1,0 +1,78 @@
+<resources>
+    
+     <string-array name = "fmDumpFiles">
+         <item>/product2.xml</item>
+         <item>/upc.xml</item>
+         <item>/pricelist.xml</item>
+         <item>/pulllist.xml</item>
+         <item>/pulllines.xml</item>
+	 </string-array>
+     
+     <array name="xml_list">
+        <item>@array/for_product</item>
+        <item>@array/for_upc</item>
+        <item>@array/for_priceList</item>
+        <item>@array/for_pullList</item>
+        <item>@array/for_pullLines</item>
+    </array>
+     
+     
+    <string-array name="for_product">
+        <item>masnum</item>
+        <item>name</item>
+        <item>category</item>
+        <item>rating</item>
+        <item>streetdate</item>
+        <item>titlefilm</item>
+        <item>nocover</item>
+        <item>pricelist</item>
+        <item>isnew</item>
+        <item>isboxset</item>
+        <item>multipack</item>
+        <item>mediaformat</item>
+        <item>pricefilters</item>
+        <item>specialfields</item>
+        <item>studio</item>
+        <item>season</item>
+        <item>numberofdiscs</item>
+        <item>theaterdate</item>
+        <item>studioname</item>
+        <item>sha</item>
+    </string-array>
+    
+    <string-array name="for_upc">
+        <item>upc</item>
+        <item>masnum</item>
+        <item>sha</item>
+    </string-array>
+    
+    <string-array name="for_priceList">
+        <item>pricelist</item>
+        <item>active</item>
+        <item>sha</item>
+    </string-array>
+    
+    <string-array name="for_pullList">
+        <item>pull</item>
+        <item>name</item>
+        <item>pulledfor</item>
+        <item>jobnumber</item>
+        <item>scheduleddate</item>
+        <item>manualqty</item>
+        <item>pullqty</item>
+        <item>sha</item>
+    </string-array>
+    
+    <string-array name="for_pullLines">
+        <item>pull</item>
+        <item>masnum</item>
+        <item>scheduledqty</item>
+        <item>sha</item>
+    </string-array>
+    
+    
+
+    
+
+    
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <issue id="DefaultLocale" severity="ignore" />
+    <issue id="SimpleDateFormat">
+        <ignore path="src/com/example/sqsscanner/ScanHome.java" />
+    </issue>
+</lint>

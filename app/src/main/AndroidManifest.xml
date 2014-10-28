@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.sqsscanner"
+    android:versionCode="5"
+    android:versionName="5.01" >
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="17" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+    <application
+        android:name="com.example.sqsscanner.ScanApiApplication"
+        android:allowBackup="true"
+        android:exported="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:screenOrientation="portrait"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.example.sqsscanner.CheckDBXActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.ScanHomeActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.ScanReviewActivity"
+            android:label="@string/title_activity_scan_review"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.EditRecordActivity"
+            android:label="@string/title_activity_edit_record"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.ScanConfigActivity"
+            android:label="@string/title_activity_scan_config"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.PullReviewActivity"
+            android:label="@string/title_activity_pull_review"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.AdminActivity"
+            android:label="@string/title_activity_admin"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.dropbox.sync.android.DbxAuthActivity" />
+        <activity
+            android:name="com.dropbox.client2.android.AuthActivity"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <data android:scheme="db-nau5nnk7gnhddc0" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.dropbox.sync.android.DbxSyncService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Dropbox Sync" />
+
+        <activity
+            android:name="com.example.sqsscanner.SkidScanActivity"
+            android:label="@string/title_activity_mark_scan" >
+        </activity>
+        <activity
+            android:name="com.example.sqsscanner.LoadActivity"
+            android:label="@string/title_activity_load"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <service
+            android:name="com.example.sqsscanner.PopDatabaseService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+    </application>
+
+</manifest>

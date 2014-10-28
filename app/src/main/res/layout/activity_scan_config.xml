@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bt_add"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ScanConfig" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/backBtn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Back" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar" >
+
+        <ToggleButton
+            android:id="@+id/togAutoQuan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/autoScanId"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:text="@string/scanModeLBL"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Spinner
+            android:id="@+id/autoCountSelect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/autoCounts" />
+        
+    </LinearLayout>
+    
+	<View
+    android:layout_width="fill_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"/>
+	
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar" >
+        
+        
+  		<ToggleButton
+            android:id="@+id/togAutoBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+  		
+        <TextView
+            android:id="@+id/msgTimeId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/listMar"
+            android:layout_weight="1"
+            android:text="@string/msgTimeLbl"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/boxQty"
+            android:layout_width="84dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.26"
+            android:ems="10"
+            android:inputType="number" >
+            <requestFocus />
+        </EditText>
+
+    </LinearLayout>
+    
+	<View
+    android:layout_width="fill_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"/>
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="@dimen/listMar"
+	    android:orientation="horizontal" >
+        
+	    <ToggleButton
+	        android:id="@+id/billBMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+       <TextView
+           android:id="@+id/lbl_billB"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="@dimen/activity_horizontal_margin"
+           android:text="Bill B. Mode"
+           android:textAppearance="?android:attr/textAppearanceMedium" />
+     </LinearLayout>
+	
+	<View
+	    android:layout_width="fill_parent"
+	    android:layout_height="1dp"
+	    android:background="@android:color/darker_gray"/>
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="@dimen/listMar"
+	    android:orientation="horizontal" >
+       
+       <ToggleButton
+           android:id="@+id/invAdjustMode"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content" />
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="@dimen/activity_horizontal_margin"
+           android:text="RI Mode"
+           android:textAppearance="?android:attr/textAppearanceMedium" />
+     </LinearLayout>
+     
+     <RadioGroup
+         android:id="@+id/invModeGroup"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="25dp"
+         android:orientation="horizontal" >
+       
+       <RadioButton
+           android:id="@+id/plus"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:text="Add" />
+       
+       <RadioButton
+           android:id="@+id/minus"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:text="Subtract" />
+       
+       <RadioButton
+           android:id="@+id/set"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+	       android:text="Set" />
+    </RadioGroup>
+<!-- 
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+
+	    	            <ToggleButton
+	                android:id="@+id/tog_set_mark"
+	                android:layout_width="60dp"
+	                android:layout_height="60dp"
+	                android:text="skid"
+	                android:textOff="@string/noMark"
+	                android:textOn="@string/markSet"
+	                android:onClick="setSkidMode" />
+	     -->
+<!-- 	    	            <LinearLayout
+	    	                android:layout_width="match_parent"
+   							android:layout_height="wrap_content"
+   							android:orientation="vertical"> -->
+<!-- 	    	                <LinearLayout
+	    	                    android:layout_width="match_parent"
+	    	                    android:layout_height="wrap_content"
+	    	                    android:orientation="horizontal"> -->
+<!-- 
+				        <TextView
+	                        android:id="@+id/lbl_skid_id"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:layout_marginRight="2dp"
+	                        android:text="Skid Id:"
+	                        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	                    <TextView
+	                        android:id="@+id/skid_id"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:textAppearance="?android:attr/textAppearanceSmall" />
+	 -->
+	                    <!-- </LinearLayout> -->
+<!-- 	                    <LinearLayout
+	                        android:layout_width="match_parent"
+	                        android:layout_height="wrap_content"
+	                        android:orientation="horizontal">
+	                    	                    <TextView
+	                        android:id="@+id/lbl_skid_total"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:layout_marginRight="2dp"
+	                        android:text="Total:"
+	                        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	                    <TextView
+	                        android:id="@+id/skid_total"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:textAppearance="?android:attr/textAppearanceSmall" />
+	                    </LinearLayout> -->
+				<!-- </LinearLayout> -->
+	    
+	    
+<!-- 		<ToggleButton
+		    android:id="@+id/newProductMode"
+		    android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+		<TextView
+		    android:id="@+id/lblNewProduct"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="New Product Mode"
+		    android:textAppearance="?android:attr/textAppearanceMedium" /> -->
+<!-- 
+	</LinearLayout>
+ -->
+	<View
+	    android:layout_width="fill_parent"
+	    android:layout_height="1dp"
+	    android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/trouble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/listMar"
+            android:text="@string/troubleShooting"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+<!-- 
+        <ImageView
+            android:id="@+id/bt_address"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:padding="@dimen/radTopMar"
+            android:scaleType="fitCenter"
+            />
+ -->
+        <TextView
+            android:id="@+id/ts1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/listMar"
+            android:text="@string/tsText"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </LinearLayout>
+
+</LinearLayout>
