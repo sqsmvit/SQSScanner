@@ -1,12 +1,12 @@
 package com.example.sqsscanner;
 
-import java.io.File;
-
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.File;
 
 public class Utilities
 {

@@ -1,9 +1,5 @@
 package com.example.sqsscanner;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -26,9 +22,13 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.example.sqsscanner.DB.ProductsDataSource;
+import com.example.sqsscanner.DB.ProductDataSource;
 import com.example.sqsscanner.DB.ScanDataSource;
 import com.example.sqsscanner.DB.UPCDataSource;
+
+import java.io.IOException;
+import java.util.Locale;
+import java.util.regex.Pattern;
 //import java.util.Calendar;
 //import android.widget.ToggleButton;
 
@@ -55,7 +55,7 @@ public class ScanHomeActivity extends Activity
 	public static int msgTime;
 	public int boxQty;
 	public boolean isBoxQty;
-
+    private String lensId;
 
 	public static Pattern sqsRegEx;
 	public static Pattern upcRegEx;
@@ -89,7 +89,7 @@ public class ScanHomeActivity extends Activity
 
 	private InputMethodManager imm;
 
-	private ProductsDataSource productDataSource;
+	private ProductDataSource productDataSource;
 	private UPCDataSource upcDataSource;
 	private ScanDataSource scanDataSource;
 
@@ -183,7 +183,7 @@ public class ScanHomeActivity extends Activity
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_scan_home);
 
-		this.productDataSource = new ProductsDataSource(this);
+		this.productDataSource = new ProductDataSource(this);
 		this.upcDataSource = new UPCDataSource(this);
 		this.scanDataSource = new ScanDataSource(this);
 
@@ -207,7 +207,7 @@ public class ScanHomeActivity extends Activity
 		config = getSharedPreferences("scanConfig", 0);
 
 
-		titleMessage = Toast.makeText(this, "", 1);
+		titleMessage = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 		titleMessage.setGravity(Gravity.BOTTOM, 5, 5);
 
 		imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -320,7 +320,7 @@ public class ScanHomeActivity extends Activity
 		this.productDataSource.close();
 		this.upcDataSource.close();
 		this.scanDataSource.close();
-		ScanApiApplication.getInstance().currPullNum = mPullNum.getText()
+        ScanApiApplication.getInstance().currPullNum = mPullNum.getText()
 				.toString();
 		super.onPause();
 	}
@@ -333,7 +333,7 @@ public class ScanHomeActivity extends Activity
 	@Override
 	protected void onResume()
 	{
-		String message = String.format("in onPause");
+		String message = String.format("in onResume");
 		Log.d(TAG, message);
 		
 		setConfig();
@@ -343,7 +343,7 @@ public class ScanHomeActivity extends Activity
 		this.productDataSource.read();
 		this.upcDataSource.read();
 		this.scanDataSource.open();
-		//this.mSkidMode.setVisibility(View.INVISIBLE);
+        //this.mSkidMode.setVisibility(View.INVISIBLE);
 		//checkMarkIntent(getIntent());
 
 		mPullNum.setText(ScanApiApplication.getInstance().currPullNum);
@@ -655,7 +655,7 @@ public class ScanHomeActivity extends Activity
 		String rating;
 		String priceFilters;
 		
-		prod = productDataSource.getProduct(this.thisMasNum);
+		prod = productDataSource.getJoinProduct(lensId, this.thisMasNum);
 		title = prod.getTitle();
 		priceList = prod.getPriceList();
 		rating = prod.getRating();
@@ -784,6 +784,7 @@ public class ScanHomeActivity extends Activity
 		//isManQty = config.getBoolean("isManQty", false);
 		//isNewProduct = config.getBoolean("isNewProduct", false);
 		String tempBox = config.getString("boxQty", "0");
+        lensId = config.getString("lensSelectionId", "1");
 		if (tempBox == "")
 		{
 			tempBox = "1";
@@ -964,13 +965,6 @@ public class ScanHomeActivity extends Activity
 		titleCount.setText(Integer.toString(itemCount));
 	}
 
-	/**
-	 * 
-	 * Get the bluetooth name for the device
-	 * 
-	 * @param none
-	 * @return if the title was found
-	 */
 	public boolean showTitle()
 	{
 		String title = mTitle.getText().toString();

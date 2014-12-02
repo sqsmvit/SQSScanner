@@ -9,8 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.DhcpInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -19,7 +17,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 
-import com.example.sqsscanner.DB.ProductsDataSource;
+import com.example.sqsscanner.DB.ProductDataSource;
 import com.example.sqsscanner.DB.ScanContract.ScanTable;
 import com.example.sqsscanner.DB.ScanDataSource;
 import com.example.sqsscanner.DB.UPCDataSource;
@@ -72,7 +70,7 @@ public class ScanReviewActivity extends ExpandableListActivity {
 
 	private ScansCursorTreeAdapter scanAdapter;
 	
-	private ProductsDataSource productDataSource;
+	private ProductDataSource productDataSource;
 	private UPCDataSource upcDataSource;
 	private ScanDataSource scanDataSource;
 	
@@ -87,7 +85,7 @@ public class ScanReviewActivity extends ExpandableListActivity {
 		pullKey = intent.getStringExtra("PULL_NUM");
 
 		
-		this.productDataSource = new ProductsDataSource(this);
+		this.productDataSource = new ProductDataSource(this);
 		this.upcDataSource = new UPCDataSource(this);
 		this.scanDataSource = new ScanDataSource(this);
 		productDataSource.read();

@@ -1,8 +1,5 @@
 package com.example.sqsscanner.DB;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import com.example.sqsscanner.DB.PriceListContract.PriceListTable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 
@@ -22,9 +22,10 @@ public class PriceListDataSource implements DataSource {
 	private static String DB_TABLE = PriceListTable.TABLE_NAME;
 	
 	public static String[] priceListCols = {
-			PriceListTable.COLUMN_NAME_PK_PRICE_LIST,
+            PriceListTable.COLUMN_NAME_PRICELISTNAME,
 			PriceListTable.COLUMN_NAME_ACTIVE,
-			PriceListTable.COLUMN_NAME_SHA
+            PriceListTable.COLUMN_NAME_PK_PRICE_LIST,
+            PriceListTable.COLUMN_NAME_SHA
 	};
 	
 	private static final String INSERT_QUERY = new QueryBuilder().buildInsertQuery(DB_TABLE, priceListCols);
@@ -78,8 +79,8 @@ public class PriceListDataSource implements DataSource {
 	 * @param priceList
 	 * @return
 	 */
-	public int getIsActive(String priceList){
-		
+	public int getIsActive(String priceList)
+    {
 		String[] args = {priceList};
 		
 		Cursor cur = db.rawQuery(DB_QUERY, args);
@@ -87,7 +88,6 @@ public class PriceListDataSource implements DataSource {
 		cur.moveToLast();
 		
 		return cur.getInt(cur.getPosition());
-		
 	}
 
 	@Override

@@ -1,10 +1,5 @@
 package com.example.sqsscanner;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,6 +9,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+
+import com.example.sqsscanner.DB.ProductLensDataSource;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class LoadActivity extends Activity {
 	 
@@ -68,34 +70,9 @@ public class LoadActivity extends Activity {
 		String message = String.format("in startScan and for the LoadActivity!");
 		Log.d(TAG, message);
 		System.out.println(message);
-		
+
 		String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
-		
-		/*
-		try {
-			String message2 = String.format("today's buildDate = %s versus the system stored buildDate = %s", 
-					buildDate, getSharedPreferences("scanConfig", 0).getString("buildDate", ""));
-			Log.d(TAG, message2);
-			
-			//Toast.makeText(getApplicationContext(), message2, Toast.LENGTH_LONG).show();
-			
-			if(!(buildDate.equals(getSharedPreferences("scanConfig", 0).getString("buildDate", ""))))
-			{
-				// yes its true ... we are now calling PopDatabaseService class
-				Intent popIntent = new Intent(this, PopDatabaseService.class);
-		   		popIntent.putExtra("XML_FILES", this.xmlFiles);
-		   		popIntent.putExtra("XML_SCHEMAS", this.xmlSchemas);
-		   		popIntent.putExtra("FORCE_UPDATE", 0);
-				this.startService(popIntent);
-			}
-				  
-		} catch (NotFoundException e) {
-			Log.i(TAG, "Crash during db pop"  ,e);
-			e.printStackTrace();
-		}
-		*/
-		
-		String message2 = String.format("today's buildDate = %s versus the system stored buildDate = %s", 
+		String message2 = String.format("today's buildDate = %s versus the system stored buildDate = %s",
 				buildDate, getSharedPreferences("scanConfig", 0).getString("buildDate", ""));
 		Log.d(TAG, message2);
 		if(!(buildDate.equals(getSharedPreferences("scanConfig", 0).getString("buildDate", ""))))
@@ -113,11 +90,22 @@ public class LoadActivity extends Activity {
 				this.startService(popIntent);
 				Utilities.cleanFolder(new File(Environment.getExternalStorageDirectory().toString() + "/backups"), 180);
 				getSharedPreferences("scanConfig", 0).edit().putString("buildDate", buildDate).apply();
-			
+
+                long productLensResetMilli = Long.parseLong(getSharedPreferences("scanConfig", 0).getString("ProductLensResetMilli", "0"));
+
+                if(((System.currentTimeMillis() - productLensResetMilli)/86400000) >= 7)
+                {
+                    ProductLensDataSource plds = new ProductLensDataSource(this);
+                    plds.open();
+                    plds.resetDB();
+                    plds.close();
+                }
+                getSharedPreferences("scanConfig", 0).edit().putString("ProductLensResetMilli", Long.toString(System.currentTimeMillis())).apply();
+
 				Intent intent = new Intent(this, ScanHomeActivity.class);
 				pauseDialog(intent);
 			}
-			catch (NotFoundException e)
+            catch (NotFoundException e)
 			{
 				Log.i(TAG, "Crash during db pop"  ,e);
 				e.printStackTrace();
@@ -128,8 +116,6 @@ public class LoadActivity extends Activity {
 			Intent intent = new Intent(this, ScanHomeActivity.class);
 			startActivity(intent);
 		}
-   		
-
 	}
 	
 	private void pauseDialog( final Intent intent){

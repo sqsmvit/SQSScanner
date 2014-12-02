@@ -17,7 +17,25 @@
         <item>@string/count280</item>
         <item>@string/custom</item>
     </string-array>
-    
+
+    <string-array
+        name="lensList">
+        <item>Default</item>
+        <item>DG</item>
+        <item>711</item>
+        <item>CF</item>
+        <item>CIRK</item>
+        <item>CNV</item>
+        <item>COL</item>
+        <item>DH</item>
+        <item>FD</item>
+        <item>GR</item>
+        <item>HOUC</item>
+        <item>HUD</item>
+        <item>PHM</item>
+        <item>WD</item>
+        <item>ACN</item>
+    </string-array>
     
     <string-array
         name="msgTimes">

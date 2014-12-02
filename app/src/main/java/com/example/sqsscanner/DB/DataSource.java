@@ -1,12 +1,12 @@
 package com.example.sqsscanner.DB;
 
+import android.database.SQLException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.database.SQLException;
-
-public interface DataSource {
-
+public interface DataSource
+{
 	public void open() throws SQLException;
 	
 	public void close();
@@ -14,6 +14,4 @@ public interface DataSource {
 	public HashMap<String, String> getSha();
 	
 	public void insertBatch(ArrayList<ArrayList<String>> batch);
-	
-	
 }

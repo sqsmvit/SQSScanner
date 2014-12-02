@@ -393,7 +393,7 @@
 	            </LinearLayout>
 	        </TableRow>
 	    </TableLayout>
-	    <TextView
+        <TextView
 	        android:id="@+id/device_location"
 	        android:layout_gravity="right"
 	        android:layout_width="wrap_content"

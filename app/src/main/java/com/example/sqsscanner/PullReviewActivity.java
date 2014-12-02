@@ -1,10 +1,5 @@
 package com.example.sqsscanner;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -24,10 +19,15 @@ import android.widget.Toast;
 import com.example.sqsscanner.DB.ScanContract.ScanTable;
 import com.example.sqsscanner.DB.ScanDataSource;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
-public class PullReviewActivity extends ListActivity {
-	
+
+public class PullReviewActivity extends ListActivity
+{
 	public static String[] writeCols = {ScanTable.COLUMN_NAME_SCAN_ENTRY,
 										ScanTable.COLUMN_NAME_QUANTITY,
 										ScanTable.COLUMN_NAME_FK_PULL_ID,
@@ -179,16 +179,16 @@ public class PullReviewActivity extends ListActivity {
 	{
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		boolean expSD = (EXPORT_METHOD == getResources().getInteger(R.integer.EXPORT_SD));
+		//boolean expSD = (EXPORT_METHOD == getResources().getInteger(R.integer.EXPORT_SD));
 		if(!(pullNumberList.isEmpty()))
 		{
-			if (wifi.isConnected() || expSD)
+			if (wifi.isConnected())
 			{
 				writeFromDB();
 				
 				try
 				{
-					ScanExporter scanExporter = new ScanExporter(this, exportFile, expSD, true);
+					ScanExporter scanExporter = new ScanExporter(this, exportFile, false, true);
 					scanExporter.exportScan();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

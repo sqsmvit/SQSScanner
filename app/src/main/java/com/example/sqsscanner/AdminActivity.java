@@ -1,5 +1,19 @@
 package com.example.sqsscanner;
 
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,21 +27,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-
-import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.TypedArray;
-import android.os.Bundle;
-import android.os.Environment;
-import android.view.View;
-import android.widget.ListView;
-import android.widget.RadioGroup;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 /**
  * @author ChrisS
@@ -47,10 +46,11 @@ import android.widget.Toast;
  *
  *Set the export location for the device for the Commit Activity
  */
-public class AdminActivity extends ListActivity {
+public class AdminActivity extends ListActivity
+{
 	private ArrayList<HashMap<String, String>>backupList = new ArrayList<HashMap<String, String>>();
 	private Context context;
-	private RadioGroup exportGrp;
+	//private RadioGroup exportGrp;
 	private SharedPreferences scanConfig;
 	private SimpleAdapter backupAdapter;
 	private File root;
@@ -64,8 +64,8 @@ public class AdminActivity extends ListActivity {
 		
 		scanConfig = getSharedPreferences("scanConfig", 0);
 		View header = getLayoutInflater().inflate(R.layout.admin_header, null);
-		exportGrp = (RadioGroup) header.findViewById(R.id.exportGrp);
-		exportGrp.check(scanConfig.getInt("exportSel", 1));
+		//exportGrp = (RadioGroup) header.findViewById(R.id.exportGrp);
+		//exportGrp.check(scanConfig.getInt("exportSel", 1));
 		
 
 		//File root = new File(getFilesDir().getAbsolutePath());
@@ -254,11 +254,10 @@ public class AdminActivity extends ListActivity {
 	 * 
 	 * @param v - the view that triggered the event
 	 */
-	public void onClickBack(View v){
+	public void onClickBack(View v)
+    {
 		super.onBackPressed();
-		
-		writePref();
-		
+		//writePref();
 	}
 	
 	
@@ -267,6 +266,7 @@ public class AdminActivity extends ListActivity {
 	 * 
 	 * 
 	 */
+    /*
 	private void writePref(){
 		
 		SharedPreferences.Editor scanState = scanConfig.edit();
@@ -275,7 +275,7 @@ public class AdminActivity extends ListActivity {
 		scanState.commit();
 		
 	}
-	
+	*/
 	/**
 	 * 
 	 * Exports a backup to the internal storage on the device
@@ -336,6 +336,7 @@ public class AdminActivity extends ListActivity {
 	 * 
 	 * @return integer bool value for exporting to dropbox
 	 */
+    /*
 	public int setExport(){
 		
 		int checkId = exportGrp.getCheckedRadioButtonId();
@@ -351,5 +352,5 @@ public class AdminActivity extends ListActivity {
 		}
 		
 	}
-
+    */
 }

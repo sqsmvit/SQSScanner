@@ -1,8 +1,8 @@
 package com.example.sqsscanner;
 
-import java.util.ArrayList;
-
 import android.database.Cursor;
+
+import java.util.ArrayList;
 
 public class Product {
 
@@ -153,6 +153,9 @@ public class Product {
 			case 19:
 				this.sha = field;
 				break;
+            case 20:
+                this.priceList = field;
+                break;
 			}
 			
 			i++;
@@ -234,9 +237,12 @@ public class Product {
 				case 19:
 					this.sha = dbCur.getString(idx);
 					break;
+                case 20:
+                    this.priceList = dbCur.getString(idx);
+                    break;
 				}
 				idx++;
-			}while (idx < 20);
+			}while (idx < dbCur.getColumnCount());
 		}
 	}
 
