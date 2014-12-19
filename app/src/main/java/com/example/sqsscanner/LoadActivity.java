@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
+import com.example.sqsscanner.DB.LensDataSource;
 import com.example.sqsscanner.DB.ProductLensDataSource;
 
 import java.io.File;
@@ -92,6 +93,11 @@ public class LoadActivity extends Activity {
 				getSharedPreferences("scanConfig", 0).edit().putString("buildDate", buildDate).apply();
 
                 long productLensResetMilli = Long.parseLong(getSharedPreferences("scanConfig", 0).getString("ProductLensResetMilli", "0"));
+
+                LensDataSource lds = new LensDataSource(this);
+                lds.open();
+                lds.resetDB();
+                lds.close();
 
                 if(((System.currentTimeMillis() - productLensResetMilli)/86400000) >= 7)
                 {

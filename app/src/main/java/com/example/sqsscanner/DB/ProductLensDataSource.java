@@ -20,6 +20,7 @@ public class ProductLensDataSource implements DataSource
                     ProductLensContract.ProductLensTable.COLUMN_NAME_FK_MASNUM,
                     ProductLensContract.ProductLensTable.COLUMN_NAME_FK_LENSID,
                     ProductLensContract.ProductLensTable.COLUMN_NAME_FK_PRICELISTID,
+                    ProductLensContract.ProductLensTable.COLUMN_NAME_PK_PRODUCTLENS,
                     ProductLensContract.ProductLensTable.COLUMN_NAME_SHA
             };
 
@@ -55,15 +56,15 @@ public class ProductLensDataSource implements DataSource
         String tempMasnum;
         String tempSha;
 
-        Cursor c = this.db.query(ProductLensDataSource.DB_TABLE, new String[]{ProductLensContract.ProductLensTable.COLUMN_NAME_FK_MASNUM, ProductLensContract.ProductLensTable.COLUMN_NAME_SHA}, null, null, null,null, null);
+        Cursor c = this.db.query(ProductLensDataSource.DB_TABLE, new String[]{ProductLensContract.ProductLensTable.COLUMN_NAME_PK_PRODUCTLENS, ProductLensContract.ProductLensTable.COLUMN_NAME_SHA}, null, null, null,null, null);
 
         if(c.moveToFirst())
         {
-            int masnumCol = c.getColumnIndex(ProductLensContract.ProductLensTable.COLUMN_NAME_FK_MASNUM);
+            int pkCol = c.getColumnIndex(ProductLensContract.ProductLensTable.COLUMN_NAME_PK_PRODUCTLENS);
             int shaCol = c.getColumnIndex(ProductLensContract.ProductLensTable.COLUMN_NAME_SHA);
             do
             {
-                tempMasnum = c.getString(masnumCol);
+                tempMasnum = c.getString(pkCol);
                 tempSha = c.getString(shaCol);
 
                 mapIds.put(tempMasnum, tempSha);

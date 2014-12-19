@@ -6,25 +6,19 @@
          <item>/upc.xml</item>
          <item>/pricelist.xml</item>
          <item>/productlens.xml</item>
-     </string-array>
-    <!--
          <item>/pulllist.xml</item>
          <item>/pulllines.xml</item>
-    -->
-
+     </string-array>
 
      <array name="xml_list">
          <item>@array/for_lens</item>
          <item>@array/for_product</item>
-        <item>@array/for_upc</item>
-        <item>@array/for_priceList</item>
-        <item>@array/for_productLens</item>
+         <item>@array/for_upc</item>
+         <item>@array/for_priceList</item>
+         <item>@array/for_productLens</item>
+         <item>@array/for_pullList</item>
+         <item>@array/for_pullLines</item>
     </array>
-    <!--
-        <item>@array/for_pullList</item>
-        <item>@array/for_pullLines</item>
-    -->
-
 
     <string-array name="for_product">
         <item>masnum</item>
@@ -70,6 +64,8 @@
         <item>scheduleddate</item>
         <item>manualqty</item>
         <item>pullqty</item>
+        <item>pricelensid</item>
+        <item>pricelistid</item>
         <item>sha</item>
     </string-array>
     
@@ -84,6 +80,7 @@
         <item>masnum</item>
         <item>lensid</item>
         <item>pricelistid</item>
+        <item>pk</item>
         <item>sha</item>
     </string-array>
 

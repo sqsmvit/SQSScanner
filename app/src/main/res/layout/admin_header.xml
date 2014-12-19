@@ -32,6 +32,13 @@
             android:text="Force DB Update" 
             android:onClick="onClickUpdate"/>
 
+        <Button
+            android:id="@+id/ResetDB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Reset Database"
+            android:onClick="onClickResetDB"/>
         <!--
         <TextView
             android:id="@+id/exportLbl"

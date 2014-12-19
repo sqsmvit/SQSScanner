@@ -52,6 +52,29 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/masnumRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <TextView
+                android:id="@+id/masnumLbl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/listMar"
+                android:text="Masnum"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <EditText
+                android:id="@+id/editMasnum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" >
+            </EditText>
+        </TableRow>
+
+        <TableRow
             android:id="@+id/editScanRow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

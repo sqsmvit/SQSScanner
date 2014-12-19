@@ -38,7 +38,8 @@
 	    	    \tWait for beep and try to scan.\n
 	    	2. Exit and restart app\n  
 	    	    \tWait for beep and try to scan\n
-	    	3. Contact Manager\n</string>
+	    	3. Contact Manager\n
+</string>
     <string name="tsText_restart">1.Restart device using small button</string>
     <string name="tsText_scan">2. Scan above barcode</string>
     <string name="tsText_app">3. Exit and restart app </string>
@@ -51,7 +52,7 @@
     <string name="qtyIdx">2</string>
     <string name="dateIdx">3</string>
     <string name="title">Title:</string>
-    <string name="scan">Scan</string>
+    <string name="scan">Title</string>
     <string name="linesForThisPull">Scans for this Pull:</string>
     <string name="totalScanCount">Total Count for this Pull:</string>
     <string name="totalTitleCount">Total Count for this Title:</string>

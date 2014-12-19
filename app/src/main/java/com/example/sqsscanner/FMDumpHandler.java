@@ -103,8 +103,8 @@ public class FMDumpHandler implements Runnable {
 		dataSource.open();
 		dbItems.putAll(this.dataSource.getSha());
 
-		File xmlFile = copyDBXFile();
-        //File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + this.file);
+		//File xmlFile = copyDBXFile();
+        File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + this.file);
 		
 		InputStreamReader in = new InputStreamReader(new FileInputStream(xmlFile));
 		
@@ -229,7 +229,7 @@ public class FMDumpHandler implements Runnable {
 			Log.d(TAG, message);
 		}
 		dataSource.close();
-		//xmlFile.delete();
+		xmlFile.delete();
 		return true;
 	}
 

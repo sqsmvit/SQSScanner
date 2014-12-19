@@ -1,13 +1,13 @@
 package com.example.sqsscanner;
 
+import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-
-import android.database.Cursor;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * @author ChrisS
@@ -68,15 +68,14 @@ public class ScanRecord implements Parcelable
 	/**
 	 * @param cur
 	 */
-	public ScanRecord(Cursor cur){
-		
+	public ScanRecord(Cursor cur)
+    {
 		if(cur.getPosition() == -1){
 			cur.moveToFirst();
 		}	
 		for(int i = 1; i < cur.getColumnCount(); i++){
 				
 			switch(i){
-			
 			case 1: this.scanEntry = cur.getString(i);
 					break;
 			case 2:	this.pullNumber = cur.getString(i);
@@ -89,17 +88,12 @@ public class ScanRecord implements Parcelable
 					break;
 			case 6:	this.title = cur.getString(i);
 					break;
-			case 7:	this.masNum = cur.getString(i);
+			case 7:	this.priceList = cur.getString(i);
 					break;
-			case 8: this.priceList = cur.getString(i);
+			case 8: this.masNum = cur.getString(i);
 					break;
-
-					
 			}
-				
-		}		
-			
-		
+		}
 	}
 	
 	/**

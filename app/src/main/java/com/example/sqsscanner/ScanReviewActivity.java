@@ -52,7 +52,8 @@ public class ScanReviewActivity extends ExpandableListActivity {
 		{
 
 			int id = groupCursor.getInt(groupCursor.getColumnIndex(ScanTable._ID));
-			Cursor childCursor =  scanDataSource.getValueByID(id, new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST});
+			//Cursor childCursor =  scanDataSource.getValueByID(id, new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST});
+            Cursor childCursor =  scanDataSource.getValueByID(id);
 			childCursor.moveToFirst();
 			return childCursor;
 			
@@ -126,10 +127,10 @@ public class ScanReviewActivity extends ExpandableListActivity {
 
 		     if(resultCode == RESULT_OK){ 
 		    	 
-		    	 Bundle b = data.getExtras();
-		    	 ScanRecord editScan = b.getParcelable("EDIT_RECORD");
+		    	 //Bundle b = data.getExtras();
+		    	 //ScanRecord editScan = b.getParcelable("EDIT_RECORD");
 
-		    	 scanDataSource.insertScan(editScan);
+		    	 //scanDataSource.insertScan(editScan);
 				 scanAdapter.changeCursor(scanDataSource.getScansByPullId(pullKey));
 				 scanAdapter.notifyDataSetChanged();
 
@@ -204,13 +205,14 @@ public class ScanReviewActivity extends ExpandableListActivity {
 		tempCursor.moveToPosition(pos);
 		ScanRecord editScan = new ScanRecord(tempCursor);
 
-		this.scanDataSource.delScansById(Integer.toString(tempCursor.getInt(tempCursor.getColumnIndex(ScanTable._ID))));
-		
+		//this.scanDataSource.delScansById(Integer.toString(tempCursor.getInt(tempCursor.getColumnIndex(ScanTable._ID))));
 
+        int scanPkey = tempCursor.getInt(tempCursor.getColumnIndex(ScanTable._ID));
 
 		Intent intent = new Intent(this, EditRecordActivity.class);
 		Bundle b = new Bundle();
-		b.putParcelable("EDIT_SCAN", editScan);
+        b.putInt("EDIT_SCAN", scanPkey);
+		//b.putParcelable("EDIT_SCAN", editScan);
 		intent.putExtras(b);
 		startActivityForResult(intent, 1);
 	}   

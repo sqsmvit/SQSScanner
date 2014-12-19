@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import com.example.sqsscanner.DB.DBAdapter;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -126,6 +128,41 @@ public class AdminActivity extends ListActivity
    		Toast.makeText(this, "DB Update starting...", Toast.LENGTH_LONG).show();
    		
 	}
+
+    public void onClickResetDB(View v)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        // set title
+        alertDialogBuilder.setTitle("Reset DB");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Are you sure you want to reset the database?")
+                .setCancelable(false)
+                .setPositiveButton("Yes",new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog,int id)
+                    {
+                        DBAdapter dbAdapter = new DBAdapter(context);
+                        dbAdapter.resetAll();
+                    }
+                })
+                .setNegativeButton("No",new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 	
 	private int[] getSchemaResIds(){
 		
@@ -208,44 +245,37 @@ public class AdminActivity extends ListActivity
 		final String fileName = selected.getName();
 
 			
-			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+	    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 			 
-			// set title
-			alertDialogBuilder.setTitle("Export Backup");
+		// set title
+		alertDialogBuilder.setTitle("Export Backup");
  
-			// set dialog message
-			alertDialogBuilder
-				.setMessage("Send Backup to DropBox?")
-				.setCancelable(false)
-				.setPositiveButton("Yes",new DialogInterface.OnClickListener()
-				{
-					@Override
-					public void onClick(DialogInterface dialog,int id)
-					{
-						try
-						{
-							exportBackup(selected, fileName);
-						}
-						catch (IOException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				})
-				.setNegativeButton("No",new DialogInterface.OnClickListener()
-				{
-					@Override
-					public void onClick(DialogInterface dialog,int id)
-					{
-						// if this button is clicked, just close
-						// the dialog box and do nothing
-						dialog.cancel();
-					}
-				});
-				// create alert dialog
-				AlertDialog alertDialog = alertDialogBuilder.create();
-				alertDialog.show();
+		// set dialog message
+		alertDialogBuilder
+			.setMessage("Send Backup to DropBox?")
+			.setCancelable(false)
+			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    try {
+                        exportBackup(selected, fileName);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            })
+			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // if this button is clicked, just close
+                    // the dialog box and do nothing
+                    dialog.cancel();
+                }
+            });
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 	/**

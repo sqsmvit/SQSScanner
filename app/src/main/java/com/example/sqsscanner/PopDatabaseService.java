@@ -39,7 +39,8 @@ public class PopDatabaseService extends IntentService
 	}
 
 	@Override
-	protected void onHandleIntent(Intent intent) {
+	protected void onHandleIntent(Intent intent)
+    {
 		
 		Log.i(TAG, "Received an Intent: " + intent);
 		String[] xmlFiles = intent.getStringArrayExtra("XML_FILES");
@@ -49,16 +50,14 @@ public class PopDatabaseService extends IntentService
 		//TODO: Uncomment when pull list info is being used
 		//DataSource[] dataSources = new DataSource[] {new ProductsDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new PullListDataSource(this), new PullLinesDataSource(this)};
 		
-		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new ProductLensDataSource(this)};
-		//makeNotification("Dropbox Download Started", false);
+		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new ProductLensDataSource(this)};//, new PullListDataSource(this)};
+		makeNotification("Dropbox Download Started", false);
 
-        LensDataSource lds = new LensDataSource(this);
-        lds.open();
-        lds.resetDB();
-        lds.close();
-        //Download file.zip from DropBox
-        //downloadDBXZip();
-        //unzip(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
+        //Download files.zip from DropBox
+        downloadDBXZip();
+        File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
+        unzip(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
+        zipFile.delete();
 
         makeNotification("Database Update Started", false);
 
@@ -71,7 +70,7 @@ public class PopDatabaseService extends IntentService
 			i += 1;
 		}
 
-		makeNotification("Database Update Finished", true);
+        makeNotification("Database Update Finished", true);
 	}
 
     private void downloadDBXZip()
@@ -82,7 +81,11 @@ public class PopDatabaseService extends IntentService
 
         try
         {
-            DbxFile dbxXml = dbxMan.openFile("/out/" + zipFileName);
+            DbxFile dbxXml = dbxMan.openFile("/out/lens.xml");
+            dbxMan.writeToStorage(dbxXml.getReadStream(), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/lens.xml");
+            dbxXml.close();
+            //DbxFile
+            dbxXml = dbxMan.openFile("/out/" + zipFileName);
             dbxMan.writeToStorage(dbxXml.getReadStream(), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
             dbxXml.close();
             Log.i(this.toString(), "It worked!");

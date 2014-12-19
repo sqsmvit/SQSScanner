@@ -1,9 +1,9 @@
 package com.example.sqsscanner;
 
 
-import java.util.ArrayList;
-
 import android.database.Cursor;
+
+import java.util.ArrayList;
 
 public class PullList {
 
@@ -16,6 +16,8 @@ public class PullList {
 	private String scheduledDate; //4
 	private int manQty; //5
 	private int pullQty; //6
+    private String fkLens;
+    private String fkPriceList;
 	
 	public PullList(){}
 	

@@ -91,8 +91,8 @@ public class PriceListDataSource implements DataSource {
 	}
 
 	@Override
-	public HashMap<String, String> getSha() {
-		
+	public HashMap<String, String> getSha()
+    {
 		HashMap<String, String> mapIds= new HashMap<String, String>();
 		
 		String tempPK;
@@ -111,17 +111,14 @@ public class PriceListDataSource implements DataSource {
 				mapIds.put(tempPK, tempSha);
 				
 				
-			}while(c.moveToNext());
-			
-			
+			} while(c.moveToNext());
 		}
-		
 		return mapIds;
 	}
 
 	@Override
-	public void insertBatch(ArrayList<ArrayList<String>> batch) {
-		
+	public void insertBatch(ArrayList<ArrayList<String>> batch)
+    {
 		final SQLiteStatement query = this.db.compileStatement(INSERT_QUERY);
 		db.beginTransaction();
 		try{
@@ -138,12 +135,12 @@ public class PriceListDataSource implements DataSource {
 				query.executeInsert();
 			
 			}
-		}finally{
+		}
+        finally
+        {
 			this.db.setTransactionSuccessful();
 			this.db.endTransaction();
-			
-		}	
-		
+		}
 	}
 		
 	

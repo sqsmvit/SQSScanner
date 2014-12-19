@@ -1,16 +1,16 @@
   package com.example.sqsscanner.DB;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.sqsscanner.ScanRecord;
 import com.example.sqsscanner.DB.ScanContract.ScanTable;
+import com.example.sqsscanner.ScanRecord;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ScanDataSource implements DataSource
 {
@@ -187,7 +187,7 @@ public class ScanDataSource implements DataSource
 				i++;
 			}while(cur.moveToNext());
 		}
-		return pulls;
+        return pulls;
 		
 	}
 		
@@ -201,15 +201,13 @@ public class ScanDataSource implements DataSource
 		
 	}
 
-	public Cursor getValueByID(int id, String[] selCols) {
-		
+	public Cursor getValueByID(int id)
+    {
 		String query = new QueryBuilder().buildSelectQuery(DB_TABLE, new String[]{"*"}, new String[]{ScanTable._ID});
 		
 		return this.db.rawQuery(query, new String[]{Integer.toString(id)});
 		
 		//return this.db.rawQuery(query, new String[]{Integer.toString(id)});
-	
-		
 	}
 	
 	public Cursor getValueByMarkID(int id, String[] selCols){
@@ -218,6 +216,13 @@ public class ScanDataSource implements DataSource
 		return this.db.rawQuery(query, new String[]{Integer.toString(id)});	
 		
 	}
-	
 
+    public int updateRecordByID(int id, ScanRecord editRecord)
+    {
+        ContentValues values = new ContentValues();
+        values.put(ScanTable.COLUMN_NAME_FK_PULL_ID, editRecord.getPullNumber());
+        values.put(ScanTable.COLUMN_NAME_QUANTITY, editRecord.getQuantity());
+
+        return db.update(DB_TABLE, values, ScanTable._ID + " = ?", new String[]{String.valueOf(id)});
+    }
 }

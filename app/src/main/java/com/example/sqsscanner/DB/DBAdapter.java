@@ -71,13 +71,15 @@ public class DBAdapter extends SQLiteOpenHelper
 	private static final String CREATE_TABLE_PULL_LIST = 
 			"CREATE TABLE " +
 			PullListTable.TABLE_NAME + "(" +
-			PullListTable.COLUMN_NAME_PK_PULL_ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
+			PullListTable.COLUMN_NAME_PK_PULL_ID + " STRING PRIMARY KEY" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_NAME + " TEXT" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_PULLED_FOR + " TEXT" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_JOB_NUMBER + " INTEGER" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_SCHEDULED_DATE + " TEXT" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_MANUAL_QTY + " INTEGER" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_PULL_QTY + " INTEGER" +  COMMA_SEP +
+            PullListTable.COLUMN_NAME_FKLENS + " TEXT" + COMMA_SEP +
+            PullListTable.COLUMN_NAME_FKPRICELIST + " TEXT" + COMMA_SEP +
 			PullListTable.COLUMN_NAME_SHA + " TEXT " +
 			");";
 	
@@ -101,6 +103,7 @@ public class DBAdapter extends SQLiteOpenHelper
             ProductLensTable.COLUMN_NAME_FK_MASNUM + " TEXT " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_FK_LENSID + " TEXT " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_FK_PRICELISTID + " TEXT" + COMMA_SEP +
+            ProductLensTable.COLUMN_NAME_PK_PRODUCTLENS + " TEXT PRIMARY KEY " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_SHA + " TEXT" + ")";
 
     public static final String CREATE_TABLE_LENS =
@@ -126,10 +129,9 @@ public class DBAdapter extends SQLiteOpenHelper
 			ScanTable.COLUMN_NAME_RATING + " TEXT " + 
 			")";
 	
-	public DBAdapter(Context ctx){
-		
+	public DBAdapter(Context ctx)
+    {
 		super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
-		
 	}
 
 	@Override
@@ -138,15 +140,16 @@ public class DBAdapter extends SQLiteOpenHelper
 		db.execSQL(CREATE_TABLE_PRODUCT);
 		db.execSQL(CREATE_TABLE_UPC);
 		db.execSQL(CREATE_TABLE_PRICE_LIST);
-		//db.execSQL(CREATE_TABLE_PULL_LIST);
-		//db.execSQL(CREATE_TABLE_PULL_LINES);
-        db.execSQL(CREATE_TABLE_LENS);
+		db.execSQL(CREATE_TABLE_LENS);
         db.execSQL(CREATE_TABLE_PRODUCT_LENS);
+        //db.execSQL(CREATE_TABLE_PULL_LIST);
+        //db.execSQL(CREATE_TABLE_PULL_LINES);
         db.execSQL(CREATE_TABLE_SCANS);
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {
 		// TODO Auto-generated method stub
 		
 		db.execSQL(DROP_TABLE + ProductTable.TABLE_NAME);
@@ -156,8 +159,34 @@ public class DBAdapter extends SQLiteOpenHelper
         db.execSQL(DROP_TABLE + ProductLensTable.TABLE_NAME);
         //db.execSQL(DROP_TABLE + PullListTable.TABLE_NAME);
 		//db.execSQL(DROP_TABLE + PullLinesTable.TABLE_NAME);
-        onCreate(db);
-		
+
+        db.execSQL(CREATE_TABLE_PRODUCT);
+        db.execSQL(CREATE_TABLE_UPC);
+        db.execSQL(CREATE_TABLE_PRICE_LIST);
+        db.execSQL(CREATE_TABLE_LENS);
+        db.execSQL(CREATE_TABLE_PRODUCT_LENS);
+        //db.execSQL(CREATE_TABLE_PULL_LIST);
+        //db.execSQL(CREATE_TABLE_PULL_LINES);
 	}
-			
+
+    public void resetAll()
+    {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.execSQL(DROP_TABLE + ProductTable.TABLE_NAME);
+        db.execSQL(DROP_TABLE + UPCTable.TABLE_NAME);
+        db.execSQL(DROP_TABLE + PriceListTable.TABLE_NAME);
+        db.execSQL(DROP_TABLE + LensTable.TABLE_NAME);
+        db.execSQL(DROP_TABLE + ProductLensTable.TABLE_NAME);
+        //db.execSQL(DROP_TABLE + PullListTable.TABLE_NAME);
+        //db.execSQL(DROP_TABLE + PullLinesTable.TABLE_NAME);
+
+        db.execSQL(CREATE_TABLE_PRODUCT);
+        db.execSQL(CREATE_TABLE_UPC);
+        db.execSQL(CREATE_TABLE_PRICE_LIST);
+        db.execSQL(CREATE_TABLE_LENS);
+        db.execSQL(CREATE_TABLE_PRODUCT_LENS);
+        //db.execSQL(CREATE_TABLE_PULL_LIST);
+        //db.execSQL(CREATE_TABLE_PULL_LINES);
+    }
 }

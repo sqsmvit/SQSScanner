@@ -1,8 +1,5 @@
 package com.example.sqsscanner.DB;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -10,12 +7,15 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
-import com.example.sqsscanner.PullList;
 import com.example.sqsscanner.DB.PullListContract.PullListTable;
+import com.example.sqsscanner.PullList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
-public class PullListDataSource implements DataSource {
-
+public class PullListDataSource implements DataSource
+{
 	private SQLiteDatabase db;
 	private DBAdapter dbAdapter;
 	private static String DB_TABLE = PullListTable.TABLE_NAME;
@@ -28,8 +28,9 @@ public class PullListDataSource implements DataSource {
 			PullListTable.COLUMN_NAME_SCHEDULED_DATE,
 			PullListTable.COLUMN_NAME_MANUAL_QTY,
 			PullListTable.COLUMN_NAME_PULL_QTY,
+            PullListTable.COLUMN_NAME_FKLENS,
+            PullListTable.COLUMN_NAME_FKPRICELIST,
 			PullListTable.COLUMN_NAME_SHA
-						
 	};
 	private static final String INSERT_QUERY = new QueryBuilder().buildInsertQuery(DB_TABLE, dbCols);
 	private static final String DB_QUERY = "Select * FROM " + PullListTable.TABLE_NAME + " WHERE " + PullListTable.COLUMN_NAME_PK_PULL_ID + "= ?" ;
@@ -136,10 +137,9 @@ public class PullListDataSource implements DataSource {
 	 * @param pullNum
 	 * @return
 	 */
-	public boolean deletePullList(int pullNum){
-		
+	public boolean deletePullList(int pullNum)
+    {
 		return this.db.delete(DB_TABLE, PullListTable.COLUMN_NAME_PK_PULL_ID + "=" + Integer.toString(pullNum), null) > 0;
-		
 	}
 	
 	/**
@@ -207,12 +207,11 @@ public class PullListDataSource implements DataSource {
 				query.executeInsert();
 			
 			}
-		}finally{
+		}
+        finally
+        {
 			this.db.setTransactionSuccessful();
 			this.db.endTransaction();
-			
-		}	
-		
+		}
 	}
-
 }

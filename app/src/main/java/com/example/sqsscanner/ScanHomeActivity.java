@@ -27,6 +27,8 @@ import com.example.sqsscanner.DB.ScanDataSource;
 import com.example.sqsscanner.DB.UPCDataSource;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 //import java.util.Calendar;
@@ -333,6 +335,7 @@ public class ScanHomeActivity extends Activity
 	@Override
 	protected void onResume()
 	{
+        super.onResume();
 		String message = String.format("in onResume");
 		Log.d(TAG, message);
 		
@@ -376,7 +379,11 @@ public class ScanHomeActivity extends Activity
 			PullReviewActivity.FILE_EXPORTED = false;
 		}
 
-		super.onResume();
+        String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
+        if(!(buildDate.equals(getSharedPreferences("scanConfig", 0).getString("buildDate", ""))))
+        {
+            finish();
+        }
 	}
 	/**
 	 * @param data
