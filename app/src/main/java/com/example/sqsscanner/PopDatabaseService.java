@@ -53,6 +53,17 @@ public class PopDatabaseService extends IntentService
 		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new ProductLensDataSource(this)};//, new PullListDataSource(this)};
 		makeNotification("Dropbox Download Started", false);
 
+        //Needed for X and X2
+        LensDataSource lds = new LensDataSource(this);
+        lds.open();
+        lds.resetDB();
+        lds.close();
+
+        ProductLensDataSource plds = new ProductLensDataSource(this);
+        plds.open();
+        plds.resetDB();
+        plds.close();
+
         //Download files.zip from DropBox
         downloadDBXZip();
         File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);

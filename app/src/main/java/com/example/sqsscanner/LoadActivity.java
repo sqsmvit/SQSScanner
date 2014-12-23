@@ -142,5 +142,13 @@ public class LoadActivity extends Activity {
 			}
 		}.start();
 	}
+
+    public void testFunction(View v)
+    {
+        ProductLensDataSource plds = new ProductLensDataSource(this);
+        plds.open();
+        plds.getSha();
+        plds.close();
+    }
 }
 

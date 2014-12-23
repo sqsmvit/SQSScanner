@@ -62,9 +62,9 @@ public class DBAdapter extends SQLiteOpenHelper
 	private static final String CREATE_TABLE_PRICE_LIST = 
 			"CREATE TABLE " +
 			PriceListTable.TABLE_NAME + "(" +
+            PriceListTable.COLUMN_NAME_PK_PRICE_LIST + " TEXT PRIMARY KEY" + COMMA_SEP +
             PriceListTable.COLUMN_NAME_PRICELISTNAME + " TEXT " + COMMA_SEP +
 			PriceListTable.COLUMN_NAME_ACTIVE + " INTEGER" + COMMA_SEP +
-            PriceListTable.COLUMN_NAME_PK_PRICE_LIST + " TEXT PRIMARY KEY" + COMMA_SEP +
             PriceListTable.COLUMN_NAME_SHA + " TEXT " +
 			");";
 	
@@ -100,10 +100,10 @@ public class DBAdapter extends SQLiteOpenHelper
     public static final String CREATE_TABLE_PRODUCT_LENS =
             "CREATE TABLE " +
             ProductLensTable.TABLE_NAME + "(" +
+            ProductLensTable.COLUMN_NAME_PK_PRODUCTLENS + " TEXT PRIMARY KEY " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_FK_MASNUM + " TEXT " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_FK_LENSID + " TEXT " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_FK_PRICELISTID + " TEXT" + COMMA_SEP +
-            ProductLensTable.COLUMN_NAME_PK_PRODUCTLENS + " TEXT PRIMARY KEY " + COMMA_SEP +
             ProductLensTable.COLUMN_NAME_SHA + " TEXT" + ")";
 
     public static final String CREATE_TABLE_LENS =

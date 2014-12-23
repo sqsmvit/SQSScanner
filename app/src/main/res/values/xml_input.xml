@@ -50,9 +50,9 @@
     </string-array>
     
     <string-array name="for_priceList">
+        <item>pricelistid</item>
         <item>pricelist</item>
         <item>active</item>
-        <item>pricelistid</item>
         <item>sha</item>
     </string-array>
     
@@ -77,10 +77,10 @@
     </string-array>
 
     <string-array name="for_productLens">
+        <item>productlensid</item>
         <item>masnum</item>
         <item>lensid</item>
         <item>pricelistid</item>
-        <item>pk</item>
         <item>sha</item>
     </string-array>
 

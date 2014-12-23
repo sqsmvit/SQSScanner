@@ -22,9 +22,9 @@ public class PriceListDataSource implements DataSource {
 	private static String DB_TABLE = PriceListTable.TABLE_NAME;
 	
 	public static String[] priceListCols = {
+            PriceListTable.COLUMN_NAME_PK_PRICE_LIST,
             PriceListTable.COLUMN_NAME_PRICELISTNAME,
 			PriceListTable.COLUMN_NAME_ACTIVE,
-            PriceListTable.COLUMN_NAME_PK_PRICE_LIST,
             PriceListTable.COLUMN_NAME_SHA
 	};
 	

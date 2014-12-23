@@ -45,5 +45,13 @@
         android:layout_alignRight="@+id/reminder"
         android:onClick="startScan"
         android:text="@string/startScan" />
-
+    <!--
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/testButton"
+        android:layout_centerInParent="true"
+        android:onClick="testFunction"
+        android:text="Test"/>
+    -->
 </RelativeLayout>
