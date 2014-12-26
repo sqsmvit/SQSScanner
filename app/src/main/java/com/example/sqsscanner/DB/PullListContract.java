@@ -18,6 +18,6 @@ public class PullListContract
 		public static final String COLUMN_NAME_PULL_QTY = "pullQty";
         public static final String COLUMN_NAME_FKLENS = "fkLens";
         public static final String COLUMN_NAME_FKPRICELIST = "fkPriceList";
-		public static final String COLUMN_NAME_SHA = "sha";
+		public static final String COLUMN_NAME_SHA = "SHA";
 	}
 }

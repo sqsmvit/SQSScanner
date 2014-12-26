@@ -12,6 +12,6 @@ public final class LensContract
         public static final String COLUMN_NAME_PK_LENSID = "pkLensId";
         public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_DESCRIPTION = "description";
-        public static final String COLUMN_NAME_SHA = "sha";
+        public static final String COLUMN_NAME_SHA = "SHA";
     }
 }

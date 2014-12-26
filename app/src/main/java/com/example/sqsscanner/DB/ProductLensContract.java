@@ -13,6 +13,6 @@ public class ProductLensContract
         public static final String COLUMN_NAME_FK_MASNUM = "fkMasnum";
         public static final String COLUMN_NAME_FK_LENSID = "fkLensId";
         public static final String COLUMN_NAME_FK_PRICELISTID = "fkPriceListId";
-        public static final String COLUMN_NAME_SHA = "sha";
+        public static final String COLUMN_NAME_SHA = "SHA";
     }
 }

@@ -54,6 +54,7 @@ public class PopDatabaseService extends IntentService
 		makeNotification("Dropbox Download Started", false);
 
         //Needed for X and X2
+        /*
         LensDataSource lds = new LensDataSource(this);
         lds.open();
         lds.resetDB();
@@ -63,7 +64,7 @@ public class PopDatabaseService extends IntentService
         plds.open();
         plds.resetDB();
         plds.close();
-
+        */
         //Download files.zip from DropBox
         downloadDBXZip();
         File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);

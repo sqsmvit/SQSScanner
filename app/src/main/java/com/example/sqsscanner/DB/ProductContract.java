@@ -29,5 +29,5 @@ public class ProductContract
 		public static final String COLUMN_NAME_THEATER_DATE = "theaterDate";
 		public static final String COLUMN_NAME_STUDIO_NAME = "studioName";
 		public static final String COLUMN_NAME_SHA = "SHA";
-	}
+    }
 }

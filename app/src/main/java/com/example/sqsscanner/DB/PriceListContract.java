@@ -9,10 +9,10 @@ public final class PriceListContract {
 	public static abstract class PriceListTable implements BaseColumns
     {
 		public static final String TABLE_NAME = "PriceList";
+        public static final String COLUMN_NAME_PK_PRICE_LIST = "pkPriceList";
         public static final String COLUMN_NAME_PRICELISTNAME = "priceList";
 		public static final String COLUMN_NAME_ACTIVE = "active";
-        public static final String COLUMN_NAME_PK_PRICE_LIST = "pkPriceList";
-        public static final String COLUMN_NAME_SHA = "sha";
+        public static final String COLUMN_NAME_SHA = "SHA";
 	}
 	
 }

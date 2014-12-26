@@ -2,6 +2,9 @@ package com.example.sqsscanner;
 
 import android.database.Cursor;
 
+import com.example.sqsscanner.DB.PriceListContract;
+import com.example.sqsscanner.DB.ProductContract.ProductTable;
+
 import java.util.ArrayList;
 
 public class Product {
@@ -172,6 +175,7 @@ public class Product {
 		if (dbCur.moveToFirst())
 		{
 			//dbCur.getColumnCount();
+            /*
 			int idx = dbCur.getPosition();
 			do
 			{
@@ -243,6 +247,60 @@ public class Product {
 				}
 				idx++;
 			}while (idx < dbCur.getColumnCount());
+			*/
+
+            final String pList = "COALESCE(prl.priceList,'N/A')";
+            int idx = 0;
+            do
+            {
+                if(idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_PK_MAS_ID))
+                    this.masNum = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_TITLE_NAME))
+                    this.title = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_CATEGORY))
+                    this.category = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_RATING))
+                    this.rating = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_STREET_DATE))
+                    this.streetDate = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_TITLE_FILM))
+                    this.titleFilm = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_NO_COVER))
+                    this.noCover = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_FK_PRICE_LIST))
+                    this.priceList = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_NEW))
+                    this.isNew = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_BOXSET))
+                    this.isBoxSet = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_MULTIPACK))
+                    this.multipack = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_MEDIA_FORMAT))
+                    this.mediaFormat = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_PRICE_FILTERS))
+                    this.priceFilters = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_SPECIAL_FIELDS))
+                    this.specialFields = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_STUDIO))
+                    this.studio = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_SEASON))
+                    this.season = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_NUMBER_OF_DISCS))
+                    this.numberOfDiscs = dbCur.getInt(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_THEATER_DATE))
+                    this.theaterDate = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_STUDIO_NAME))
+                    this.studioName = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(ProductTable.COLUMN_NAME_SHA))
+                    this.sha = dbCur.getString(idx);
+                else if (idx == dbCur.getColumnIndex(PriceListContract.PriceListTable.COLUMN_NAME_PRICELISTNAME))
+                {
+                    this.priceList = dbCur.getString(idx);
+                    if(this.priceList == null)
+                        this.priceList = "N/A";
+                }
+                idx++;
+            } while (idx < dbCur.getColumnCount());
 		}
 	}
 

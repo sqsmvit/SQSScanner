@@ -12,7 +12,7 @@ public class PullLinesContract {
 		public static final String COLUMN_NAME_FK_PULL_ID = "fkPull";
 		public static final String COLUMN_NAME_FK_MASNUM = "fkMasnum";
 		public static final String COLUMN_NAME_SCHEDULED_QTY = "scheduledQty";
-		public static final String COLUMN_NAME_SHA = "sha";
+		public static final String COLUMN_NAME_SHA = "SHA";
 		
 	}
 }
