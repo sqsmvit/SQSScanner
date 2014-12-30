@@ -36,10 +36,11 @@
     <string name="tsText">        If scanner does not work try these steps:\n
 	    	1. Restart scanner using small button.\n
 	    	    \tWait for beep and try to scan.\n
-	    	2. Exit and restart app\n  
+            2. Re-pair scanner following instructions below.\n
 	    	    \tWait for beep and try to scan\n
-	    	3. Contact Manager\n
-</string>
+	    	3. Exit and restart app\n
+	    	    \tWait for beep and try to scan\n
+	    	4. Contact Manager\n</string>
     <string name="tsText_restart">1.Restart device using small button</string>
     <string name="tsText_scan">2. Scan above barcode</string>
     <string name="tsText_app">3. Exit and restart app </string>
@@ -90,12 +91,19 @@
     <string name="dbx">DropBox</string>
     <string name="sdCard">SD Card</string>
     <string name="exportLbl">Export Method:</string>
-	<string name = "backButton">Back Button</string>
-	<string name = "file">File</string>
-	<string name = "date">Date</string>
-	<string name = "size">Size</string>
-	<string name = "massDelete">Del All</string>
-	
+    <string name="backButton">Back Button</string>
+    <string name="file">File</string>
+    <string name="date">Date</string>
+    <string name="size">Size</string>
+    <string name="massDelete">Del All</string>
+
+    <!-- Pair Activity -->
+    <string name="pairHeader">Pair Instructions</string>
+    <string name="pairInstruction1">1) Hold Scan and Power buttons until device restarts</string>
+    <string name="pairInstruction2">2) Scan SPP Barcode</string>
+    <string name="pairInstruction3">3) Scan barcode below, then accept pairing request if prompted</string>
+    <string name="pairInstruction4">4) Wait for single beep and try to scan</string>
+
     <!-- ScanApi -->
     <string name="scanner_NoDevice">No Scanner Connected!</string>
     <string name="title_activity_check_dbx">CheckDBX</string>
@@ -105,8 +113,8 @@
     <string name="noMark">No Skid</string>
     <string name="title_activity_mark_scan">MarkScanActivity</string>
     <string name="title_activity_load">LoadActivity</string>
-
     <string name="ERR_WIFI">Must be connected to WiFi to start scan!</string>
-    <string name = "ERR_DROPBOX">Error connecting to DropBox!</string>
-    
+    <string name="ERR_DROPBOX">Error connecting to DropBox!</string>
+    <string name="title_activity_socket_mobile_pair">Pair Scanner</string>
+
 </resources>

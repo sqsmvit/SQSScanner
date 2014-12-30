@@ -41,7 +41,7 @@ public class ScanConfigActivity  extends Activity
     private LinearLayout billBArea;
     private ToggleButton billBToggle, invAdjustToggle;
 	private RadioGroup invModeRGroup;
-    Button lockBillBAccess;
+    Button lockBillBAccess, pairScanner;
     private boolean hasBillBAccess;
 	private int invModeChoice;
     private LensDataSource lensDataSource;
@@ -66,6 +66,7 @@ public class ScanConfigActivity  extends Activity
         invAdjustToggle = (ToggleButton)findViewById(R.id.invAdjustMode);
         invModeRGroup = (RadioGroup)findViewById(R.id.invModeGroup);
         lockBillBAccess = (Button)findViewById(R.id.LockBillBAccess);
+        pairScanner =  (Button)findViewById(R.id.PairScanner);
 
 		setSpinner(autoCount, R.array.autoCounts);
 		autoCount.setSelection(scanConfig.getInt("autoCountIdx", 0));
@@ -211,6 +212,15 @@ public class ScanConfigActivity  extends Activity
                     billBToggle.setChecked(true);
                     break;
                 }
+            }
+        });
+
+        pairScanner.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                goToPairActivity();
             }
         });
 
@@ -397,6 +407,12 @@ public class ScanConfigActivity  extends Activity
     {
         lensDataSource.close();
         super.onPause();
+    }
+
+    private void goToPairActivity()
+    {
+        Intent intent = new Intent(this, SocketMobilePairActivity.class);
+        startActivity(intent);
     }
 	
 	/*

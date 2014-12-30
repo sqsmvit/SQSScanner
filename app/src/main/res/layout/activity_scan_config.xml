@@ -311,6 +311,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/PairScanner"
+        android:text="PairScanner/Trouble Shoot"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/listMar"/>
+
+    <!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -324,15 +333,14 @@
             android:layout_marginTop="@dimen/listMar"
             android:text="@string/troubleShooting"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-<!-- 
+
         <ImageView
             android:id="@+id/bt_address"
             android:layout_width="match_parent"
             android:layout_height="90dp"
             android:padding="@dimen/radTopMar"
-            android:scaleType="fitCenter"
-            />
- -->
+            android:scaleType="fitCenter" />
+
         <TextView
             android:id="@+id/ts1"
             android:layout_width="wrap_content"
@@ -340,6 +348,6 @@
             android:layout_margin="@dimen/listMar"
             android:text="@string/tsText"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
     </LinearLayout>
+     -->
 </LinearLayout>
