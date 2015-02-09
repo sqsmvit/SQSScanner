@@ -138,7 +138,7 @@ public class CheckDBXActivity extends Activity {
 		else{
 			
 			displayErrMessage(this.getString(R.string.ERR_WIFI));
-
+            finish();
 			
 		}
 		
@@ -165,7 +165,7 @@ public class CheckDBXActivity extends Activity {
 			     else{
 			    	 
 			    	 displayErrMessage(this.getString(R.string.ERR_DROPBOX));
-			    	 
+			    	 finish();
 			     }
 		  }
 	}

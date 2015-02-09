@@ -72,7 +72,7 @@ public class ScanDataSource implements DataSource
 		if(compactMode)
 		{
 			String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_SCAN_ENTRY, "SUM("+ScanTable.COLUMN_NAME_QUANTITY+") As Total", ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_DATE, ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable.COLUMN_NAME_PRICEFILTERS, ScanTable.COLUMN_NAME_RATING};
-			return this.db.query(ScanTable.TABLE_NAME, cols, null, null, ScanTable.COLUMN_NAME_SCAN_ENTRY, null, ScanTable.COLUMN_NAME_TITLE);
+			return this.db.query(ScanTable.TABLE_NAME, cols, null, null, ScanTable.COLUMN_NAME_SCAN_ENTRY+ ", " + ScanTable.COLUMN_NAME_FK_PULL_ID, null, ScanTable.COLUMN_NAME_TITLE);
 		}
 		else
 		{
@@ -181,8 +181,8 @@ public class ScanDataSource implements DataSource
 		Cursor cur = this.db.query(true, ScanTable.TABLE_NAME, new String[]{ScanTable.COLUMN_NAME_FK_PULL_ID}, null, null, null, null, null, null);
 		String[] pulls = new String[cur.getCount()];
 		if(cur.moveToFirst()){
-			do{
-				
+			do
+            {
 				pulls[i] = cur.getString(0);
 				i++;
 			}while(cur.moveToNext());
