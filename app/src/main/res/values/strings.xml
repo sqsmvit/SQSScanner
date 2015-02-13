@@ -101,8 +101,9 @@
     <string name="pairHeader">Pair Instructions</string>
     <string name="pairInstruction1">1) Hold Scan and Power buttons until device restarts</string>
     <string name="pairInstruction2">2) Scan SPP Barcode</string>
-    <string name="pairInstruction3">3) Scan barcode below, then accept pairing request if prompted</string>
-    <string name="pairInstruction4">4) Wait for single beep and try to scan</string>
+    <string name="pairInstruction3">3) Scan barcode below</string>
+    <string name="pairInstruction4">4) Return to main screen of app and accept pairing request if prompted
+        \n5) Wait for single beep and try to scan</string>
 
     <!-- ScanApi -->
     <string name="scanner_NoDevice">No Scanner Connected!</string>

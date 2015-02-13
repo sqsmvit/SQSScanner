@@ -1,8 +1,5 @@
 package com.example.sqsscanner;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.content.Context;
 import android.os.Environment;
 import android.widget.Toast;
@@ -12,6 +9,9 @@ import com.dropbox.sync.android.DbxFile;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 
+import java.io.File;
+import java.io.IOException;
+
 /**ScanExport class handles all exports from the device to 
  * either the DropBox or the SD Card.  First create the object
  * then make a call to exportScan() to export the file.
@@ -20,12 +20,13 @@ import com.dropbox.sync.android.DbxPath;
  * @author ChrisS
  *
  */
-public class ScanExporter {
-
+public class ScanExporter
+{
 	private File exportFile;
-	private boolean isSD, fromCommit;
+	private boolean fromCommit;
 	private Context callingContext;
 	private DbxAccountManager mDbxAcctMgr;
+    private int exportMode;
 	
 	/**Creates a ScanExporter object which is used to export a
 	 * scan to DropBox through the DropBox Sync API or to the External
@@ -36,10 +37,10 @@ public class ScanExporter {
 	 * @param exportMode	true - export to SD Card
 	 * 						false - export to DropBox
 	 */
-	public ScanExporter(Context ctx, File exportFile, boolean exportMode, boolean fromCommit) {
-
+	public ScanExporter(Context ctx, File exportFile, int exportMode, boolean fromCommit)
+    {
 		this.exportFile = exportFile;
-		this.isSD = exportMode;
+		this.exportMode = exportMode;
 		this.fromCommit = fromCommit;
 		this.callingContext = ctx;
 		this.mDbxAcctMgr = DbxAccountManager.getInstance(ctx.getApplicationContext(), ctx.getString(R.string.DBX_APP_KEY), ctx.getString(R.string.DBX_SECRET_KEY));
@@ -53,6 +54,18 @@ public class ScanExporter {
 	 */
 	public boolean exportScan() throws IOException
 	{
+        String exportPath = "/Default/";
+        if(exportMode == 1 || exportMode == 2)
+            exportPath = "/PullScan/";
+        else if(exportMode == 3)
+            exportPath = "/BB/";
+        else if(exportMode == 4)
+            exportPath = "/Drew/";
+        else if(exportMode == 5)
+            exportPath = "/RI/";
+
+        return exportDBX(exportPath);
+        /*
 		if(isSD)
 		{
 			return exportSD();
@@ -60,7 +73,7 @@ public class ScanExporter {
 		else
 		{
 			return exportDBX();	
-		}
+		}*/
 	}
 	
 	/**Exports the File to the SD card,
@@ -77,7 +90,7 @@ public class ScanExporter {
 			File root = new File(Environment.getExternalStorageDirectory().toString() + "/Scans");
 			root.mkdirs();
 			File toSDFile = new File(root.getAbsolutePath(), this.exportFile.getName());
-			new ScanWriter(this.callingContext, isSD, this.exportFile.getName()).copyFile(exportFile, toSDFile);
+			new ScanWriter(this.callingContext, 0, this.exportFile.getName()).copyFile(exportFile, toSDFile);
 			Toast.makeText(this.callingContext, "File exported to SD card" , Toast.LENGTH_SHORT).show();
 			if(fromCommit)
 				this.exportFile.delete();
@@ -117,11 +130,11 @@ public class ScanExporter {
 	 * @return if export is successful
 	 * @throws IOException
 	 */
-	private boolean exportDBX() throws IOException
+	private boolean exportDBX(String exportPath) throws IOException
 	{
 		if(mDbxAcctMgr.hasLinkedAccount())
 		{
-			DbxPath scanPath = new DbxPath("/"+ this.exportFile.getName());
+			DbxPath scanPath = new DbxPath(exportPath + this.exportFile.getName());
 			DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
 			DbxFile tempFile = dbxFs.create(scanPath);
 			tempFile.getNewerStatus();

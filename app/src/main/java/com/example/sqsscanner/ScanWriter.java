@@ -1,5 +1,12 @@
 package com.example.sqsscanner;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.database.Cursor;
+import android.os.Environment;
+
+import com.example.sqsscanner.DB.ScanDataSource;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,16 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.database.Cursor;
-import android.os.Environment;
-
-import com.example.sqsscanner.DB.ScanDataSource;
-
 public class ScanWriter
 {
 	private Cursor dbCur;
+    private int exportMode;
 	private boolean compactMode;
 	private boolean invAdjMode;
 	private int invAdjChoice;
@@ -42,17 +43,27 @@ public class ScanWriter
 		getCursor();
 		setFileName();
 	}
+
+    public ScanWriter(Context ctx, int exportModeChoice, int invModeChoice)
+    {
+        this.callingContext = ctx;
+        this.sds = new ScanDataSource(callingContext);
+        this.exportMode = exportModeChoice;
+        this.invAdjChoice = invModeChoice;
+        getCursor();
+        setFileName();
+    }
 	
 	/**
 	 * @param ctx
-	 * @param isCompact
+	 * @param exportModeChoice
 	 * @param fileName
 	 */
-	public ScanWriter(Context ctx, boolean isCompact, String fileName)
+	public ScanWriter(Context ctx, int exportModeChoice, String fileName)
 	{
 		this.callingContext = ctx;
 		this.sds = new ScanDataSource(callingContext);
-		this.compactMode = isCompact;
+		this.exportMode = exportModeChoice;
 		getCursor();
 		this.fileName = fileName;
 	}
@@ -64,7 +75,7 @@ public class ScanWriter
 	private void getCursor()
 	{
 		this.sds.open();			
-		this.dbCur = sds.getScansForPrint(this.compactMode);		
+		this.dbCur = sds.getScansForPrint(exportMode);
 		this.colNames = dbCur.getColumnNames();
 	}
 	
@@ -72,7 +83,8 @@ public class ScanWriter
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean writeToFile() throws IOException{
+	public boolean writeToFile() throws IOException
+    {
 		this.dbCur.getColumnCount();
 		String writeString;
 		FileOutputStream output = this.callingContext.openFileOutput(this.fileName, Context.MODE_APPEND);
@@ -96,7 +108,7 @@ public class ScanWriter
 		
 		int i = 0;
 		
-		if(invAdjMode)
+		if(exportMode == 5)
 		{
 			if(invAdjChoice == 1)
 				writeString = "add\t";
@@ -107,31 +119,14 @@ public class ScanWriter
 		}
 		
 		//if there is no masNum write the scanEntry
-		if(dbCur.isNull(0))
+		if(!dbCur.isNull(0))
 		{
-			i++;
-		}
-		else
-		{	
 			writeString += dbCur.getString(0) + "\t";
-			i = 2;
 		}
-		
+        i++;
+
 		while(i < colNames.length)
 		{
-			if(i == 5 && !compactMode)
-			{
-				String defGateway = Utilities.getDefaultGateway(callingContext);
-				if(defGateway.matches("3.150.168.192"))
-					//Reading 3.150.168.192
-					writeString += "r\t";
-				else if(defGateway.matches("1.150.168.192"))
-					//PTown 1.150.168.192
-					writeString += "p\t";
-				else
-					writeString += "u\t";
-			}
-			
 			if(i == colNames.length-1)
 			{
 				writeString += this.dbCur.getString(dbCur.getColumnIndex(colNames[i])) + "\n";
@@ -158,10 +153,13 @@ public class ScanWriter
 		Date today = new Date();
 		SimpleDateFormat fileFmt = new SimpleDateFormat("yyMMdd_kkmm", Locale.US);
 		fileName =  deviceId + "_" + fileFmt.format(today);
-		if(invAdjMode)
-			fileName = "RI_"+ fileName;
-		else if(compactMode)
+        /*
+		if(exportMode == 3)
 			fileName = "BB_"+ fileName;
+		else if(exportMode == 4)
+			fileName = "DR_"+ fileName;
+        else if(exportMode == 5)
+            fileName = "RI_"+ fileName;*/
 		fileName += ".txt";
 	}
 		

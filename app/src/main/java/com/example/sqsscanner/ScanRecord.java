@@ -25,7 +25,7 @@ public class ScanRecord implements Parcelable
 	public String priceList;
 	public String priceFilters;
 	public String rating;
-
+    public String location;
 	
 	/**
 	 * 
@@ -41,7 +41,7 @@ public class ScanRecord implements Parcelable
 	 * @param priceList
 	 * @param masNum
 	 */
-	public ScanRecord(String scanEntry, String quantity, String pullNumber, String mark, String title, String priceList, String masNum, String priceFilters, String rating)
+	public ScanRecord(String scanEntry, String quantity, String pullNumber, String mark, String title, String priceList, String masNum, String priceFilters, String rating, String location)
 	{
 		super();
 		if(quantity.isEmpty())
@@ -62,6 +62,7 @@ public class ScanRecord implements Parcelable
 		this.masNum = masNum;
 		this.priceFilters = priceFilters;
 		this.rating = rating;
+        this.location = location;
 	}
 	
 
@@ -75,23 +76,25 @@ public class ScanRecord implements Parcelable
 		}	
 		for(int i = 1; i < cur.getColumnCount(); i++){
 				
-			switch(i){
-			case 1: this.scanEntry = cur.getString(i);
+			switch(i)
+            {
+                case 1: this.scanEntry = cur.getString(i);
+                    break;
+                case 2:	this.pullNumber = cur.getString(i);
 					break;
-			case 2:	this.pullNumber = cur.getString(i);
+			    case 3:	this.quantity = cur.getString(i);
 					break;
-			case 3:	this.quantity = cur.getString(i);
+    			case 4:	this.scanDate = cur.getString(i);
 					break;
-			case 4:	this.scanDate = cur.getString(i);
+    			case 5:	this.mark = cur.getString(i);
 					break;
-			case 5:	this.mark = cur.getString(i);
+    			case 6:	this.title = cur.getString(i);
 					break;
-			case 6:	this.title = cur.getString(i);
+    			case 7:	this.priceList = cur.getString(i);
 					break;
-			case 7:	this.priceList = cur.getString(i);
+    			case 8: this.masNum = cur.getString(i);
 					break;
-			case 8: this.masNum = cur.getString(i);
-					break;
+                case 9: this.location = cur.getString(i);
 			}
 		}
 	}
@@ -99,59 +102,54 @@ public class ScanRecord implements Parcelable
 	/**
 	 * @param in
 	 */
-	public ScanRecord(Parcel in){
-		
+	public ScanRecord(Parcel in)
+    {
 		ArrayList<String> data = new ArrayList<String>();
 
 		in.readStringList(data);
 		int i = 1;
-		for(String datum : data){
-			
-			switch(i){
-			
-			case 1: this.scanEntry = datum;
+		for(String datum : data)
+        {
+			switch(i)
+            {
+    			case 1: this.scanEntry = datum;
 					break;
-			case 2:	this.pullNumber = datum;
+	    		case 2:	this.pullNumber = datum;
 					break;
-			case 3:	this.quantity = datum;
+		    	case 3:	this.quantity = datum;
 					break;
-			case 4:	this.scanDate = datum;
+    			case 4:	this.scanDate = datum;
 					break;
-			case 5:	this.mark = datum;
+	    		case 5:	this.mark = datum;
 					break;
-			case 6:	this.title = datum;
+		    	case 6:	this.title = datum;
 					break;
-			case 7:	this.priceList = datum;
+			    case 7:	this.priceList = datum;
 					break;
-			case 8: this.masNum = datum;
+			    case 8: this.masNum = datum;
 					break;
-
-					
+                case 9: this.location = datum;
 			}
 			i++;
 		}
-		
 	}
 	
 	/**
 	 * @return
 	 */
-	public String setDate(){
-		
+	public String setDate()
+    {
 		Date today = new Date();
 		SimpleDateFormat dateFmt = new SimpleDateFormat("MM/dd/yy", Locale.US);
 		return dateFmt.format(today);
-
 	}
-	
-	
 	
 	/* (non-Javadoc)
 	 * @see android.os.Parcelable#describeContents()
 	 */
 	@Override
-	public int describeContents() {
-
+	public int describeContents()
+    {
 		return 0;
 	}
 
@@ -283,37 +281,36 @@ public class ScanRecord implements Parcelable
 		this.rating = rating;
 	}
 
+    public String getLocation() { return location; }
+
+    public void setLocation(String location) { this.location = location; }
+
 	/* (non-Javadoc)
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
 	 */
 	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-				
-		String[] list = new String[]  {this.scanEntry, this.pullNumber,  
+	public void writeToParcel(Parcel dest, int flags)
+    {
+		String[] list = new String[]  {this.scanEntry, this.pullNumber,
 				this.quantity, this.scanDate, this.mark, 
-				this.title, this.priceList, this.masNum};
-		
-				
+				this.title, this.priceList, this.masNum, this.location};
+
 		dest.writeStringArray(list);
-		
 	}
 	
 	/**
 	 * 
 	 */
-	public static final Parcelable.Creator<ScanRecord> CREATOR = new Parcelable.Creator<ScanRecord>(){
-			
+	public static final Parcelable.Creator<ScanRecord> CREATOR = new Parcelable.Creator<ScanRecord>()
+    {
 		public ScanRecord createFromParcel(Parcel in){
 			return new ScanRecord(in);
 		}
 			
-		public ScanRecord[] newArray(int size){
+		public ScanRecord[] newArray(int size)
+        {
 			return new ScanRecord[size];
-				
-		
 		}
-			
 	};
-	
 }
 	

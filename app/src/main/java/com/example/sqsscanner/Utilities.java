@@ -38,7 +38,13 @@ public class Utilities
 		Log.d(TAG, "In makeToast()");
 		Toast.makeText(callingContext, message, Toast.LENGTH_SHORT).show();
 	}
-	
+
+    public static void makeLongToast(Context callingContext, String message)
+    {
+        Log.d(TAG, "In makeToast()");
+        Toast.makeText(callingContext, message, Toast.LENGTH_LONG).show();
+    }
+
 	public static String getDefaultGateway(Context callingContext)
 	{
 		Log.d(TAG, "In getDefaultGateway()");

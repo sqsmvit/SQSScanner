@@ -25,22 +25,17 @@ import android.widget.ToggleButton;
 import com.example.sqsscanner.DB.ProductDataSource;
 import com.example.sqsscanner.DB.ScanDataSource;
 import com.example.sqsscanner.DB.UPCDataSource;
+import com.socketmobile.apiintegration.ScanAPIApplication;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
-//import java.util.Calendar;
-//import android.widget.ToggleButton;
 
 /**
  * @author ChrisS
  *
- */
-/**
- * @author ChrisS
- * 
  */
 @SuppressLint("ShowToast")
 public class ScanHomeActivity extends Activity
@@ -94,81 +89,6 @@ public class ScanHomeActivity extends Activity
 	private ProductDataSource productDataSource;
 	private UPCDataSource upcDataSource;
 	private ScanDataSource scanDataSource;
-
-	// Broadcast Reciever
-	// Receives scan events from scanner
-	private final BroadcastReceiver receiver = new BroadcastReceiver() {
-
-		private static final String TAG = "BroadcastReceiver";
-		
-		@Override
-		public void onReceive(Context c, Intent intent) {
-			String message = String.format("in onReceive");
-			Log.d(TAG, message);
-			
-			if (intent.getAction().equalsIgnoreCase(
-					ScanApiApplication.NOTIFY_ERROR_MESSAGE)) {
-				String text = intent
-						.getStringExtra(ScanApiApplication.EXTRA_ERROR_MESSAGE);
-				Toast.makeText(c, text, Toast.LENGTH_LONG).show();
-			}
-
-			else if (intent.getAction().equalsIgnoreCase(
-					ScanApiApplication.NOTIFY_DECODED_DATA)) {
-
-				String data = new String(intent.getCharArrayExtra(ScanApiApplication.EXTRA_DECODEDDATA));
-
-				if (data.equals(getString(R.string.adminCode)))
-				{
-					goToAdmin();
-					mScanId.setText("");
-					titleCount.setText("");
-				}// end if
-				else if(mPullNum.getText().toString().equals("1"))
-				{
-					goToAdmin();
-				}
-				else if (data.contains("P"))
-				{
-					mPullNum.setText(data.substring(1));
-					setPullNumbers();
-				}// end if
-				else if (mPullNum.getText().length() <= 0)
-				{
-					Toast.makeText(getBaseContext(),
-							"Enter Pull Number before Scanning",
-							Toast.LENGTH_LONG).show();
-				}// end else if
-				else
-				{
-					mScanId.setText("");
-					titleCount.setText("");
-					checkScan(data);
-				}// end else
-			}// end else if
-
-			else if (intent.getAction().equalsIgnoreCase(
-					ScanApiApplication.NOTIFY_SCANNER_ARRIVAL)) {
-				String text = intent
-						.getStringExtra(ScanApiApplication.EXTRA_SCANNER_ARRIVAL);
-				Toast.makeText(c, text, Toast.LENGTH_LONG).show();
-
-			} else if (intent.getAction().equalsIgnoreCase(
-					ScanApiApplication.NOTIFY_SCANPI_INITIALIZED)) {
-				String text = intent
-						.getStringExtra(ScanApiApplication.EXTRA_SCANPI_INITIALIZED);
-				Toast.makeText(c, text, Toast.LENGTH_LONG).show();
-
-			} else if (intent.getAction().equalsIgnoreCase(
-					ScanApiApplication.NOTIFY_CLOSE_ACTIVITY)) {
-				String text = intent
-						.getStringExtra(ScanApiApplication.EXTRA_CLOSE_ACTIVITY);
-				Toast.makeText(c, text, Toast.LENGTH_LONG).show();
-
-			}
-		}// end on Recieve
-
-	};
 
 	/*
 	 * (non-Javadoc)
@@ -306,8 +226,31 @@ public class ScanHomeActivity extends Activity
 			}
 		});
 	}
-	
-	/*
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        regBroadCastReceivers();
+    }
+
+    @Override
+    protected void onStop()
+    {
+        // unregister the scanner
+        unregisterReceiver(receiver);
+
+        // indicate this view has been destroyed
+        // if the reference count becomes 0 ScanAPI can
+        // be closed if this is not a screen rotation scenario
+        ScanAPIApplication.getApplicationInstance().decreaseViewCount();
+
+        super.onStop();
+    }
+
+
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see android.app.Activity#onPause()
@@ -318,12 +261,10 @@ public class ScanHomeActivity extends Activity
 		String message = String.format("in onPause");
 		Log.d(TAG, message);
 		
-		this.unregisterReceiver(receiver);
 		this.productDataSource.close();
 		this.upcDataSource.close();
 		this.scanDataSource.close();
-        ScanApiApplication.getInstance().currPullNum = mPullNum.getText()
-				.toString();
+        ScanAPIApplication.getApplicationInstance().currPullNum = mPullNum.getText().toString();
 		super.onPause();
 	}
 
@@ -341,7 +282,6 @@ public class ScanHomeActivity extends Activity
 		
 		setConfig();
 		setLocation();
-		regBroadCastReceivers();
 
 		this.productDataSource.read();
 		this.upcDataSource.read();
@@ -349,7 +289,7 @@ public class ScanHomeActivity extends Activity
         //this.mSkidMode.setVisibility(View.INVISIBLE);
 		//checkMarkIntent(getIntent());
 
-		mPullNum.setText(ScanApiApplication.getInstance().currPullNum);
+		mPullNum.setText(ScanAPIApplication.getApplicationInstance().currPullNum);
 
 		isMasNum = false;
 
@@ -625,15 +565,20 @@ public class ScanHomeActivity extends Activity
 			tempmScanId = tempmScanId.substring(0, tempmScanId.length() - 3);
 		}
 
+        String location = "";
+        String defGateway = Utilities.getDefaultGateway(this);
+        if(defGateway.matches("3.150.168.192"))
+            location = "r";
+        else if(defGateway.matches("1.150.168.192"))
+            location = "p";
+        else
+            location = "o";
 		currentRecord = new ScanRecord(tempmScanId, tempQuantity, tempPull,
-				mark, tempTitle, tempPriceList, thisMasNum, tempPriceFilters, tempRating);
+				mark, tempTitle, tempPriceList, thisMasNum, tempPriceFilters, tempRating, location);
 
 		return true;
 	}
 
-	/**
-	 * 
-	 */
 	private void enterQuantity()
 	{
 		quantity.setEnabled(true);
@@ -676,9 +621,6 @@ public class ScanHomeActivity extends Activity
 	 * 
 	 * @param View v
 	 */
-	/**
-	 * 
-	 */
 	public void goToAdmin()
 	{
 		Intent intent = new Intent(this, AdminActivity.class);
@@ -689,9 +631,6 @@ public class ScanHomeActivity extends Activity
 	 * View OnClick event that starts the Scan Config Activity.
 	 * 
 	 * @param View v
-	 */
-	/**
-	 * @param v
 	 */
 	public void goToConfig(View v)
 	{
@@ -720,45 +659,12 @@ public class ScanHomeActivity extends Activity
 	}
 
 	/*
-	 * Creates a record from information input into the fields and updates
-	 * display information.
-	 * 
-	 * @param none
-	 */
-	/**
-	 * 
-	 */
-	private void regBroadCastReceivers() {
-
-		IntentFilter filter;
-
-		filter = new IntentFilter(ScanApiApplication.NOTIFY_ERROR_MESSAGE);
-		registerReceiver(this.receiver, filter);
-
-		filter = new IntentFilter(ScanApiApplication.NOTIFY_DECODED_DATA);
-		registerReceiver(this.receiver, filter);
-
-		filter = new IntentFilter(ScanApiApplication.NOTIFY_SCANNER_ARRIVAL);
-		registerReceiver(this.receiver, filter);
-
-		filter = new IntentFilter(ScanApiApplication.NOTIFY_SCANPI_INITIALIZED);
-		registerReceiver(this.receiver, filter);
-
-		filter = new IntentFilter(ScanApiApplication.NOTIFY_CLOSE_ACTIVITY);
-		registerReceiver(this.receiver, filter);
-
-	}
-
-	/*
 	 * Reset all data that is displayed on the screen. Called only after a file
 	 * is exported.
 	 * 
 	 * @param none
 	 * 
 	 * @see onResume()
-	 */
-	/**
-	 * 
 	 */
 	private void resetViews()
 	{
@@ -778,9 +684,6 @@ public class ScanHomeActivity extends Activity
 	 * Reads a config file and sets all configs for this activity
 	 * 
 	 * @param none
-	 */
-	/**
-	 * 
 	 */
 	public void setConfig()
 	{
@@ -816,13 +719,7 @@ public class ScanHomeActivity extends Activity
 	}
 
 	/*
-	 * 
 	 * Displays toast dialog with the title and count information.
-	 * 
-	 * @param none
-	 */
-	/**
-	 * 
 	 */
 	private void setPullNumbers()
 	{
@@ -835,9 +732,6 @@ public class ScanHomeActivity extends Activity
 	/*
 	 * Sets the quantity view to display the correct scan quantity
 	 * 
-	 * @param none
-	 */
-	/**
 	 * @param id
 	 */
 	public void setQuantity(String id)
@@ -867,13 +761,8 @@ public class ScanHomeActivity extends Activity
 	}
 
 	/*
-	 * 
 	 * Updates the count for a specific scan/title.
-	 * 
 	 * @param id
-	 */
-	/**
-	 * @return
 	 */
 	public boolean setScanTitle()
 	{
@@ -1106,4 +995,96 @@ public class ScanHomeActivity extends Activity
 				sha;
 		Toast.makeText(this, displayString, Toast.LENGTH_SHORT).show();
 	}
+
+	private final BroadcastReceiver receiver = new BroadcastReceiver()
+    {
+		private static final String TAG = "BroadcastReceiver";
+
+		@Override
+		public void onReceive(Context c, Intent intent)
+        {
+			String message = String.format("in onReceive");
+			Log.d(TAG, message);
+
+            if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_DECODED_DATA))
+            {
+                String data = new String(intent.getCharArrayExtra(ScanAPIApplication.EXTRA_DECODEDDATA));
+
+                if(mPullNum.getText().toString().equals("1"))
+                {
+                    goToAdmin();
+                }/*
+                else if (data.equals(getString(R.string.adminCode)))
+                {
+                    goToAdmin();
+                    mScanId.setText("");
+                    titleCount.setText("");
+                }// end if*/
+                else if (data.contains("P"))
+                {
+                    mPullNum.setText(data.substring(1));
+                    setPullNumbers();
+                }// end if
+                else if (mPullNum.getText().length() <= 0)
+                {
+                    Toast.makeText(getBaseContext(),
+                            "Enter Pull Number before Scanning",
+                            Toast.LENGTH_LONG).show();
+                }// end else if
+                else
+                {
+                    mScanId.setText("");
+                    titleCount.setText("");
+                    checkScan(data);
+                }// end else
+            }// end else if
+			else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_SCANNER_ARRIVAL))
+            {
+                Utilities.makeLongToast(c, intent.getStringExtra(ScanAPIApplication.EXTRA_DEVICENAME) + " Connected");
+			}
+            else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_SCANPI_INITIALIZED))
+            {
+                Utilities.makeLongToast(c, "Ready to pair with scanner");
+			}
+            else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_CLOSE_ACTIVITY))
+            {
+			}
+            else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_ERROR_MESSAGE))
+            {
+                Utilities.makeLongToast(c, intent.getStringExtra(ScanAPIApplication.EXTRA_ERROR_MESSAGE));
+            }
+        }// end on Recieve
+	};
+
+	private void regBroadCastReceivers()
+    {
+        IntentFilter filter;
+        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANPI_INITIALIZED);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_ARRIVAL);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_REMOVAL);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.NOTIFY_DECODED_DATA);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.NOTIFY_ERROR_MESSAGE);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.NOTIFY_CLOSE_ACTIVITY);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.SET_SOUND_CONFIG_COMPLETE);
+        registerReceiver(this.receiver, filter);
+
+        filter = new IntentFilter(ScanAPIApplication.GET_SOUND_CONFIG_COMPLETE);
+        registerReceiver(this.receiver, filter);
+
+        // increasing the Application View count from 0 to 1 will
+        // cause the application to open and initialize ScanAPI
+        ScanAPIApplication.getApplicationInstance().increaseViewCount();
+    }
 }

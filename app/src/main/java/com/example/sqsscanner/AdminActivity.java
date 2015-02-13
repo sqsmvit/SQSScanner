@@ -320,7 +320,7 @@ public class AdminActivity extends ListActivity
 		//ScanExporter scanExporter = new ScanExporter(this, src, true, false);
 		//scanExporter.exportScan();
 		//Export to DropBox 
-		ScanExporter scanExporter = new ScanExporter(this, src, false, false);
+		ScanExporter scanExporter = new ScanExporter(this, src, 0, false);
 		scanExporter.exportScan();
 		/*
 		File root = new File(Environment.getExternalStorageDirectory().toString() + "/Scans");

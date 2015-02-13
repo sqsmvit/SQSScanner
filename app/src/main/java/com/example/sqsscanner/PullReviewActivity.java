@@ -36,6 +36,7 @@ public class PullReviewActivity extends ListActivity
 	public static int EXPORT_METHOD;
 	public static boolean FILE_EXPORTED;
 	public static boolean BILL_B_MODE;
+    int exportModeChoice;
 	private boolean invAdjMode;
 	private int invAdjChoice;
 	
@@ -111,7 +112,7 @@ public class PullReviewActivity extends ListActivity
 	 */
 	public void writeFromDB()
 	{
-		ScanWriter scanWriter = new ScanWriter(this, BILL_B_MODE, invAdjMode, invAdjChoice);
+		ScanWriter scanWriter = new ScanWriter(this, exportModeChoice, invAdjChoice);
 
 		try {
 			scanWriter.writeToFile();
@@ -179,7 +180,6 @@ public class PullReviewActivity extends ListActivity
 	{
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		//boolean expSD = (EXPORT_METHOD == getResources().getInteger(R.integer.EXPORT_SD));
 		if(!(pullNumberList.isEmpty()))
 		{
 			if (wifi.isConnected())
@@ -188,10 +188,11 @@ public class PullReviewActivity extends ListActivity
 				
 				try
 				{
-					ScanExporter scanExporter = new ScanExporter(this, exportFile, false, true);
+					ScanExporter scanExporter = new ScanExporter(this, exportFile, exportModeChoice, true);
 					scanExporter.exportScan();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+				}
+                catch (IOException e)
+                {
 					e.printStackTrace();
 				}
 				this.pullNumberList.clear();
@@ -202,7 +203,6 @@ public class PullReviewActivity extends ListActivity
 			{
 				Toast.makeText(this, "Not Connected to WIFI - cannot commit scan", Toast.LENGTH_LONG).show();
 			}
-
 		}
 		else
 		{
@@ -272,22 +272,39 @@ public class PullReviewActivity extends ListActivity
 		SharedPreferences config = getSharedPreferences("scanConfig", 0);
 		//default is DBX
 		EXPORT_METHOD = config.getInt("exportMethod", 1);
-		BILL_B_MODE = config.getBoolean("isBillB", false);
-		invAdjMode = config.getBoolean("isInvAdj", false);
-		invAdjChoice = config.getInt("InventoryModeChoice", 1);
-	}
+        exportModeChoice = config.getInt("ExportModeChoice", 1);
+        invAdjChoice = config.getInt("InventoryModeChoice", 1);
+
+    }
 	
 	private void displayMode()
 	{
-		if(BILL_B_MODE)
-		{
-			commitModeView.setVisibility(View.VISIBLE);
-			if(invAdjMode)
-				commitModeView.setText("RI Mode");
-			else
-				commitModeView.setText("Bill B. Mode");
-		}
+        if(exportModeChoice == 1)
+        {
+            //Normal Mode
+            commitModeView.setText("Normal Pull Mode");
+        }
+        else if(exportModeChoice == 2)
+        {
+            //Consolidated Mode
+            commitModeView.setText("Consolidated Pull Mode");
+        }
+        else if(exportModeChoice == 3)
+        {
+            //BillB Mode
+            commitModeView.setText("Bill B. Mode");
+        }
+        else if(exportModeChoice == 4)
+        {
+            //Drew mode
+            commitModeView.setText("Drew Mode");
+        }
+        else if(exportModeChoice == 5)
+        {
+            //RI Mode
+            commitModeView.setText("RI Mode");
+        }
 		else
-			commitModeView.setVisibility(View.GONE);
+			commitModeView.setText("Error");
 	}
 }

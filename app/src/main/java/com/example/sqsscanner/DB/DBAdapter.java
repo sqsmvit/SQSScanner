@@ -112,9 +112,11 @@ public class DBAdapter extends SQLiteOpenHelper
             LensTable.COLUMN_NAME_PK_LENSID + " TEXT PRIMARY KEY " + COMMA_SEP +
             LensTable.COLUMN_NAME_NAME + " TEXT " + COMMA_SEP +
             LensTable.COLUMN_NAME_DESCRIPTION + " TEXT" + COMMA_SEP +
-            LensTable.COLUMN_NAME_SHA + " TEXT" + ")";
+            LensTable.COLUMN_NAME_SHA + " TEXT" +
+            ")";
 	
-	private static final String CREATE_TABLE_SCANS =  "CREATE TABLE "+
+	private static final String CREATE_TABLE_SCANS =
+            "CREATE TABLE "+
 			ScanTable.TABLE_NAME + " (" + ScanTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			ScanTable.COLUMN_NAME_SCAN_ENTRY + " TEXT" + " NOT NULL" + COMMA_SEP +
 			ScanTable.COLUMN_NAME_FK_PULL_ID + " TEXT" + " REFERENCES " + PullListTable.TABLE_NAME + "(" + PullListTable.COLUMN_NAME_PK_PULL_ID + ")"
@@ -126,8 +128,9 @@ public class DBAdapter extends SQLiteOpenHelper
 			ScanTable.COLUMN_NAME_PRICE_LIST + " TEXT " + COMMA_SEP + 
 			ScanTable.COLUMN_NAME_MASNUM + " TEXT " + COMMA_SEP + 
 			ScanTable.COLUMN_NAME_PRICEFILTERS + " TEXT " + COMMA_SEP + 
-			ScanTable.COLUMN_NAME_RATING + " TEXT " + 
-			")";
+			ScanTable.COLUMN_NAME_RATING + " TEXT " + COMMA_SEP +
+            ScanTable.COLUMN_NAME_LOCATION + " TEXT " +
+            ")";
 	
 	public DBAdapter(Context ctx)
     {

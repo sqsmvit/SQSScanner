@@ -24,4 +24,6 @@ dependencies {
     compile files('libs/ScanAPIFactoryAndroid.jar')
     compile files('libs/dropbox-sync-sdk-android.jar')
     compile files('libs/OnBarcode.AndroidBarcode.jar')
+    compile files('libs/ScanAPI.jar')
+    compile files('libs/ScanAPIFactory.jar')
 }

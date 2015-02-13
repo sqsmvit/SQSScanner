@@ -19,5 +19,6 @@ public final class ScanContract
 		public static final String COLUMN_NAME_MASNUM = "masNum";
 		public static final String COLUMN_NAME_PRICEFILTERS = "priceFilters";
 		public static final String COLUMN_NAME_RATING = "rating";
+        public static final String COLUMN_NAME_LOCATION = "location";
 	}
 }

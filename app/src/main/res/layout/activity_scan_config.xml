@@ -22,7 +22,7 @@
     </LinearLayout>
 
     <View
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray" />
 
@@ -56,7 +56,7 @@
     </LinearLayout>
     
 	<View
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="1dp"
     android:background="@android:color/darker_gray"/>
 	
@@ -97,7 +97,7 @@
     </LinearLayout>
     
 	<View
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
 
@@ -127,11 +127,11 @@
 
 
     <View
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray" />
 
-
+    <!--
     <EditText
         android:id="@+id/BillBAccess"
         android:layout_width="250dp"
@@ -148,84 +148,150 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-	
-        <LinearLayout
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar"
+        android:orientation="horizontal" >
+
+        <ToggleButton
+            android:id="@+id/billBMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/lbl_billB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:text="Bill B. Mode"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar"
+        android:orientation="horizontal" >
+
+        <ToggleButton
+            android:id="@+id/invAdjustMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:text="RI Mode"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
+    -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/listMar"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:text="Export Mode"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <RadioGroup
+            android:id="@+id/exportModeGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/listMar"
-            android:orientation="horizontal" >
+            android:layout_marginLeft="25dp"
+            android:orientation="vertical" >
 
-            <ToggleButton
+            <RadioButton
+                android:id="@+id/normalMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Normal Pull" />
+
+            <RadioButton
+                android:id="@+id/consolidateMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Consolidate Pull" />
+
+            <RadioButton
                 android:id="@+id/billBMode"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Bill B" />
 
-           <TextView
-               android:id="@+id/lbl_billB"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="@dimen/activity_horizontal_margin"
-               android:text="Bill B. Mode"
-               android:textAppearance="?android:attr/textAppearanceMedium" />
-         </LinearLayout>
+            <RadioButton
+                android:id="@+id/drewMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Drew" />
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/listMar"
-            android:orientation="horizontal" >
-
-           <ToggleButton
-               android:id="@+id/invAdjustMode"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content" />
-
-           <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="@dimen/activity_horizontal_margin"
-               android:text="RI Mode"
-               android:textAppearance="?android:attr/textAppearanceMedium" />
-         </LinearLayout>
-
-         <RadioGroup
-             android:id="@+id/invModeGroup"
-             android:layout_width="fill_parent"
-             android:layout_height="wrap_content"
-             android:layout_marginLeft="25dp"
-             android:orientation="horizontal" >
-
-           <RadioButton
-               android:id="@+id/plus"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               android:layout_marginRight="10dp"
-               android:text="Add" />
-
-           <RadioButton
-               android:id="@+id/minus"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               android:layout_marginRight="10dp"
-               android:text="Subtract" />
-
-           <RadioButton
-               android:id="@+id/set"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               android:layout_marginRight="10dp"
-               android:text="Set" />
+            <RadioButton
+                android:id="@+id/invAdjustMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="RI" />
         </RadioGroup>
     </LinearLayout>
-<!--
+
+    <RadioGroup
+        android:id="@+id/invModeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/plus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Add" />
+
+        <RadioButton
+            android:id="@+id/minus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Subtract" />
+
+        <RadioButton
+            android:id="@+id/set"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Set" />
+    </RadioGroup>
+    <!--
+    </LinearLayout>
+    -->
+    <!--
 	<LinearLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
@@ -300,17 +366,17 @@
 	</LinearLayout>
  -->
 	<View
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="1dp"
 	    android:background="@android:color/darker_gray" />
-
+    <!--
     <Button
         android:id="@+id/LockBillBAccess"
         android:text="Lock"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
+    -->
     <Button
         android:id="@+id/PairScanner"
         android:text="PairScanner/Trouble Shoot"
@@ -319,35 +385,4 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/listMar"/>
 
-    <!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/listMar"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/trouble"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/listMar"
-            android:text="@string/troubleShooting"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <ImageView
-            android:id="@+id/bt_address"
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:padding="@dimen/radTopMar"
-            android:scaleType="fitCenter" />
-
-        <TextView
-            android:id="@+id/ts1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/listMar"
-            android:text="@string/tsText"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </LinearLayout>
-     -->
 </LinearLayout>

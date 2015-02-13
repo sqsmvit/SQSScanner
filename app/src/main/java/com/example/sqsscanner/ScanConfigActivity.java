@@ -7,21 +7,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -37,12 +32,15 @@ public class ScanConfigActivity  extends Activity
 	private String customValue = "0";
 	private Context context;
 	private String mark = "";
-    private EditText billBAccess;
-    private LinearLayout billBArea;
-    private ToggleButton billBToggle, invAdjustToggle;
-	private RadioGroup invModeRGroup;
-    Button lockBillBAccess, pairScanner;
-    private boolean hasBillBAccess;
+    //private EditText billBAccess;
+    //private LinearLayout billBArea;
+    //private ToggleButton billBToggle, invAdjustToggle;
+    private RadioGroup exportModeRGroup;
+    private RadioGroup invModeRGroup;
+    Button pairScanner;
+    //Button lockBillBAccess;
+    //private boolean hasBillBAccess;
+    private int exportModeChoice;
 	private int invModeChoice;
     private LensDataSource lensDataSource;
 
@@ -60,12 +58,13 @@ public class ScanConfigActivity  extends Activity
         ((ToggleButton) findViewById(R.id.togAutoQuan)).setChecked(scanConfig.getBoolean("isAutoCount", false));
         ((ToggleButton) findViewById(R.id.togAutoBox)).setChecked(scanConfig.getBoolean("isBoxQty", false));
         lensSelect = (Spinner)findViewById(R.id.LensSelect);
-        billBAccess = (EditText)findViewById(R.id.BillBAccess);
-        billBArea = (LinearLayout)findViewById(R.id.BillBArea);
-        billBToggle = (ToggleButton)findViewById(R.id.billBMode);
-        invAdjustToggle = (ToggleButton)findViewById(R.id.invAdjustMode);
+        //billBAccess = (EditText)findViewById(R.id.BillBAccess);
+        //billBArea = (LinearLayout)findViewById(R.id.BillBArea);
+        //billBToggle = (ToggleButton)findViewById(R.id.billBMode);
+        //invAdjustToggle = (ToggleButton)findViewById(R.id.invAdjustMode);
+        exportModeRGroup = (RadioGroup)findViewById(R.id.exportModeGroup);
         invModeRGroup = (RadioGroup)findViewById(R.id.invModeGroup);
-        lockBillBAccess = (Button)findViewById(R.id.LockBillBAccess);
+        //lockBillBAccess = (Button)findViewById(R.id.LockBillBAccess);
         pairScanner =  (Button)findViewById(R.id.PairScanner);
 
 		setSpinner(autoCount, R.array.autoCounts);
@@ -75,14 +74,35 @@ public class ScanConfigActivity  extends Activity
         lensSelect.setSelection(scanConfig.getInt("lensSelectIdx", 0));
         //setSpinner(lensSelect, R.array.lensList);
         lensSelect.setSelection(scanConfig.getInt("lensSelectIdx", 0));
-        hasBillBAccess = scanConfig.getBoolean("hasBillBAccess", false);
-        billBToggle.setChecked(scanConfig.getBoolean("isBillB", false));
-		invAdjustToggle.setChecked(scanConfig.getBoolean("isInvAdj", false));
-		if(invAdjustToggle.isChecked())
+        //hasBillBAccess = scanConfig.getBoolean("hasBillBAccess", false);
+        //billBToggle.setChecked(scanConfig.getBoolean("isBillB", false));
+		//invAdjustToggle.setChecked(scanConfig.getBoolean("isInvAdj", false));
+        exportModeChoice = scanConfig.getInt("ExportModeChoice", 1);
+        switch(exportModeChoice)
+        {
+            case 1:
+                ((RadioButton)findViewById(R.id.normalMode)).setChecked(true);
+                break;
+            case 2:
+                ((RadioButton)findViewById(R.id.consolidateMode)).setChecked(true);
+                break;
+            case 3:
+                ((RadioButton)findViewById(R.id.billBMode)).setChecked(true);
+                break;
+            case 4:
+                ((RadioButton)findViewById(R.id.drewMode)).setChecked(true);
+                break;
+            case 5:
+                ((RadioButton)findViewById(R.id.invAdjustMode)).setChecked(true);
+                break;
+        }
+
+        if(((RadioButton)findViewById(R.id.invAdjustMode)).isChecked())
 			invModeRGroup.setVisibility(View.VISIBLE);
 		else
 			invModeRGroup.setVisibility(View.GONE);
-		invModeChoice = scanConfig.getInt("InventoryModeChoice", 1);
+
+        invModeChoice = scanConfig.getInt("InventoryModeChoice", 1);
 		if(invModeChoice == 1)
 			((RadioButton)findViewById(R.id.plus)).setChecked(true);
 		else if(invModeChoice == 2)
@@ -90,10 +110,11 @@ public class ScanConfigActivity  extends Activity
 		else if(invModeChoice == 3)
 			((RadioButton)findViewById(R.id.set)).setChecked(true);
 
+        /*
         if(!hasBillBAccess)
             toggleBillBVisibility();
-		//setBluToothImg();
-		
+        */
+
 		autoCount.setOnItemSelectedListener(new OnItemSelectedListener()
 		{
 				@Override
@@ -152,7 +173,7 @@ public class ScanConfigActivity  extends Activity
 				onBackPressed();
 			}
 		});
-
+        /*
         billBAccess.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
@@ -172,28 +193,39 @@ public class ScanConfigActivity  extends Activity
                 return true;
             }
         });
-		
-		billBToggle.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				if(!billBToggle.isChecked())
-				{
-                    ((RadioButton)findViewById(R.id.plus)).setChecked(true);
-				}
-			}
-		});
+		*/
 		 
-		invAdjustToggle.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				toggleInvAdjustSettings();
-			}
-		});
-		
+        exportModeRGroup.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkedId)
+            {
+                switch(checkedId)
+                {
+                    case R.id.normalMode:
+                        exportModeChoice = 1;
+                        hideInvAdjust();
+                        break;
+                    case R.id.consolidateMode:
+                        exportModeChoice = 2;
+                        hideInvAdjust();
+                        break;
+                    case R.id.billBMode:
+                        exportModeChoice = 3;
+                        hideInvAdjust();
+                        break;
+                    case R.id.drewMode:
+                        exportModeChoice = 4;
+                        hideInvAdjust();
+                        break;
+                    case R.id.invAdjustMode:
+                        exportModeChoice = 5;
+                        showInvAdjust();
+                        break;
+                }
+            }
+        });
+
 		invModeRGroup.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
@@ -209,7 +241,6 @@ public class ScanConfigActivity  extends Activity
                     break;
                 case R.id.set:
                 	invModeChoice = 3;
-                    billBToggle.setChecked(true);
                     break;
                 }
             }
@@ -223,7 +254,7 @@ public class ScanConfigActivity  extends Activity
                 goToPairActivity();
             }
         });
-
+        /*
         lockBillBAccess.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -232,6 +263,7 @@ public class ScanConfigActivity  extends Activity
                 toggleBillBVisibility();
             }
         });
+        */
 	}//end onCreate
 	
 	private boolean checkValues()
@@ -252,29 +284,6 @@ public class ScanConfigActivity  extends Activity
 		return true;
 	}
 	
-	/*
-	private void setBluToothImg()
-	{
-		int[] images = {R.drawable.d1_blutooth_addr, 
-					    R.drawable.d2_blutooth_addr,
-					    R.drawable.d3_blutooth_addr,
-					    R.drawable.d5_blutooth_addr,
-					    R.drawable.d6_blutooth_addr};
-		
-		String deviceName = BluetoothAdapter.getDefaultAdapter().getName();
-		ImageView imBt = (ImageView) findViewById(R.id.bt_address);
-		try
-		{
-			int deviceId = Integer.parseInt(deviceName.substring(1));		
-			imBt.setImageResource(images[(deviceId - 1)]);
-		} catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	*/
-
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onBackPressed()
 	 */
@@ -326,13 +335,12 @@ public class ScanConfigActivity  extends Activity
 		scanState.putString("boxQty", boxQty.getText().toString());
 		scanState.putBoolean("isAutoCount", ((ToggleButton) findViewById(R.id.togAutoQuan)).isChecked());
 		scanState.putBoolean("isBoxQty", ((ToggleButton) findViewById(R.id.togAutoBox)).isChecked());
-        scanState.putBoolean("hasBillBAccess", hasBillBAccess);
-		scanState.putBoolean("isBillB", ((ToggleButton) findViewById(R.id.billBMode)).isChecked());
-		scanState.putBoolean("isInvAdj", ((ToggleButton) findViewById(R.id.invAdjustMode)).isChecked());
+        //scanState.putBoolean("hasBillBAccess", hasBillBAccess);
+		//scanState.putBoolean("isBillB", ((ToggleButton) findViewById(R.id.billBMode)).isChecked());
+		//scanState.putBoolean("isInvAdj", ((ToggleButton) findViewById(R.id.invAdjustMode)).isChecked());
+        scanState.putInt("ExportModeChoice", exportModeChoice);
 		scanState.putInt("InventoryModeChoice", invModeChoice);
-		//scanState.putBoolean("isManQty", ((ToggleButton) findViewById(R.id.manualQty)).isChecked());
-		//scanState.putBoolean("isNewProduct", ((ToggleButton) findViewById(R.id.newProductMode)).isChecked());
-			
+
 		//if(this.customValue.equals("0"))
 			//scanState.putInt("autoCount", Integer.parseInt(autoCount.getSelectedItem().toString()));
 		//else
@@ -362,20 +370,16 @@ public class ScanConfigActivity  extends Activity
         lensDataSource.close();
     }
 	
-	private void toggleInvAdjustSettings()
+	private void showInvAdjust()
 	{
-		if(invAdjustToggle.isChecked())
-		{	
-			//billBToggle.setChecked(true);
-			invModeRGroup.setVisibility(View.VISIBLE);
-		}
-		else
-		{
-			//billBToggle.setChecked(false);
-			invModeRGroup.setVisibility(View.GONE);
-		}
-	}
+        invModeRGroup.setVisibility(View.VISIBLE);
+    }
 
+    private void hideInvAdjust()
+    {
+        invModeRGroup.setVisibility(View.GONE);
+    }
+	/*
     private void toggleBillBVisibility()
     {
         if(billBArea.getVisibility() == View.VISIBLE)
@@ -394,7 +398,7 @@ public class ScanConfigActivity  extends Activity
             lockBillBAccess.setVisibility(View.VISIBLE);
         }
     }
-
+    */
     @Override
     protected void onResume()
     {
