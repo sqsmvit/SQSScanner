@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.sqsscanner"
+    package="com.sqsmv.sqsscanner"
     android:versionCode="6"
     android:versionName="6.0" >
 
@@ -27,7 +27,7 @@
         android:screenOrientation="portrait"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".CheckDBXActivity"
+            android:name="com.sqsmv.sqsscanner.CheckDBXActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -37,32 +37,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ScanHomeActivity"
+            android:name="com.sqsmv.sqsscanner.ScanHomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ScanReviewActivity"
+            android:name="com.sqsmv.sqsscanner.ScanReviewActivity"
             android:label="@string/title_activity_scan_review"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".EditRecordActivity"
+            android:name="com.sqsmv.sqsscanner.EditRecordActivity"
             android:label="@string/title_activity_edit_record"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ScanConfigActivity"
+            android:name="com.sqsmv.sqsscanner.ScanConfigActivity"
             android:label="@string/title_activity_scan_config"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".PullReviewActivity"
+            android:name="com.sqsmv.sqsscanner.PullReviewActivity"
             android:label="@string/title_activity_pull_review"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".AdminActivity"
+            android:name="com.sqsmv.sqsscanner.AdminActivity"
             android:label="@string/title_activity_admin"
             android:screenOrientation="portrait" >
         </activity>
@@ -87,22 +87,22 @@
             android:label="Dropbox Sync" />
 
         <activity
-            android:name=".SkidScanActivity"
+            android:name="com.sqsmv.sqsscanner.SkidScanActivity"
             android:label="@string/title_activity_mark_scan" >
         </activity>
         <activity
-            android:name=".LoadActivity"
+            android:name="com.sqsmv.sqsscanner.LoadActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".SocketMobilePairActivity"
+            android:name="com.sqsmv.sqsscanner.SocketMobilePairActivity"
             android:label="@string/title_activity_socket_mobile_pair"
             android:screenOrientation="portrait" >
         </activity>
 
         <service
-            android:name=".PopDatabaseService"
+            android:name="com.sqsmv.sqsscanner.PopDatabaseService"
             android:enabled="true"
             android:exported="true" >
         </service>

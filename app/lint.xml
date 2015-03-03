@@ -2,6 +2,6 @@
 <lint>
     <issue id="DefaultLocale" severity="ignore" />
     <issue id="SimpleDateFormat">
-        <ignore path="src/com/example/sqsscanner/ScanHome.java" />
+        <ignore path="src/com/sqsmv/sqsscanner/ScanHome.java" />
     </issue>
 </lint>

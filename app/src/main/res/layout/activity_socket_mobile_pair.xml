@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.sqsscanner.SocketMobilePairActivity"
+    tools:context="com.sqsmv.sqsscanner.SocketMobilePairActivity"
     android:orientation="vertical" >
 
 
@@ -74,7 +74,7 @@
                 android:layout_marginRight="10dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-            <com.example.sqsscanner.BarcodeView
+            <com.sqsmv.sqsscanner.BarcodeView
                 android:id="@+id/SPPBarcodeView"
                 android:layout_width="wrap_content"
                 android:layout_height="105px" />
@@ -87,7 +87,7 @@
             android:text="@string/pairInstruction3"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-        <com.example.sqsscanner.BarcodeView
+        <com.sqsmv.sqsscanner.BarcodeView
             android:id="@+id/BTAddrBarcodeView"
             android:layout_width="wrap_content"
             android:layout_height="105px" />

@@ -15,7 +15,7 @@ import com.SocketMobile.ScanAPI.ISktScanProperty;
 import com.SocketMobile.ScanAPI.SktScanApiOwnership;
 import com.SocketMobile.ScanAPI.SktScanApiOwnership.Notification;
 import com.SocketMobile.ScanAPI.SktScanErrors;
-import com.example.sqsscanner.R;
+import com.sqsmv.sqsscanner.R;
 import com.socketmobile.apiintegration.ScanApiHelper.ScanApiHelperNotification;
 
 import java.util.Locale;

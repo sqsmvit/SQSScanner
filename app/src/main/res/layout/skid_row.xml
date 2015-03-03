@@ -99,7 +99,7 @@
 
 	</LinearLayout>
 
-   <com.example.sqsscanner.ListViewButton
+   <com.sqsmv.sqsscanner.ListViewButton
        android:id="@+id/btn_mark_edit"
        android:layout_width="39dp"
        android:layout_height="40dp"

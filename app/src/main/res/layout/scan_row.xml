@@ -32,7 +32,7 @@
         android:padding="@dimen/listMar"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <com.example.sqsscanner.ListViewButton
+    <com.sqsmv.sqsscanner.ListViewButton
         android:id="@+id/editBtn"
         android:layout_width="0dp"
         android:layout_height="40dp"
@@ -40,7 +40,7 @@
         android:onClick="clickGoToEdit"
         android:src="@drawable/ic_pen" />
 
-    <com.example.sqsscanner.ListViewButton
+    <com.sqsmv.sqsscanner.ListViewButton
         android:id="@+id/delBtn"
         android:layout_width="0dp"
         android:layout_height="40dp"
