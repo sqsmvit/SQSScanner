@@ -238,13 +238,17 @@ public class ScanHomeActivity extends Activity
     @Override
     protected void onStop()
     {
+        boolean scannerLock = config.getBoolean("scannerLock", false);
         // unregister the scanner
-        unregisterReceiver(receiver);
+        if(!scannerLock)
+        {
+            unregisterReceiver(receiver);
 
-        // indicate this view has been destroyed
-        // if the reference count becomes 0 ScanAPI can
-        // be closed if this is not a screen rotation scenario
-        ScanAPIApplication.getApplicationInstance().decreaseViewCount();
+            // indicate this view has been destroyed
+            // if the reference count becomes 0 ScanAPI can
+            // be closed if this is not a screen rotation scenario
+            ScanAPIApplication.getApplicationInstance().forceRelease();
+        }
 
         super.onStop();
     }

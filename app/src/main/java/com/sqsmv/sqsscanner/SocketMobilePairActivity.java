@@ -2,8 +2,10 @@ package com.sqsmv.sqsscanner;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.widget.ToggleButton;
 
 import com.onbarcode.barcode.android.AndroidColor;
 import com.onbarcode.barcode.android.AndroidFont;
@@ -13,7 +15,10 @@ import com.onbarcode.barcode.android.IBarcode;
 
 public class SocketMobilePairActivity extends Activity
 {
+    SharedPreferences config;
+
     BarcodeView sppBarcodeView, btaddrBarcodeView;
+    ToggleButton scannerLockToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -27,14 +32,26 @@ public class SocketMobilePairActivity extends Activity
         Code128 sppBarcode = new Code128();
         Code128 btaddrBarcode = new Code128();
 
+        config = getSharedPreferences("scanConfig", 0);
+
         sppBarcodeView = (BarcodeView)findViewById(R.id.SPPBarcodeView);
         btaddrBarcodeView = (BarcodeView)findViewById(R.id.BTAddrBarcodeView);
+        scannerLockToggle = (ToggleButton)findViewById(R.id.scannerLockToggle);
+
+        scannerLockToggle.setChecked(config.getBoolean("scannerLock", false));
 
         makeBarcode(sppBarcode, sppData, 0);
         sppBarcodeView.drawBarcode(sppBarcode);
 
         makeBarcode(btaddrBarcode, btAddr, 0);
         btaddrBarcodeView.drawBarcode(btaddrBarcode);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        saveScanLock();
+        super.onDestroy();
     }
 
     private String getBTAddr()
@@ -92,5 +109,10 @@ public class SocketMobilePairActivity extends Activity
         // barcode bar color and background color in Android device
         barcode.setForeColor(AndroidColor.black);
         barcode.setBackColor(AndroidColor.white);
+    }
+
+    private void saveScanLock()
+    {
+        config.edit().putBoolean("scannerLock", scannerLockToggle.isChecked()).apply();
     }
 }

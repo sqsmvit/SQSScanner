@@ -484,6 +484,12 @@ public class ScanAPIApplication extends Application {
         Debug.MSG(Debug.kLevelTrace,"Decrease View count, New view count: "+_viewCount);
     }
 
+    public void forceRelease()
+    {
+        _viewCount = 1;
+        decreaseViewCount();
+    }
+
     public void setTraces(boolean bTracesOn){
         _scanApiHelper.postSetScanAPITraces(bTracesOn);
     }
