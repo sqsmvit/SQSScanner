@@ -92,8 +92,8 @@ public class ScanDataSource implements DataSource
         else if(exportMode == 5)
         {
             //RI Mode
-            String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, "SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") As Total", ScanTable.COLUMN_NAME_TITLE};
-            return db.query(ScanTable.TABLE_NAME, cols, null, null, ScanTable.COLUMN_NAME_MASNUM, null, ScanTable.COLUMN_NAME_MASNUM);
+            String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_TITLE};
+            return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, ScanTable.COLUMN_NAME_MASNUM);
         }
         else
         {

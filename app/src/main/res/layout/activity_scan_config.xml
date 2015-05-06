@@ -271,6 +271,7 @@
             android:id="@+id/plus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:text="Add" />
@@ -279,17 +280,20 @@
             android:id="@+id/minus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:text="Subtract" />
-
+<!--
         <RadioButton
             android:id="@+id/set"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:text="Set" />
+-->
     </RadioGroup>
     <!--
     </LinearLayout>

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -54,17 +55,8 @@ public class PopDatabaseService extends IntentService
 		makeNotification("Dropbox Download Started", false);
 
         //Needed for X and X2
-        /*
-        LensDataSource lds = new LensDataSource(this);
-        lds.open();
-        lds.resetDB();
-        lds.close();
+        //resetDBs();
 
-        ProductLensDataSource plds = new ProductLensDataSource(this);
-        plds.open();
-        plds.resetDB();
-        plds.close();
-        */
         //Download files.zip from DropBox
         downloadDBXZip();
         File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
@@ -74,13 +66,27 @@ public class PopDatabaseService extends IntentService
         makeNotification("Database Update Started", false);
 
         int i = 0;
-		
+        ArrayList<Thread> updateThreads = new ArrayList<Thread>();
 		for(DataSource dataSource : dataSources)
 		{
 			FMDumpHandler xmlHandler = new FMDumpHandler(this, xmlFiles[i], dataSource, this.getResources().getStringArray(xmlSchemas[i]), forceDBUpdate);
-			xmlHandler.run();
+			//xmlHandler.run();
+            Thread updateThread = new Thread(xmlHandler);
+            updateThreads.add(updateThread);
+            updateThread.start();
 			i += 1;
 		}
+        for(Thread updateThread : updateThreads)
+        {
+            try
+            {
+                updateThread.join();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
 
         makeNotification("Database Update Finished", true);
 	}
@@ -172,4 +178,17 @@ public class PopDatabaseService extends IntentService
 		// mId allows you to update the notification later on.
 		mNotificationManager.notify(0, mBuilder.build());
 	}
+
+    private void resetDBs()
+    {
+        LensDataSource lds = new LensDataSource(this);
+        lds.open();
+        lds.resetDB();
+        lds.close();
+
+        ProductLensDataSource plds = new ProductLensDataSource(this);
+        plds.open();
+        plds.resetDB();
+        plds.close();
+    }
 }

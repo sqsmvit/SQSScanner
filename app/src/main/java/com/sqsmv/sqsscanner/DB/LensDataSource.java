@@ -75,7 +75,7 @@ public class LensDataSource implements DataSource
                 mapIds.put(tempPK, tempSha);
             }while(c.moveToNext());
         }
-
+        c.close();
         return mapIds;
     }
 

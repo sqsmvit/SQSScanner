@@ -113,6 +113,7 @@ public class PriceListDataSource implements DataSource {
 				
 			} while(c.moveToNext());
 		}
+        c.close();
 		return mapIds;
 	}
 

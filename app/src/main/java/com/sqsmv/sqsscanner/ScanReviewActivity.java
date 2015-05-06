@@ -28,38 +28,28 @@ import com.sqsmv.sqsscanner.DB.UPCDataSource;
  * @author ChrisS
  *
  */
-public class ScanReviewActivity extends ExpandableListActivity {
+public class ScanReviewActivity extends ExpandableListActivity
+{
+	private class ScansCursorTreeAdapter extends SimpleCursorTreeAdapter
+    {
+        public ScansCursorTreeAdapter(Context context, Cursor cursor,
+                                      int groupLayout, String[] groupFrom,
+                                      int[] groupTo, int childLayout, String[] childFrom,
+                                      int[] childTo)
+                {
 
+                    super(context, cursor, groupLayout, groupFrom, groupTo, childLayout, childFrom, childTo);
+        		}
 
-	
-	private class ScansCursorTreeAdapter extends SimpleCursorTreeAdapter {
-
-
-
-		public ScansCursorTreeAdapter(Context context, Cursor cursor,
-				int groupLayout, String[] groupFrom, int[] groupTo,
-				int childLayout, String[] childFrom, int[] childTo) 
-		{
-			super(context, cursor, groupLayout, groupFrom, groupTo, childLayout, childFrom,
-					childTo);
-			
-			
-			
-		}
-
-		@Override
+        @Override
 		protected Cursor getChildrenCursor(Cursor groupCursor) 
 		{
-
 			int id = groupCursor.getInt(groupCursor.getColumnIndex(ScanTable._ID));
 			//Cursor childCursor =  scanDataSource.getValueByID(id, new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST});
             Cursor childCursor =  scanDataSource.getValueByID(id);
 			childCursor.moveToFirst();
 			return childCursor;
-			
 		}
-
-
 	}
 	
 	public static final String PULL_KEY = "com.sqsmv.sqsscanner.pullKey";
@@ -77,28 +67,25 @@ public class ScanReviewActivity extends ExpandableListActivity {
 	
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+    {
 		super.onCreate(savedInstanceState);
-		
-		
+
 		Intent intent = getIntent();
-		
 		pullKey = intent.getStringExtra("PULL_NUM");
 
-		
-		this.productDataSource = new ProductDataSource(this);
-		this.upcDataSource = new UPCDataSource(this);
-		this.scanDataSource = new ScanDataSource(this);
+		productDataSource = new ProductDataSource(this);
+		upcDataSource = new UPCDataSource(this);
+		scanDataSource = new ScanDataSource(this);
 		productDataSource.read();
 		upcDataSource.read();
 		scanDataSource.open();
 		
 		scanAdapter = new ScansCursorTreeAdapter(this, scanDataSource.getScansByPullId(pullKey), 
-						R.layout.scan_row, new String[]{ScanTable.COLUMN_NAME_TITLE, 
-						ScanTable.COLUMN_NAME_QUANTITY}, new int[] {R.id.scanTitle, R.id.Scan_qty},
-						R.layout.scan_title, new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable._ID}, 
+						R.layout.scan_row, new String[]{ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_QUANTITY},
+                        new int[] {R.id.scanTitle, R.id.Scan_qty}, R.layout.scan_title,
+                        new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable._ID},
 						new int[] {R.id.scanID, R.id.pList});
-		
 
 		ListView listView = getExpandableListView();
 		

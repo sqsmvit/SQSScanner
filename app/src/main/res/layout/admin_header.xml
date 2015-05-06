@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:textAlignment="center" >
+    android:paddingLeft="@dimen/listMar"
+    android:paddingRight="@dimen/listMar"
+    android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:orientation="vertical" >
 
         <ImageButton
@@ -15,15 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onClickBack"
-            android:padding="@dimen/listMar"
             android:src="@android:drawable/ic_menu_revert"
             android:contentDescription="@string/backButton" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
 
         <Button
             android:id="@+id/btnForceUpdate"
@@ -80,37 +75,35 @@
 
         <TextView
             android:id="@+id/headBackupName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".25"
+            android:layout_weight=".5"
             android:clickable="true"
             android:onClick="onClickSort"
-            android:padding="@dimen/listMar"
             android:text="@string/file"
-            android:textAlignment="center"
+            android:gravity="left"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/headBackupDate"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".25"
+            android:layout_weight=".3"
             android:clickable="true"
             android:onClick="onClickSort"
-            android:padding="@dimen/listMar"
             android:text="@string/date"
-            android:textAlignment="center"
+            android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/headBackupSize"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".25"
+            android:layout_weight=".2"
             android:clickable="true"
             android:onClick="onClickSort"
-            android:padding="@dimen/listMar"
             android:text="@string/size"
+            android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 

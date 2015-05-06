@@ -108,8 +108,7 @@ public class LoadActivity extends Activity {
                 }
                 getSharedPreferences("scanConfig", 0).edit().putString("ProductLensResetMilli", Long.toString(System.currentTimeMillis())).apply();
 
-				Intent intent = new Intent(this, ScanHomeActivity.class);
-				pauseDialog(intent);
+				pauseDialog();
 			}
             catch (NotFoundException e)
 			{
@@ -118,13 +117,11 @@ public class LoadActivity extends Activity {
 			}
 		}
 		else
-		{
-			Intent intent = new Intent(this, ScanHomeActivity.class);
-			startActivity(intent);
-		}
+            startScanHomeActivity();
 	}
 	
-	private void pauseDialog( final Intent intent){
+	private void pauseDialog()
+    {
 		String message = String.format("in pauseDialog and for the LoadActivity!");
 		Log.d(TAG, message);
 		
@@ -133,7 +130,7 @@ public class LoadActivity extends Activity {
 			public void run() {
 				try {
 					Thread.sleep(10000);
-					startActivity(intent);
+                    startScanHomeActivity();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -143,12 +140,10 @@ public class LoadActivity extends Activity {
 		}.start();
 	}
 
-    public void testFunction(View v)
+    private void startScanHomeActivity()
     {
-        ProductLensDataSource plds = new ProductLensDataSource(this);
-        plds.open();
-        plds.getSha();
-        plds.close();
+        Intent intent = new Intent(this, ScanHomeActivity.class);
+        startActivity(intent);
     }
 }
 

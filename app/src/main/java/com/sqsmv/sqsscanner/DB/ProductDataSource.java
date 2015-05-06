@@ -192,9 +192,8 @@ public class ProductDataSource implements DataSource
 			
 			
 		}
-		
+        c.close();
 		return mapIds;
-		
 	}
 	
 	/**

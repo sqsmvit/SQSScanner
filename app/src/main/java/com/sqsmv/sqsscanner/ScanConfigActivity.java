@@ -107,12 +107,9 @@ public class ScanConfigActivity  extends Activity
 			((RadioButton)findViewById(R.id.plus)).setChecked(true);
 		else if(invModeChoice == 2)
 			((RadioButton)findViewById(R.id.minus)).setChecked(true);
+        /*
 		else if(invModeChoice == 3)
 			((RadioButton)findViewById(R.id.set)).setChecked(true);
-
-        /*
-        if(!hasBillBAccess)
-            toggleBillBVisibility();
         */
 
 		autoCount.setOnItemSelectedListener(new OnItemSelectedListener()
@@ -239,9 +236,11 @@ public class ScanConfigActivity  extends Activity
                 case R.id.minus:
                 	invModeChoice = 2;
                     break;
+                /*
                 case R.id.set:
                 	invModeChoice = 3;
                     break;
+                */
                 }
             }
         });

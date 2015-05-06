@@ -181,7 +181,7 @@ public class PullListDataSource implements DataSource
 			
 			
 		}
-		
+        c.close();
 		return mapIds;
 	}
 

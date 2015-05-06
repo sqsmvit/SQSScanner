@@ -167,7 +167,7 @@ public class PullReviewActivity extends ListActivity
 		scanDS = new ScanDataSource(this);
 		scanDS.open();
 		scanDS.delAllScans();
-		this.pullNumberList.clear();
+		pullNumberList.clear();
 		//resetScans();
 		pullAdapter.notifyDataSetChanged();
 	}

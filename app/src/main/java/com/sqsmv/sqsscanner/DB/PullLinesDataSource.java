@@ -1,8 +1,5 @@
 package com.sqsmv.sqsscanner.DB;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,6 +9,9 @@ import android.database.sqlite.SQLiteStatement;
 
 import com.sqsmv.sqsscanner.DB.PullLinesContract.PullLinesTable;
 import com.sqsmv.sqsscanner.Unimplemented.PullLines;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class PullLinesDataSource implements DataSource {
@@ -168,7 +168,7 @@ public class PullLinesDataSource implements DataSource {
 			
 			
 		}
-		
+        c.close();
 		return mapIds;
 	}
 
