@@ -3,7 +3,7 @@
 
     <string name="app_name">SQS Scanner</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="apk_file_name">SQSScanner.apk</string>
     <string name="scan_lbl">Prev Scan:</string>
     <string name="pull_lbl">Pull:</string>
     <string name="qty_lbl">Qty:</string>

@@ -3,14 +3,12 @@ package com.sqsmv.sqsscanner;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.widget.Toast;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.dropbox.sync.android.DbxAccountManager;
 
 
@@ -25,8 +23,8 @@ import com.dropbox.sync.android.DbxAccountManager;
 public class CheckDBXActivity extends Activity
 {
     private static final String TAG = "CheckDBXActivity";
-	
-	/* (non-Javadoc)
+
+    /* (non-Javadoc)
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 * 
 	 * ****** THIS IS THE ENTRY POINT ***********
@@ -37,53 +35,19 @@ public class CheckDBXActivity extends Activity
         super.onCreate(savedInstanceState);
 		String message = String.format("in onCreate and starting the PROGRAM for real!");
 		Log.d(TAG, message);
-		System.out.println(message);
 		setContentView(R.layout.activity_check_dbx);
-				
-		checkDbxAcct();		   
-		setAppTitle();
+
+    	//setAppTitle();
+		checkDbxAcct();
 	}
 
-	/**
-	 * Sets the title of the application
-	 */
-	private void setAppTitle()
-    {
-		this.setTitle("Scanner" + " v" + getVersion());
-	}   
-
-	/**
-	 * Gets the device version from the Android Manifest
-	 * 
-	 * @return the version of the application
-	 */
-	private String getVersion()
-    {
-		PackageManager man = this.getPackageManager();
-		
-		PackageInfo info;
-		try
-        {
-			info = man.getPackageInfo(this.getPackageName(), 0);
-			return info.versionName;
-		}
-        catch (NameNotFoundException e)
-        {
-			e.printStackTrace();
-			return "";
-		}
-
-		
-	}
-	
-	
 	/**
 	 * Check is the device is connected to wifi.
 	 * 
 	 * @return boolean for the wifi connection
 	 */
-	private boolean checkWifi(){
-		
+	private boolean checkWifi()
+	{
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		String message = String.format("in checkWifi and is connected is %b", wifi.isConnected());
@@ -127,7 +91,7 @@ public class CheckDBXActivity extends Activity
 				String message = String.format("in checkDbxAcct and the DbxAcctManager is convinced we have a linked Account.");
 				Log.d(TAG, message);
 				startLoadActivity();
-                finish();
+				finish();
 			}
 		}
 		else
@@ -149,15 +113,10 @@ public class CheckDBXActivity extends Activity
         if(requestCode == 0)
         {
             if(resultCode == RESULT_OK)
-            {
                 startLoadActivity();
-            }
 			else
-            {
                 displayErrMessage(this.getString(R.string.ERR_DROPBOX));
-            }
             finish();
 		}
 	}
-
 }

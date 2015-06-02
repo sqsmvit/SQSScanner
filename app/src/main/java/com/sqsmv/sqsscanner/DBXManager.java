@@ -1,10 +1,5 @@
 package com.sqsmv.sqsscanner;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -16,9 +11,16 @@ import com.dropbox.sync.android.DbxAccountManager;
 import com.dropbox.sync.android.DbxException;
 import com.dropbox.sync.android.DbxException.Unauthorized;
 import com.dropbox.sync.android.DbxFile;
+import com.dropbox.sync.android.DbxFileInfo;
 import com.dropbox.sync.android.DbxFileStatus;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 
 /**Manages interactions through the DropBox Sync API
  * 
@@ -39,10 +41,10 @@ public class DBXManager {
 	 */
 	public DBXManager(Context c)
 	{
-		this.context = c;
-		this.init();
-		this.mDbxAcctMgr = DbxAccountManager.getInstance(context.getApplicationContext(), appKey, appSecretKey);
-		this.getFileSystem();
+		context = c;
+		init();
+		mDbxAcctMgr = DbxAccountManager.getInstance(context.getApplicationContext(), appKey, appSecretKey);
+		getFileSystem();
 		clearCache();
 	}
 	
@@ -115,12 +117,12 @@ public class DBXManager {
 	/**
 	 * @param filePath
 	 * @return
-	 * @throws IOException
+	 * @throws DbxException
 	 */
-	public DbxFile openFile(String filePath) throws IOException
-	{
+	public DbxFile openFile(String filePath) throws DbxException
+    {
 		DbxPath dbxPath = new DbxPath(filePath);
-		DbxFile thisFile = this.dbxFs.open(dbxPath);
+		DbxFile thisFile = dbxFs.open(dbxPath);
 		checkFileSyncStatus(thisFile);
 		return thisFile;
 	}
@@ -183,6 +185,26 @@ public class DBXManager {
 			mDbxAcctMgr.startLink((Activity) this.context, 0);
 		}
 	}
+
+    public Date getDbxFileDate(String dbxFilePath)
+    {
+        Date lastModifiedDate = null;
+        clearCache();
+
+        try
+        {
+            DbxFile dbxFile = openFile(dbxFilePath);
+            dbxFile.getNewerStatus();
+            DbxFileInfo dbxFileInfo = dbxFile.getInfo();
+            lastModifiedDate = dbxFileInfo.modifiedTime;
+            dbxFile.close();
+        }
+        catch(DbxException e)
+        {
+            e.printStackTrace();
+        }
+        return lastModifiedDate;
+    }
 	
 	private void clearCache()
 	{

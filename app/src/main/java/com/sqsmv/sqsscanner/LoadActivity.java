@@ -3,6 +3,9 @@ package com.sqsmv.sqsscanner;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources.NotFoundException;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -18,30 +21,25 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class LoadActivity extends Activity {
+public class LoadActivity extends Activity
+{
 	 
-	 private static final String TAG = "Load_Activity";
-	 
-	//String[] xmlFiles;
-	//int[] xmlSchemas;
-	//private static ProgressDialog progressDialog; 
-		
+	private static final String TAG = "Load_Activity";
+
+    SharedPreferences config;
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+    {
 		super.onCreate(savedInstanceState);
 		String message = String.format("in onCreate and starting the LoadActivity!");
 		Log.d(TAG, message);
 		setContentView(R.layout.activity_load);
-	}
 
-	protected void onResume(){
-		super.onResume();
-		String message = String.format("in onResume and for the LoadActivity!");
-		Log.d(TAG, message);
-		//xmlFiles = LoadActivity.this.getResources().getStringArray(R.array.fmDumpFiles);
-		//xmlSchemas = getSchemaResIds();
-	}
-	
+        config = getSharedPreferences("scanConfig", 0);
+        setTitle(getTitle() + " v" + getVersion());
+    }
+
 	/**
 	 * Gets the resource Ids for the schemas of the xml files.
 	 * 
@@ -74,47 +72,53 @@ public class LoadActivity extends Activity {
 
 		String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
 		String message2 = String.format("today's buildDate = %s versus the system stored buildDate = %s",
-				buildDate, getSharedPreferences("scanConfig", 0).getString("buildDate", ""));
+				buildDate, config.getString("buildDate", ""));
 		Log.d(TAG, message2);
-		if(!(buildDate.equals(getSharedPreferences("scanConfig", 0).getString("buildDate", ""))))
+		if(!(buildDate.equals(config.getString("buildDate", ""))))
 		{
-			try
-			{
-				Intent popIntent = new Intent(this, PopDatabaseService.class);
-				String[] xmlFiles = this.getResources().getStringArray(R.array.fmDumpFiles);
-				int[] xmlSchemas = getSchemaResIds();
-		
-				popIntent.putExtra("XML_FILES", xmlFiles);
-				popIntent.putExtra("XML_SCHEMAS", xmlSchemas);
-				popIntent.putExtra("FORCE_UPDATE", 1);
-		
-				this.startService(popIntent);
-				Utilities.cleanFolder(new File(Environment.getExternalStorageDirectory().toString() + "/backups"), 180);
-				getSharedPreferences("scanConfig", 0).edit().putString("buildDate", buildDate).apply();
-
-                long productLensResetMilli = Long.parseLong(getSharedPreferences("scanConfig", 0).getString("ProductLensResetMilli", "0"));
-
-                LensDataSource lds = new LensDataSource(this);
-                lds.open();
-                lds.resetDB();
-                lds.close();
-
-                if(((System.currentTimeMillis() - productLensResetMilli)/86400000) >= 7)
+            if(checkNeedUpdate())
+                startUpdate();
+            else
+            {
+                try
                 {
-                    ProductLensDataSource plds = new ProductLensDataSource(this);
-                    plds.open();
-                    plds.resetDB();
-                    plds.close();
-                }
-                getSharedPreferences("scanConfig", 0).edit().putString("ProductLensResetMilli", Long.toString(System.currentTimeMillis())).apply();
+                    config.edit().putString("priorVersion", "").apply();
+                    Intent popIntent = new Intent(this, PopDatabaseService.class);
+                    String[] xmlFiles = this.getResources().getStringArray(R.array.fmDumpFiles);
+                    int[] xmlSchemas = getSchemaResIds();
 
-				pauseDialog();
-			}
-            catch (NotFoundException e)
-			{
-				Log.i(TAG, "Crash during db pop"  ,e);
-				e.printStackTrace();
-			}
+                    popIntent.putExtra("XML_FILES", xmlFiles);
+                    popIntent.putExtra("XML_SCHEMAS", xmlSchemas);
+                    popIntent.putExtra("FORCE_UPDATE", 1);
+
+                    this.startService(popIntent);
+                    Utilities.cleanFolder(new File(Environment.getExternalStorageDirectory().toString() + "/backups"), 180);
+                    config.edit().putString("buildDate", buildDate).apply();
+
+                    long productLensResetMilli = Long.parseLong(config.getString("ProductLensResetMilli", "0"));
+
+                    LensDataSource lds = new LensDataSource(this);
+                    lds.open();
+                    lds.resetDB();
+                    lds.close();
+
+                    if(((System.currentTimeMillis() - productLensResetMilli) / 86400000) >= 7)
+                    {
+                        ProductLensDataSource plds = new ProductLensDataSource(this);
+                        plds.open();
+                        plds.resetDB();
+                        plds.close();
+                    }
+                    config.edit().putString("ProductLensResetMilli", Long.toString(System.currentTimeMillis())).apply();
+
+                    pauseDialog();
+                }
+                catch(NotFoundException e)
+                {
+                    Log.i(TAG, "Crash during db pop", e);
+                    e.printStackTrace();
+                }
+            }
 		}
 		else
             startScanHomeActivity();
@@ -144,6 +148,54 @@ public class LoadActivity extends Activity {
     {
         Intent intent = new Intent(this, ScanHomeActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Gets the device version from the Android Manifest
+     *
+     * @return the version of the application
+     */
+    private String getVersion()
+    {
+        PackageManager man = getPackageManager();
+
+        PackageInfo info;
+        try
+        {
+            info = man.getPackageInfo(getPackageName(), 0);
+            return info.versionName;
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+    private boolean checkNeedUpdate()
+    {
+        boolean needUpdate = false;
+        DBXManager dbxManager = new DBXManager(this);
+        String apkFileName = getString(R.string.apk_file_name);
+        String lastUpdated = config.getString("lastAppUpdate", "");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd", Locale.US);
+        Date fileModifiedDate = dbxManager.getDbxFileDate("/out/" + apkFileName);
+
+        if(lastUpdated.isEmpty())
+            config.edit().putString("lastAppUpdate", dateFormat.format(fileModifiedDate)).apply();
+        else if(!lastUpdated.equals(dateFormat.format(fileModifiedDate)) || config.getString("priorVersion", "").equals(getVersion()))
+            needUpdate = true;
+
+        return needUpdate;
+    }
+
+    private void startUpdate()
+    {
+        config.edit().putString("priorVersion", getVersion()).apply();
+        ProgressDialog.show(this, "Updating Application", "Please Stay in Wifi Range...", true);
+        Intent appUpdateIntent = new Intent(this, AppUpdateService.class);
+        startService(appUpdateIntent);
     }
 }
 
