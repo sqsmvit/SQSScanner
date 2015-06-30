@@ -48,10 +48,7 @@ public class PopDatabaseService extends IntentService
 		int[] xmlSchemas = intent.getIntArrayExtra("XML_SCHEMAS");
 		forceDBUpdate = intent.getIntExtra("FORCE_UPDATE", 0) == 1 ? true : false;
 		
-		//TODO: Uncomment when pull list info is being used
-		//DataSource[] dataSources = new DataSource[] {new ProductsDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new PullListDataSource(this), new PullLinesDataSource(this)};
-		
-		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new ProductLensDataSource(this)};//, new PullListDataSource(this)};
+		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new ProductLensDataSource(this)};
 		makeNotification("Dropbox Download Started", false);
 
         //Needed for X and X2
@@ -69,24 +66,15 @@ public class PopDatabaseService extends IntentService
         ArrayList<Thread> updateThreads = new ArrayList<Thread>();
 		for(DataSource dataSource : dataSources)
 		{
-			FMDumpHandler xmlHandler = new FMDumpHandler(this, xmlFiles[i], dataSource, this.getResources().getStringArray(xmlSchemas[i]), forceDBUpdate);
+			FMDumpHandler xmlHandler = new FMDumpHandler(this, xmlFiles[i], dataSource, getResources().getStringArray(xmlSchemas[i]), forceDBUpdate);
 			//xmlHandler.run();
-            Thread updateThread = new Thread(xmlHandler);
+            Thread updateThread = new Thread(xmlHandler, xmlFiles[i]);
             updateThreads.add(updateThread);
-            updateThread.start();
+            //updateThread.start();
 			i += 1;
 		}
-        for(Thread updateThread : updateThreads)
-        {
-            try
-            {
-                updateThread.join();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
+
+        startUpdateThreads(updateThreads);
 
         makeNotification("Database Update Finished", true);
 	}
@@ -178,6 +166,33 @@ public class PopDatabaseService extends IntentService
 		// mId allows you to update the notification later on.
 		mNotificationManager.notify(0, mBuilder.build());
 	}
+
+    private void startUpdateThreads(ArrayList<Thread> updateThreads)
+    {
+        int count = 0;
+        while(!updateThreads.isEmpty())
+        {
+            Thread updateThread = updateThreads.get(count);
+            Log.d(TAG, "Staring thread " + updateThread.getName());
+            updateThread.start();
+            count++;
+            if((count % 2) == 0 || updateThreads.size() < 2)
+            {
+                for(int i = 0; i < count; i++)
+                {
+                    try
+                    {
+                        updateThreads.remove(0).join();
+                    }
+                    catch(InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                count = 0;
+            }
+        }
+    }
 
     private void resetDBs()
     {

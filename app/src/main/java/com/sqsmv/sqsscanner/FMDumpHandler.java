@@ -38,10 +38,8 @@ public class FMDumpHandler implements Runnable {
 	
  	public FMDumpHandler(Context ctx, String file, DataSource dataSource, String[] xmlTags, Boolean forceUpdate)
     {
-		String message = String.format("in constructor and starting %s!", TAG);
+		String message = String.format("in constructor %s!", TAG);
 		Log.d(TAG, message);
-		
-		System.out.println(message);
 		
 		this.callingContext = ctx;
 		this.file = file;
