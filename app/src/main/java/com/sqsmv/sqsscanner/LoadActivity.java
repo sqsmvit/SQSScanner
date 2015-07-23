@@ -180,6 +180,7 @@ public class LoadActivity extends Activity
         String apkFileName = getString(R.string.apk_file_name);
         String lastUpdated = config.getString("lastAppUpdate", "");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd", Locale.US);
+        dbxManager.getDbxFileDate("/out/" + apkFileName);
         Date fileModifiedDate = dbxManager.getDbxFileDate("/out/" + apkFileName);
 
         if(lastUpdated.isEmpty())
