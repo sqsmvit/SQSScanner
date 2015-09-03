@@ -9,7 +9,6 @@ import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.dropbox.sync.android.DbxFile;
 import com.sqsmv.sqsscanner.DB.DataSource;
 import com.sqsmv.sqsscanner.DB.LensDataSource;
 import com.sqsmv.sqsscanner.DB.PriceListDataSource;
@@ -30,25 +29,23 @@ import java.util.zip.ZipInputStream;
 public class PopDatabaseService extends IntentService
 {
 	private static final String TAG = "PopDatabaseService";
-	private Boolean forceDBUpdate;
 
-    String zipFileName = "files.zip";
+    private String zipFileName = "files.zip";
 	
-	public PopDatabaseService() {
+	public PopDatabaseService()
+    {
 		super(TAG);
-		forceDBUpdate = false;
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent)
     {
-		
 		Log.i(TAG, "Received an Intent: " + intent);
 		String[] xmlFiles = intent.getStringArrayExtra("XML_FILES");
 		int[] xmlSchemas = intent.getIntArrayExtra("XML_SCHEMAS");
-		forceDBUpdate = intent.getIntExtra("FORCE_UPDATE", 0) == 1 ? true : false;
-		
-		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this), new PriceListDataSource(this), new ProductLensDataSource(this)};
+
+		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this),
+                                                     new PriceListDataSource(this), new ProductLensDataSource(this)};
 		makeNotification("Dropbox Download Started", false);
 
         //Needed for X and X2
@@ -66,7 +63,7 @@ public class PopDatabaseService extends IntentService
         ArrayList<Thread> updateThreads = new ArrayList<Thread>();
 		for(DataSource dataSource : dataSources)
 		{
-			FMDumpHandler xmlHandler = new FMDumpHandler(this, xmlFiles[i], dataSource, getResources().getStringArray(xmlSchemas[i]), forceDBUpdate);
+			FMDumpHandler xmlHandler = new FMDumpHandler(xmlFiles[i], dataSource, getResources().getStringArray(xmlSchemas[i]));
 			//xmlHandler.run();
             Thread updateThread = new Thread(xmlHandler, xmlFiles[i]);
             updateThreads.add(updateThread);
@@ -83,25 +80,9 @@ public class PopDatabaseService extends IntentService
     {
         String message = String.format("in copyDBXFile");
         Log.d(TAG, message);
-        DBXManager dbxMan = new DBXManager(this);
+        DropboxManager dbxMan = new DropboxManager(this);
 
-        try
-        {
-            DbxFile dbxXml = dbxMan.openFile("/out/lens.xml");
-            dbxMan.writeToStorage(dbxXml.getReadStream(), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/lens.xml");
-            dbxXml.close();
-            //DbxFile
-            dbxXml = dbxMan.openFile("/out/" + zipFileName);
-            dbxMan.writeToStorage(dbxXml.getReadStream(), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
-            dbxXml.close();
-            Log.i(this.toString(), "It worked!");
-        }
-        catch (Exception e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Log.i(this.toString(), "It did NOT Work! DropBox ERROR", e);
-        }
+        dbxMan.writeToStorage("/out/" + zipFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + File.separator + zipFileName, false);
     }
 
     private void unzip(File zipFile)

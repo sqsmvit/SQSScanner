@@ -2,7 +2,6 @@ package com.sqsmv.sqsscanner;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.widget.ToggleButton;
@@ -15,7 +14,7 @@ import com.onbarcode.barcode.android.IBarcode;
 
 public class SocketMobilePairActivity extends Activity
 {
-    SharedPreferences config;
+    private DroidConfigManager appConfig;
 
     BarcodeView sppBarcodeView, btaddrBarcodeView;
     ToggleButton scannerLockToggle;
@@ -32,13 +31,13 @@ public class SocketMobilePairActivity extends Activity
         Code128 sppBarcode = new Code128();
         Code128 btaddrBarcode = new Code128();
 
-        config = getSharedPreferences("scanConfig", 0);
+        appConfig = new DroidConfigManager(this);
 
         sppBarcodeView = (BarcodeView)findViewById(R.id.SPPBarcodeView);
         btaddrBarcodeView = (BarcodeView)findViewById(R.id.BTAddrBarcodeView);
         scannerLockToggle = (ToggleButton)findViewById(R.id.scannerLockToggle);
 
-        scannerLockToggle.setChecked(config.getBoolean("scannerLock", false));
+        scannerLockToggle.setChecked(appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, null, false));
 
         makeBarcode(sppBarcode, sppData, 0);
         sppBarcodeView.drawBarcode(sppBarcode);
@@ -113,6 +112,6 @@ public class SocketMobilePairActivity extends Activity
 
     private void saveScanLock()
     {
-        config.edit().putBoolean("scannerLock", scannerLockToggle.isChecked()).apply();
+        appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, scannerLockToggle.isChecked(), false);
     }
 }

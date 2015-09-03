@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sqsmv.sqsscanner.DB.ScanContract.ScanTable;
 import com.sqsmv.sqsscanner.DB.ScanDataSource;
 
 import java.io.File;
@@ -28,16 +26,8 @@ import java.util.HashMap;
 
 public class PullReviewActivity extends ListActivity
 {
-	public static String[] writeCols = {ScanTable.COLUMN_NAME_SCAN_ENTRY,
-										ScanTable.COLUMN_NAME_QUANTITY,
-										ScanTable.COLUMN_NAME_FK_PULL_ID,
-										ScanTable.COLUMN_NAME_DATE};
-	
-	public static int EXPORT_METHOD;
-	public static boolean FILE_EXPORTED;
-	public static boolean BILL_B_MODE;
-    int exportModeChoice;
-	private boolean invAdjMode;
+    public static boolean FILE_EXPORTED;
+	private int exportModeChoice;
 	private int invAdjChoice;
 	
 	private File exportFile;
@@ -46,7 +36,6 @@ public class PullReviewActivity extends ListActivity
 	private ScanDataSource scanDS;
 	private ArrayList<HashMap<String, String>>pullNumberList = new ArrayList<HashMap<String, String>>();
 
-	public int editPos = 0;
 	TextView commitModeView;
 	
 	@Override
@@ -61,17 +50,14 @@ public class PullReviewActivity extends ListActivity
 		View header = getLayoutInflater().inflate(R.layout.pullrow_header, null);
 		listView.addHeaderView(header);
 		
-		commitModeView = (TextView) findViewById(R.id.commitMode); 
-		
-		//createAdapter();
-		//listView.setAdapter(pullAdapter);
+		commitModeView = (TextView) findViewById(R.id.commitMode);
 		
 		listView.setOnItemClickListener(new OnItemClickListener()
 		{
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View view, int position, long id)
 			{
-				editPos = position - 1;
+                int editPos = position - 1;
 				String pullNum = pullNumberList.get(editPos).get("pullNum");
 				String pullRecords = pullNumberList.get(editPos).get("pullLines");
 				String pullPieces = pullNumberList.get(editPos).get("pullCount");
@@ -107,9 +93,6 @@ public class PullReviewActivity extends ListActivity
 		pullAdapter.notifyDataSetInvalidated();
 	}
 
-	/**
-	 * 
-	 */
 	public void writeFromDB()
 	{
 		ScanWriter scanWriter = new ScanWriter(this, exportModeChoice, invAdjChoice);
@@ -168,11 +151,9 @@ public class PullReviewActivity extends ListActivity
 		scanDS.open();
 		scanDS.delAllScans();
 		pullNumberList.clear();
-		//resetScans();
 		pullAdapter.notifyDataSetChanged();
 	}
-	
-	
+
 	/**
 	 * @param v
 	 */
@@ -267,14 +248,12 @@ public class PullReviewActivity extends ListActivity
 	/**
 	 * 
 	 */
-	private void setConfig(){
-		
-		SharedPreferences config = getSharedPreferences("scanConfig", 0);
+	private void setConfig()
+	{
+		DroidConfigManager appConfig = new DroidConfigManager(this);
 		//default is DBX
-		EXPORT_METHOD = config.getInt("exportMethod", 1);
-        exportModeChoice = config.getInt("ExportModeChoice", 1);
-        invAdjChoice = config.getInt("InventoryModeChoice", 1);
-
+		exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
+        invAdjChoice = appConfig.accessInt(DroidConfigManager.INVENTORY_MODE_CHOICE, null, 1);
     }
 	
 	private void displayMode()
@@ -305,6 +284,8 @@ public class PullReviewActivity extends ListActivity
             commitModeView.setText("RI Mode");
         }
 		else
-			commitModeView.setText("Error");
+        {
+            commitModeView.setText("Error");
+        }
 	}
 }

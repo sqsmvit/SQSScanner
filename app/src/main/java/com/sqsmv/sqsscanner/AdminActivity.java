@@ -5,7 +5,6 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,11 +16,7 @@ import android.widget.Toast;
 import com.sqsmv.sqsscanner.DB.DBAdapter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,8 +47,6 @@ public class AdminActivity extends ListActivity
 {
 	private ArrayList<HashMap<String, String>>backupList = new ArrayList<HashMap<String, String>>();
 	private Context context;
-	//private RadioGroup exportGrp;
-	private SharedPreferences scanConfig;
 	private SimpleAdapter backupAdapter;
 	private File root;
 	
@@ -64,14 +57,8 @@ public class AdminActivity extends ListActivity
 		
 		context = this;
 		
-		scanConfig = getSharedPreferences("scanConfig", 0);
 		View header = getLayoutInflater().inflate(R.layout.admin_header, null);
-		//exportGrp = (RadioGroup) header.findViewById(R.id.exportGrp);
-		//exportGrp.check(scanConfig.getInt("exportSel", 1));
-		
 
-		//File root = new File(getFilesDir().getAbsolutePath());
-		//root = new File(getDir(getString(R.string.BACKUP_DIR, Context.MODE_PRIVATE), 0).getAbsolutePath());
 		root = new File(Environment.getExternalStorageDirectory().toString() + "/backups");
 		root.mkdir();
 		createAdapterDataset(root);
@@ -258,7 +245,7 @@ public class AdminActivity extends ListActivity
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
                     try {
-                        exportBackup(selected, fileName);
+                        exportBackup(selected);
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -289,98 +276,16 @@ public class AdminActivity extends ListActivity
 		super.onBackPressed();
 		//writePref();
 	}
-	
-	
+
 	/**
-	 * Writes the export location to the shared preferences file.
-	 * 
-	 * 
-	 */
-    /*
-	private void writePref(){
-		
-		SharedPreferences.Editor scanState = scanConfig.edit();
-		scanState.putInt("exportSel", exportGrp.getCheckedRadioButtonId());
-		scanState.putInt("exportMethod", setExport());
-		scanState.commit();
-		
-	}
-	*/
-	/**
-	 * 
 	 * Exports a backup to the internal storage on the device
 	 * 
 	 * @param src - where the file is coming from
-	 * @param fName - where the file is going to
 	 * @throws IOException
 	 */
-	private void exportBackup(File src, String fName) throws IOException
+	private void exportBackup(File src) throws IOException
 	{
-		//Export to SD Card
-		//ScanExporter scanExporter = new ScanExporter(this, src, true, false);
-		//scanExporter.exportScan();
-		//Export to DropBox 
 		ScanExporter scanExporter = new ScanExporter(this, src, 0, false);
 		scanExporter.exportScan();
-		/*
-		File root = new File(Environment.getExternalStorageDirectory().toString() + "/Scans");
-		root.mkdirs();
-		File expScan = new File(root.getAbsolutePath(), fName);
-		copyFile(src, expScan);	
-		*/
 	}
-	
-	
-	
-	/**
-	 * 
-	 * Copies the file to the filesystem
-	 * 
-	 * @param src - where the file is coming from
-	 * @param dest - where the file is going to
-	 * @throws IOException
-	 */
-	public void copyFile(File src, File dest) throws IOException{
-		
-	    InputStream in = new FileInputStream(src);
-	    OutputStream out = new FileOutputStream(dest);
-
-	    byte[] buf = new byte[1024];
-	    int len;
-	    
-	    while ((len = in.read(buf)) > 0) {
-	        out.write(buf, 0, len);
-	    }
-	    
-	    in.close();
-	    out.close();
-		
-	}
-	
-	/**
-	 * 
-	 * Looks at which radiobutton is selected and sets:
-	 * 
-	 * 0 - sdcard export
-	 * 1 - dropbox export
-	 * 
-	 * @return integer bool value for exporting to dropbox
-	 */
-    /*
-	public int setExport(){
-		
-		int checkId = exportGrp.getCheckedRadioButtonId();
-		
-		switch(checkId){
-		
-			case(R.id.SD): return getResources().getInteger(R.integer.EXPORT_SD);
-		
-			case(R.id.DBX): return getResources().getInteger(R.integer.EXPORT_DBX);
-
-		default: return 1;
-		
-		}
-		
-	}
-    */
 }

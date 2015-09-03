@@ -1,13 +1,7 @@
 package com.sqsmv.sqsscanner;
 
 import android.content.Context;
-import android.os.Environment;
 import android.widget.Toast;
-
-import com.dropbox.sync.android.DbxAccountManager;
-import com.dropbox.sync.android.DbxFile;
-import com.dropbox.sync.android.DbxFileSystem;
-import com.dropbox.sync.android.DbxPath;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +19,7 @@ public class ScanExporter
 	private File exportFile;
 	private boolean fromCommit;
 	private Context callingContext;
-	private DbxAccountManager mDbxAcctMgr;
+	private DropboxManager dropboxManager;
     private int exportMode;
 	
 	/**Creates a ScanExporter object which is used to export a
@@ -43,15 +37,9 @@ public class ScanExporter
 		this.exportMode = exportMode;
 		this.fromCommit = fromCommit;
 		this.callingContext = ctx;
-		this.mDbxAcctMgr = DbxAccountManager.getInstance(ctx.getApplicationContext(), ctx.getString(R.string.DBX_APP_KEY), ctx.getString(R.string.DBX_SECRET_KEY));
+		this.dropboxManager = new DropboxManager(ctx);
 	}
 	
-	/**Process the export of the file to DropBox or the SD Card
-	 * 
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
 	public boolean exportScan() throws IOException
 	{
         String exportPath = "/Default/";
@@ -65,83 +53,21 @@ public class ScanExporter
             exportPath = "/RI/";
 
         return exportDBX(exportPath);
-        /*
-		if(isSD)
-		{
-			return exportSD();
-		}
-		else
-		{
-			return exportDBX();	
-		}*/
 	}
 	
-	/**Exports the File to the SD card,
-	 * Alerts the user that the File has been 
-	 * exported.
-	 * 
-	 * @return whether the export was successful or not
-	 * @throws IOException
-	 */
-	private boolean exportSD() throws IOException
-	{
-		if(checkSD())
-		{
-			File root = new File(Environment.getExternalStorageDirectory().toString() + "/Scans");
-			root.mkdirs();
-			File toSDFile = new File(root.getAbsolutePath(), this.exportFile.getName());
-			new ScanWriter(this.callingContext, 0, this.exportFile.getName()).copyFile(exportFile, toSDFile);
-			Toast.makeText(this.callingContext, "File exported to SD card" , Toast.LENGTH_SHORT).show();
-			if(fromCommit)
-				this.exportFile.delete();
-			return true;
-		}
-		else
-		{
-			Toast.makeText(this.callingContext, "Error exporting to SD" , Toast.LENGTH_SHORT).show();
-			return false;
-		}
-	}
-	
-	/**Checks to make sure that the SD card 
-	 * is available
-	 * 
-	 * 
-	 * @return whether the sd card is available.
-	 */
-	private boolean checkSD()
-	{
-		String sdState = Environment.getExternalStorageState();
-		
-		if (Environment.MEDIA_MOUNTED.equals(sdState) && !(Environment.MEDIA_MOUNTED_READ_ONLY.equals(sdState)))
-		{
-			return true;
-		}
-		else
-		{
-			Toast.makeText(callingContext, "SD Card not available", Toast.LENGTH_LONG).show();
-			return false;
-		}
-	}
-	
-	/**Exports the file to DropBox.
-	 * 
-	 * 
+	/**
+     * Exports the file to DropBox.
 	 * @return if export is successful
 	 * @throws IOException
 	 */
 	private boolean exportDBX(String exportPath) throws IOException
 	{
-		if(mDbxAcctMgr.hasLinkedAccount())
+		if(dropboxManager.hasLinkedAccount())
 		{
-			DbxPath scanPath = new DbxPath(exportPath + this.exportFile.getName());
-			DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
-			DbxFile tempFile = dbxFs.create(scanPath);
-			tempFile.getNewerStatus();
-			tempFile.writeFromExistingFile(this.exportFile, fromCommit);
-			Toast.makeText(this.callingContext, "File exported to DropBox" , Toast.LENGTH_SHORT).show();
-			tempFile.close();
-			return true;	
+			String scanPath = exportPath + this.exportFile.getName();
+            dropboxManager.writeToDropbox(this.exportFile, scanPath, fromCommit, true);
+			Toast.makeText(this.callingContext, "File exported to DropBox", Toast.LENGTH_SHORT).show();
+			return true;
 		}
 		else
 		{

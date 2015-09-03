@@ -9,9 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.dropbox.sync.android.DbxAccountManager;
-
-
 /**
  * @author ChrisS
  *
@@ -23,6 +20,9 @@ import com.dropbox.sync.android.DbxAccountManager;
 public class CheckDBXActivity extends Activity
 {
     private static final String TAG = "CheckDBXActivity";
+
+	private DroidConfigManager appConfig;
+	private DropboxManager dropboxManager;
 
     /* (non-Javadoc)
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -37,12 +37,31 @@ public class CheckDBXActivity extends Activity
 		Log.d(TAG, message);
 		setContentView(R.layout.activity_check_dbx);
 
-    	//setAppTitle();
-		checkDbxAcct();
+		appConfig = new DroidConfigManager(this);
+		dropboxManager = new DropboxManager(this);
+
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+        checkDbxAcct();
+
+		if(dropboxManager.finishAuthentication())
+		{
+			String accessToken = dropboxManager.getOAuth2AccessToken();
+			appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, "");
+			dropboxManager.setStaticOAuth2AccessToken(accessToken);
+		}
+		if(dropboxManager.hasLinkedAccount())
+        {
+            startLoadActivity();
+        }
 	}
 
 	/**
-	 * Check is the device is connected to wifi.
+	 * Check if the device is connected to wifi.
 	 * 
 	 * @return boolean for the wifi connection
 	 */
@@ -54,8 +73,7 @@ public class CheckDBXActivity extends Activity
 		Log.d(TAG, message);
 		return wifi.isConnected();
 	}
-	
-	
+
 	/**
 	 * Starts the LoadActivity
 	 */
@@ -81,41 +99,19 @@ public class CheckDBXActivity extends Activity
     {
 		if(checkWifi())
         {
-			DbxAccountManager mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), getString(R.string.DBX_APP_KEY), getString(R.string.DBX_SECRET_KEY));
-			if(!(mDbxAcctMgr.hasLinkedAccount()))
-            {
-				mDbxAcctMgr.startLink((Activity)this, 0);
+			String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, "");
+			if(!accessToken.isEmpty())
+			{
+				dropboxManager.setStaticOAuth2AccessToken(accessToken);
 			}
 			else
-            {
-				String message = String.format("in checkDbxAcct and the DbxAcctManager is convinced we have a linked Account.");
-				Log.d(TAG, message);
-				startLoadActivity();
-				finish();
+			{
+				dropboxManager.linkDropboxAccount();
 			}
 		}
 		else
         {
 			displayErrMessage(this.getString(R.string.ERR_WIFI));
-            finish();
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
-	 */
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        String message = String.format("in onActivityResult and we got a requestCode of %d and resultCode of %d.", requestCode, resultCode);
-        Log.d(TAG, message);
-
-        if(requestCode == 0)
-        {
-            if(resultCode == RESULT_OK)
-                startLoadActivity();
-			else
-                displayErrMessage(this.getString(R.string.ERR_DROPBOX));
             finish();
 		}
 	}

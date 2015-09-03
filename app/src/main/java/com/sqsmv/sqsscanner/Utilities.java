@@ -1,6 +1,8 @@
 package com.sqsmv.sqsscanner;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -61,5 +63,22 @@ public class Utilities
 				((i >> 16 ) & 0xFF) + "." +
 				((i >> 8 ) & 0xFF) + "." +
 				( i & 0xFF);
+	}
+
+	public static String getVersion(Context callingContext)
+	{
+		String version = "";
+
+		try
+		{
+			PackageInfo packageInfo = callingContext.getPackageManager().getPackageInfo(callingContext.getPackageName(), 0);
+			version = packageInfo.versionName;
+		}
+		catch (PackageManager.NameNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+
+		return version;
 	}
 }

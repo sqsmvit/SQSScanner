@@ -1,10 +1,8 @@
 package com.sqsmv.sqsscanner;
 
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.dropbox.sync.android.DbxFile;
 import com.sqsmv.sqsscanner.DB.DataSource;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -15,82 +13,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 
 
 public class FMDumpHandler implements Runnable {
 
 	private static final String TAG = "FMDumpHandler";
-	private Context callingContext;
 	private String file;
 	private String[] xmlTags;
 	private DataSource dataSource;
-	private Boolean forceDBUpdate;
-	
-	public FMDumpHandler(Context ctx, String file, DataSource dataSource, String[] xmlTags)
-    {
-		this(ctx, file, dataSource, xmlTags, false);
-	}
-	
- 	public FMDumpHandler(Context ctx, String file, DataSource dataSource, String[] xmlTags, Boolean forceUpdate)
+
+ 	public FMDumpHandler(String file, DataSource dataSource, String[] xmlTags)
     {
 		String message = String.format("in constructor %s!", TAG);
 		Log.d(TAG, message);
 		
-		this.callingContext = ctx;
 		this.file = file;
 		this.dataSource = dataSource;
 		this.xmlTags = xmlTags;
-		this.forceDBUpdate = forceUpdate;
-	}
-	
-	public boolean checkPreferences()
-	{
-		if (forceDBUpdate)
-		{
-			return false;
-		}
-		else
-		{
-			String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
-			return buildDate.equals(callingContext.getSharedPreferences("scanConfig", 0).getString("buildDate", ""));
-		}
 	}
 
-	private File copyDBXFile() throws Exception
-	{
-		String message = String.format("in copyDBXFile");
-		Log.d(TAG, message);
-		DBXManager dbxMan = new DBXManager(callingContext);
-		
-		try
-		{
-			DbxFile dbxXml = dbxMan.openFile("/out" + this.file);
-			String message2 = String.format("dbxXml file is %s, public storage is %s", 
-					dbxXml.getPath().toString(),
-					Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + this.file);
-			Log.d(TAG, message2);
-			dbxMan.writeToStorage(dbxXml.getReadStream(), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + this.file);
-			message2 = String.format("It Worked!");
-			dbxXml.close();
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Log.i(this.toString(), "It did NOT Work! DropBox ERROR", e);
-			throw e;
-		}
-		
-		File localFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + this.file);
-		
-		return localFile;
-	}
-			
 	private boolean buildTableFromXML() throws Exception
     {
 		String message = String.format("in buildTableFromXML at 1");

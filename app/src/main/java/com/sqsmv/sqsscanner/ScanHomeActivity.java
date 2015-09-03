@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -22,10 +21,10 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.socketmobile.apiintegration.ScanAPIApplication;
 import com.sqsmv.sqsscanner.DB.ProductDataSource;
 import com.sqsmv.sqsscanner.DB.ScanDataSource;
 import com.sqsmv.sqsscanner.DB.UPCDataSource;
-import com.socketmobile.apiintegration.ScanAPIApplication;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -40,34 +39,32 @@ import java.util.regex.Pattern;
 @SuppressLint("ShowToast")
 public class ScanHomeActivity extends Activity
 {
-	public static final String DEBUG = "SQS";
 	public static boolean ERROR_SCANS;
 	private static final String TAG = "ScanHomeActivity";
 
 	private ScanRecord currentRecord;
 
 	// Config info
-	public static boolean isAutoScan;
-	public static int autoVal;
-	public static int msgTime;
+	public boolean isAutoScan;
+	public int autoVal;
+	public int msgTime;
 	public int boxQty;
 	public boolean isBoxQty;
     private String lensId;
 
-	public static Pattern sqsRegEx;
-	public static Pattern upcRegEx;
+	public Pattern sqsRegEx;
+	public Pattern upcRegEx;
 
 	private boolean ERR_SCAN;
 
 	private String thisMasNum;
 
-	private SharedPreferences config;
+    private DroidConfigManager appConfig;
 
 	private boolean isMasNum = false;
 	public boolean isManQty;
 	public boolean isNewProduct;
-	
-	
+
 	private String mark = "";
 	private Toast titleMessage;
 	private EditText mScanId;
@@ -109,6 +106,7 @@ public class ScanHomeActivity extends Activity
 		this.upcDataSource = new UPCDataSource(this);
 		this.scanDataSource = new ScanDataSource(this);
 
+        msgTime = 3;
 		upcRegEx = Pattern.compile(getString(R.string.upcRegEx));
 		sqsRegEx = Pattern.compile(getString(R.string.sqsRegEx));
 
@@ -126,7 +124,7 @@ public class ScanHomeActivity extends Activity
 		pullPieceCount = (TextView) findViewById(R.id.totalCount);
 		titleCount = (TextView) findViewById(R.id.totalTitleCount);
 
-		config = getSharedPreferences("scanConfig", 0);
+        appConfig = new DroidConfigManager(this);
 
 
 		titleMessage = Toast.makeText(this, "", Toast.LENGTH_SHORT);
@@ -238,7 +236,7 @@ public class ScanHomeActivity extends Activity
     @Override
     protected void onStop()
     {
-        boolean scannerLock = config.getBoolean("scannerLock", false);
+        boolean scannerLock = appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, null, false);
         // unregister the scanner
         unregisterReceiver(receiver);
 
@@ -325,41 +323,12 @@ public class ScanHomeActivity extends Activity
 		}
 
         String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
-        if(!(buildDate.equals(getSharedPreferences("scanConfig", 0).getString("buildDate", ""))))
+        if(!(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, ""))))
         {
             finish();
         }
 	}
-	/**
-	 * @param data
-	 */
-	/*
-	private void checkMarkIntent(Intent data) {
 
-		if (data != null) {  
-			if (data.hasExtra("MARK_ID")) {
-				this.mSkidMode.setVisibility(View.VISIBLE);
-				this.mark = data.getStringExtra("MARK_ID");
-				//((TextView) this.findViewById(R.id.skid_id)).setText(this.mark);
-				//((ToggleButton) this.findViewById(R.id.tog_set_mark)).setChecked(true);
-				updateMarks();
-
-			}
-		}
-
-	}
-
-	  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		     if (resultCode == 0) 
-		     {
-		    	 if(requestCode == 3)
-		    	 {
-		    		 mark = data.getStringExtra("MARK_ID");
-		    	 }
-		     }
-	}*/
-	
-	
 	/*
 	 * Checks data sent read from scanner using regex. Ensures data is a MAS
 	 * number or a valid UPC. Sets the text ScanId view to a valid scan. The UPC
@@ -371,8 +340,8 @@ public class ScanHomeActivity extends Activity
 	 * @param data
 	 * @return
 	 */
-	public boolean checkScan(String data) {
-
+	public boolean checkScan(String data)
+	{
 		if (sqsRegEx.matcher(data).matches())
 		{
 			isMasNum = true;
@@ -405,26 +374,11 @@ public class ScanHomeActivity extends Activity
 			}
 			else
 				commitRecord();
-			/*
-			if (isAutoScan && !isManQty)
-			{
-				quantity.setText(Integer.toString(autoVal));
-				commitRecord();
-				return true;
-			}
-			else if()
-			else
-			{
-				enterQuantity();
-				return true;
-			}*/
 			return true;
 		}
-
-		else {
-
-			Toast.makeText(getBaseContext(), "Invalid Scan", Toast.LENGTH_LONG)
-					.show();
+		else
+		{
+			Toast.makeText(getBaseContext(), "Invalid Scan", Toast.LENGTH_LONG).show();
 			return false;
 		}
 
@@ -433,27 +387,10 @@ public class ScanHomeActivity extends Activity
 	/**
 	 * @return
 	 */
-	public boolean commitRecord() {
-
+	public boolean commitRecord()
+    {
 		String tempId = getProductId();
-
 		processRecord();
-		/*
-		if(isBoxQty)
-		{
-			confirmBoxQty(this.boxQty);
-			processRecord();
-		}
-		else
-		{
-			processRecord();
-		}
-		 */
-		/*
-		if (!mark.isEmpty()) {
-			updateMarks();
-		}
-		*/
 		showTitle();
 		setTitleCount(currentRecord.getScanEntry());
 
@@ -692,14 +629,12 @@ public class ScanHomeActivity extends Activity
 	 */
 	public void setConfig()
 	{
-		isAutoScan = config.getBoolean("isAutoCount", false);
-		autoVal = config.getInt("autoCount", 0);
-		msgTime = config.getInt("msgTime", 3);
-		isBoxQty = config.getBoolean("isBoxQty", false);
-		//isManQty = config.getBoolean("isManQty", false);
-		//isNewProduct = config.getBoolean("isNewProduct", false);
-		String tempBox = config.getString("boxQty", "0");
-        lensId = config.getString("lensSelectionId", "1");
+		isAutoScan = appConfig.accessBoolean(DroidConfigManager.IS_AUTO_COUNT, null, false);
+		autoVal = appConfig.accessInt(DroidConfigManager.AUTO_COUNT, null, 0);
+
+		isBoxQty = appConfig.accessBoolean(DroidConfigManager.IS_BOX_QTY, null, false);
+		String tempBox = appConfig.accessString(DroidConfigManager.BOX_QTY, null, "0");
+        lensId = appConfig.accessString(DroidConfigManager.LENS_SELECTION_ID, null, "1");
 		if (tempBox == "")
 		{
 			tempBox = "1";
@@ -1018,13 +953,7 @@ public class ScanHomeActivity extends Activity
                 if(mPullNum.getText().toString().equals("1"))
                 {
                     goToAdmin();
-                }/*
-                else if (data.equals(getString(R.string.adminCode)))
-                {
-                    goToAdmin();
-                    mScanId.setText("");
-                    titleCount.setText("");
-                }// end if*/
+                }
                 else if (data.contains("P"))
                 {
                     mPullNum.setText(data.substring(1));
