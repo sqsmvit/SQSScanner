@@ -93,7 +93,7 @@ public class ScanDataSource implements DataSource
         {
             //RI Mode
             String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_TITLE};
-            return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, ScanTable.COLUMN_NAME_MASNUM);
+            return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, null);
         }
         else
         {
