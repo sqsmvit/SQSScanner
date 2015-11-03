@@ -95,6 +95,12 @@ public class ScanDataSource implements DataSource
             String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_TITLE};
             return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, null);
         }
+		else if(exportMode == 6)
+		{
+			//Skid Mode
+			String[] cols = new String[]{ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_DATE};
+			return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, null);
+		}
         else
         {
             //Fail for some reason

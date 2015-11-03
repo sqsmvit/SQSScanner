@@ -151,6 +151,22 @@ public class PopDatabaseService extends IntentService
     private void startUpdateThreads(ArrayList<Thread> updateThreads)
     {
         int count = 0;
+        for(Thread updateThread : updateThreads)
+        {
+            updateThread.start();
+        }
+        for(Thread updateThread : updateThreads)
+        {
+            try
+            {
+                updateThread.join();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+            /*
         while(!updateThreads.isEmpty())
         {
             Thread updateThread = updateThreads.get(count);
@@ -172,7 +188,7 @@ public class PopDatabaseService extends IntentService
                 }
                 count = 0;
             }
-        }
+        }*/
     }
 
     private void resetDBs()

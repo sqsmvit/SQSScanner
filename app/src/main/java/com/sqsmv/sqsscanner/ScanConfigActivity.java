@@ -20,6 +20,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.sqsmv.sqsscanner.DB.LensDataSource;
+import com.sqsmv.sqsscanner.DB.ScanDataSource;
 
 import java.util.ArrayList;
 
@@ -37,6 +38,7 @@ public class ScanConfigActivity  extends Activity
     private int exportModeChoice;
 	private int invModeChoice;
     private LensDataSource lensDataSource;
+    private ScanDataSource scanDataSource;
 
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -45,6 +47,7 @@ public class ScanConfigActivity  extends Activity
 		
 		context = this;
         lensDataSource = new LensDataSource(this);
+        scanDataSource = new ScanDataSource(this);
 
         appConfig = new DroidConfigManager(this);
         autoCount = (Spinner) findViewById(R.id.autoCountSelect);
@@ -62,24 +65,7 @@ public class ScanConfigActivity  extends Activity
         setLensSpinner(lensSelect);
         lensSelect.setSelection(appConfig.accessInt(DroidConfigManager.LENS_SELECT_IDX, null, 0));
         exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
-        switch(exportModeChoice)
-        {
-            case 1:
-                ((RadioButton)findViewById(R.id.normalMode)).setChecked(true);
-                break;
-            case 2:
-                ((RadioButton)findViewById(R.id.consolidateMode)).setChecked(true);
-                break;
-            case 3:
-                ((RadioButton)findViewById(R.id.billBMode)).setChecked(true);
-                break;
-            case 4:
-                ((RadioButton)findViewById(R.id.drewMode)).setChecked(true);
-                break;
-            case 5:
-                ((RadioButton)findViewById(R.id.invAdjustMode)).setChecked(true);
-                break;
-        }
+        setExportRadio();
 
         if(((RadioButton)findViewById(R.id.invAdjustMode)).isChecked())
 			invModeRGroup.setVisibility(View.VISIBLE);
@@ -135,10 +121,8 @@ public class ScanConfigActivity  extends Activity
 				}
 
 				@Override
-				public void onNothingSelected(AdapterView<?> parent) {
-					// TODO Auto-generated method stub
-					
-				}	
+				public void onNothingSelected(AdapterView<?> parent)
+                {}
 		});
 			
 		findViewById(R.id.backBtn).setOnClickListener(new View.OnClickListener()
@@ -146,7 +130,6 @@ public class ScanConfigActivity  extends Activity
 			@Override
 			public void onClick(View v)
 			{
-				// TODO Auto-generated method stub
 				onBackPressed();
 			}
 		});
@@ -159,24 +142,22 @@ public class ScanConfigActivity  extends Activity
                 switch(checkedId)
                 {
                     case R.id.normalMode:
-                        exportModeChoice = 1;
-                        hideInvAdjust();
+                        setExportMode(1);
                         break;
                     case R.id.consolidateMode:
-                        exportModeChoice = 2;
-                        hideInvAdjust();
+                        setExportMode(2);
                         break;
                     case R.id.billBMode:
-                        exportModeChoice = 3;
-                        hideInvAdjust();
+                        setExportMode(3);
                         break;
                     case R.id.drewMode:
-                        exportModeChoice = 4;
-                        hideInvAdjust();
+                        setExportMode(4);
+                        break;
+                    case R.id.skidMode:
+                        setExportMode(6);
                         break;
                     case R.id.invAdjustMode:
-                        exportModeChoice = 5;
-                        showInvAdjust();
+                        setExportMode(5);
                         break;
                 }
             }
@@ -252,6 +233,76 @@ public class ScanConfigActivity  extends Activity
 		intent.putExtras(returnData);
 		return intent;		
 	}
+
+    private void setExportRadio()
+    {
+        switch(exportModeChoice)
+        {
+            case 1:
+                ((RadioButton)findViewById(R.id.normalMode)).setChecked(true);
+                break;
+            case 2:
+                ((RadioButton)findViewById(R.id.consolidateMode)).setChecked(true);
+                break;
+            case 3:
+                ((RadioButton)findViewById(R.id.billBMode)).setChecked(true);
+                break;
+            case 4:
+                ((RadioButton)findViewById(R.id.drewMode)).setChecked(true);
+                break;
+            case 5:
+                ((RadioButton)findViewById(R.id.invAdjustMode)).setChecked(true);
+                break;
+            case 6:
+                ((RadioButton)findViewById(R.id.skidMode)).setChecked(true);
+                break;
+        }
+    }
+
+    private void setExportMode(int modeChoice)
+    {
+        switch(modeChoice)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                if(exportModeChoice == 6 && scanDataSource.getAllScans().getCount() > 0)
+                {
+                    Utilities.makeToast(this, "Please commit scans first.");
+                    setExportRadio();
+                }
+                else
+                {
+                    exportModeChoice = modeChoice;
+                    hideInvAdjust();
+                }
+                break;
+            case 5:
+                if(exportModeChoice == 6 && scanDataSource.getAllScans().getCount() > 0)
+                {
+                    Utilities.makeToast(this, "Please commit scans first.");
+                    setExportRadio();
+                }
+                else
+                {
+                    exportModeChoice = modeChoice;
+                    showInvAdjust();
+                }
+                break;
+            case 6:
+                if(exportModeChoice != 6 && scanDataSource.getAllScans().getCount() > 0)
+                {
+                    Utilities.makeToast(this, "Please commit scans first.");
+                    setExportRadio();
+                }
+                else
+                {
+                    exportModeChoice = modeChoice;
+                }
+                break;
+        }
+    }
 	
 						
 	/**
@@ -311,30 +362,12 @@ public class ScanConfigActivity  extends Activity
     {
         invModeRGroup.setVisibility(View.GONE);
     }
-	/*
-    private void toggleBillBVisibility()
-    {
-        if(billBArea.getVisibility() == View.VISIBLE)
-        {
-            billBAccess.setVisibility(View.VISIBLE);
-            billBArea.setVisibility(View.GONE);
-            lockBillBAccess.setVisibility(View.GONE);
-            billBToggle.setChecked(false);
-            invAdjustToggle.setChecked(false);
-            hasBillBAccess = false;
-        }
-        else
-        {
-            billBAccess.setVisibility(View.GONE);
-            billBArea.setVisibility(View.VISIBLE);
-            lockBillBAccess.setVisibility(View.VISIBLE);
-        }
-    }
-    */
+
     @Override
     protected void onResume()
     {
         lensDataSource.read();
+        scanDataSource.read();
         super.onResume();
     }
 
@@ -342,6 +375,7 @@ public class ScanConfigActivity  extends Activity
     protected void onPause()
     {
         lensDataSource.close();
+        scanDataSource.close();
         super.onPause();
     }
 
@@ -350,20 +384,4 @@ public class ScanConfigActivity  extends Activity
         Intent intent = new Intent(this, SocketMobilePairActivity.class);
         startActivity(intent);
     }
-	
-	/*
-	public void setSkidMode(View v){
-		
-		if(((ToggleButton) v).isChecked()){
-			//create skid id
-			Calendar c = Calendar.getInstance();
-			mark = Integer.toString(c.get(Calendar.HOUR)) + Integer.toString(c.get(Calendar.MILLISECOND));
-	    	((TextView)this.findViewById(R.id.skid_id)).setText(this.mark);
-		}
-		else{
-			mark = "";
-			((TextView)this.findViewById(R.id.skid_id)).setText("");
-			//updateMarks();
-		}	
-	}*/
 }

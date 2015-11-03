@@ -137,10 +137,8 @@ public class EditRecordActivity extends Activity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-
-            }
+            public void onNothingSelected(AdapterView<?> parent)
+			{}
         });
 	}
 	

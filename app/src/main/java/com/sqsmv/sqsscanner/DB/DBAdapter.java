@@ -153,8 +153,6 @@ public class DBAdapter extends SQLiteOpenHelper
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-		// TODO Auto-generated method stub
-		
 		db.execSQL(DROP_TABLE + ProductTable.TABLE_NAME);
 		db.execSQL(DROP_TABLE + UPCTable.TABLE_NAME);
 		db.execSQL(DROP_TABLE + PriceListTable.TABLE_NAME);

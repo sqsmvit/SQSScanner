@@ -193,6 +193,7 @@
 	        </TableRow>
 	
 	        <HorizontalScrollView
+				android:id="@+id/titleScrollView"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_margin="2dp" >
@@ -240,6 +241,7 @@
 	        </TableRow>
 	        
 		    <HorizontalScrollView
+				android:id="@+id/priceFiltersScrollView"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_margin="2dp" >

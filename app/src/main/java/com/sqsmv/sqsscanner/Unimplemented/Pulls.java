@@ -1,8 +1,8 @@
   package com.sqsmv.sqsscanner.Unimplemented;
 
-import java.util.ArrayList;
-
 import com.sqsmv.sqsscanner.ScanRecord;
+
+import java.util.ArrayList;
 
 public class Pulls implements PullInterface {
 
@@ -17,7 +17,6 @@ public class Pulls implements PullInterface {
 		this.pullRecords = new ArrayList<ScanRecord>();
 		this.pullPieceCount = 0;
 		this.pullLineCount = 0;
-		// TODO Auto-generated constructor stub
 	}
 
 

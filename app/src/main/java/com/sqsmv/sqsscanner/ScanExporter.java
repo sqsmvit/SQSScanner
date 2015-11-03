@@ -51,6 +51,8 @@ public class ScanExporter
             exportPath = "/Drew/";
         else if(exportMode == 5)
             exportPath = "/RI/";
+		else if(exportMode == 6)
+			exportPath = "/Skid/";
 
         return exportDBX(exportPath);
 	}

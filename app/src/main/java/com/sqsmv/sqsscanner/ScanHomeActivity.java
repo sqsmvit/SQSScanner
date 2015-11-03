@@ -50,6 +50,7 @@ public class ScanHomeActivity extends Activity
 	public int msgTime;
 	public int boxQty;
 	public boolean isBoxQty;
+    private boolean isSkidScanMode;
     private String lensId;
 
 	public Pattern sqsRegEx;
@@ -164,6 +165,18 @@ public class ScanHomeActivity extends Activity
 					{
 						goToAdmin();
 					}
+                    else if(isSkidScanMode)
+                    {
+                        if(mPullNum.getText().toString().isEmpty())
+                        {
+                            mPullNum.requestFocus();
+                            quantity.clearFocus();
+                        }
+                        else
+                        {
+                            insertSkidScan();
+                        }
+                    }
 					else if(mScanId.getText().length() == 0)
 					{
 						mScanId.requestFocus();
@@ -322,6 +335,20 @@ public class ScanHomeActivity extends Activity
 			PullReviewActivity.FILE_EXPORTED = false;
 		}
 
+        if(appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1) == 6)
+        {
+            isSkidScanMode = true;
+			hideProduct();
+        }
+        else
+        {
+			if(isSkidScanMode)
+			{
+				isSkidScanMode = false;
+				showProduct();
+			}
+        }
+
         String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
         if(!(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, ""))))
         {
@@ -410,14 +437,14 @@ public class ScanHomeActivity extends Activity
 			setScanTitle();
 			createRecord();
 			scanDataSource.insertScan(currentRecord);
-			recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
-			setPullNumbers();
 			if (ERR_SCAN)
 			{
 				Toast.makeText(this, "Bring Copy of Title to Dave Kinn", Toast.LENGTH_LONG).show();
 			}
 			i++;
 		} while(i<this.boxQty && this.isBoxQty);
+        recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
+        setPullNumbers();
 	}
 	/* Creates error with Box Quantity mode
 	private void confirmBoxQty(int boxQty)
@@ -648,8 +675,7 @@ public class ScanHomeActivity extends Activity
 	public void setData() throws IOException
 	{
 		setQuantity(mScanId.getText().toString());
-		recordCount.setText(Integer.toString(this.scanDataSource.getAllScans()
-				.getCount()));
+		recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
 		setPullNumbers();
 
 		if (!(mScanId.getText().toString().isEmpty()))
@@ -680,19 +706,6 @@ public class ScanHomeActivity extends Activity
 		{
 			quantity.setText(Integer.toString(autoVal));
 		}
-		/*
-		else if (isMasNum && !isManQty)
-		{
-			if (id.substring(id.length() - 3).startsWith("0"))
-			{
-				quantity.setText(id.substring(id.length() - 2));
-			}
-			else
-			{
-				quantity.setText(id.substring(id.length() - 3));
-			}
-		}
-		*/
 		else
 		{
 			quantity.setText("");
@@ -888,53 +901,43 @@ public class ScanHomeActivity extends Activity
 		}
 	}
 	
-	public void checkProduct()
+	public void hideProduct()
 	{
-		Product prod = productDataSource.getProduct(mScanId.getText().toString());
-		int masNum = prod.getMasNum();
-		String title = prod.getTitle();
-		String category = prod.getCategory();
-		String rating = prod.getRating();
-		String streetDate = prod.getStreetDate();
-		int titleFilm = prod.getTitleFilm();
-		int noCover = prod.getNoCover();
-		String priceList = prod.getPriceList();
-		int isNew = prod.getIsNew();
-		int isBoxSet = prod.getIsBoxSet();
-		int multipack = prod.getMultipack();
-		String mediaFormat = prod.getMediaFormat();
-		String priceFilters = prod.getPriceFilters();
-		String specialFields = prod.getSpecialFields();
-		String studio = prod.getStudio();
-		String season = prod.getSeason();
-		int numberOfDiscs = prod.getNumberOfDiscs();
-		String theaterDate = prod.getTheaterDate();
-		String studioName = prod.getStudioName();
-		String sha = prod.getSha();
+		View scanRow = findViewById(R.id.scanRow);
+		View tableRow3 = findViewById(R.id.tableRow3);
+		View titleScrollView = findViewById(R.id.titleScrollView);
+		View priceListRow = findViewById(R.id.priceListRow);
+		View priceFilterScrollView = findViewById(R.id.titleScrollView);
+		scanRow.setVisibility(View.GONE);
+		tableRow3.setVisibility(View.GONE);
+		titleScrollView.setVisibility(View.GONE);
+		priceListRow.setVisibility(View.GONE);
+		priceFilterScrollView.setVisibility(View.GONE);
 
-		String displayString = 
-				Integer.toString(masNum) + '\n' +
-				title + '\n' +
-				category + '\n' +
-				rating + '\n' +
-				streetDate + '\n' +
-				Integer.toString(titleFilm) + '\n' +
-				Integer.toString(noCover) + '\n' + 
-				priceList + '\n' + 
-				isNew + '\n' +
-				isBoxSet + '\n' +
-				multipack + '\n' +
-				mediaFormat + '\n' +
-				priceFilters + '\n' +
-				specialFields + '\n' +
-				studio + '\n' +
-				season + '\n' +
-				numberOfDiscs + '\n' +
-				theaterDate + '\n' +
-				studioName + '\n' +
-				sha;
-		Toast.makeText(this, displayString, Toast.LENGTH_SHORT).show();
 	}
+
+    public void showProduct()
+    {
+		View scanRow = findViewById(R.id.scanRow);
+		View tableRow3 = findViewById(R.id.tableRow3);
+		View titleScrollView = findViewById(R.id.titleScrollView);
+		View priceListRow = findViewById(R.id.priceListRow);
+		View priceFilterScrollView = findViewById(R.id.titleScrollView);
+		scanRow.setVisibility(View.VISIBLE);
+		tableRow3.setVisibility(View.VISIBLE);
+		titleScrollView.setVisibility(View.VISIBLE);
+		priceListRow.setVisibility(View.VISIBLE);
+		priceFilterScrollView.setVisibility(View.VISIBLE);
+    }
+
+    public void insertSkidScan()
+    {
+        scanDataSource.insertScan(new ScanRecord(mPullNum.getText().toString(), quantity.getText().toString()));
+        recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
+        setPullNumbers();
+        mPullNum.setText("");
+        quantity.setText("");
+    }
 
 	private final BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -953,6 +956,21 @@ public class ScanHomeActivity extends Activity
                 if(mPullNum.getText().toString().equals("1"))
                 {
                     goToAdmin();
+                }
+                else if(isSkidScanMode)
+                {
+                    if (data.contains("P"))
+                    {
+                        mPullNum.setText(data.substring(1));
+                        if(quantity.getText().toString().isEmpty())
+                        {
+                            enterQuantity();
+                        }
+                        else
+                        {
+                            insertSkidScan();
+                        }
+                    }
                 }
                 else if (data.contains("P"))
                 {

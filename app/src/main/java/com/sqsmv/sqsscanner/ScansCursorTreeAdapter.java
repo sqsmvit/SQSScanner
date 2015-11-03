@@ -14,13 +14,11 @@ public class ScansCursorTreeAdapter extends SimpleCursorTreeAdapter {
 	{
 		super(context, cursor, groupLayout, groupFrom, groupTo, childLayout, childFrom,
 				childTo);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected Cursor getChildrenCursor(Cursor groupCursor) 
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 

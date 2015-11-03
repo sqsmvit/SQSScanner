@@ -64,6 +64,21 @@ public class ScanRecord implements Parcelable
 		this.rating = rating;
         this.location = location;
 	}
+
+	public ScanRecord(String pullNumber, String quantity)
+	{
+		this.scanEntry = "";
+		this.pullNumber = pullNumber;
+        this.quantity = quantity;
+		this.scanDate = setDate();
+		this.mark = "";
+		this.title = "Skid";
+		this.priceList = "";
+		this.masNum = "";
+		this.priceFilters = "";
+		this.rating = "";
+		this.location = "";
+	}
 	
 
 	/**

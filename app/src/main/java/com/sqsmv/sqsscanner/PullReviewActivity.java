@@ -35,22 +35,24 @@ public class PullReviewActivity extends ListActivity
 	private SimpleAdapter pullAdapter;
 	private ScanDataSource scanDS;
 	private ArrayList<HashMap<String, String>>pullNumberList = new ArrayList<HashMap<String, String>>();
+    private DroidConfigManager appConfig;
 
-	TextView commitModeView;
+    TextView commitModeView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pull_review);
-		
+
+        appConfig = new DroidConfigManager(this);
 		setConfig();
 		
 		ListView listView = getListView();
 		View header = getLayoutInflater().inflate(R.layout.pullrow_header, null);
 		listView.addHeaderView(header);
 		
-		commitModeView = (TextView) findViewById(R.id.commitMode);
+		commitModeView = (TextView)findViewById(R.id.commitMode);
 		
 		listView.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -102,7 +104,6 @@ public class PullReviewActivity extends ListActivity
 			scanWriter.writeBackup();
 			scanWriter.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 			
@@ -124,11 +125,11 @@ public class PullReviewActivity extends ListActivity
 		alertDialogBuilder
 			.setMessage("Delete ALL Scans ?")
 			.setCancelable(false)
-			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,int id) {
-					
+			.setPositiveButton("Yes",new DialogInterface.OnClickListener()
+            {
+				public void onClick(DialogInterface dialog,int id)
+                {
 					performMassDelete();
-												
 				}
 			  })
 			.setNegativeButton("No",new DialogInterface.OnClickListener() {
@@ -171,7 +172,8 @@ public class PullReviewActivity extends ListActivity
 				{
 					ScanExporter scanExporter = new ScanExporter(this, exportFile, exportModeChoice, true);
 					scanExporter.exportScan();
-				}
+                    appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
+                }
                 catch (IOException e)
                 {
 					e.printStackTrace();
@@ -250,7 +252,6 @@ public class PullReviewActivity extends ListActivity
 	 */
 	private void setConfig()
 	{
-		DroidConfigManager appConfig = new DroidConfigManager(this);
 		//default is DBX
 		exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
         invAdjChoice = appConfig.accessInt(DroidConfigManager.INVENTORY_MODE_CHOICE, null, 1);
@@ -283,6 +284,11 @@ public class PullReviewActivity extends ListActivity
             //RI Mode
             commitModeView.setText("RI Mode");
         }
+		else if(exportModeChoice == 6)
+		{
+			//RI Mode
+			commitModeView.setText("Skid Mode");
+		}
 		else
         {
             commitModeView.setText("Error");

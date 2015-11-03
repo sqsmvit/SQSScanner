@@ -12,7 +12,6 @@ public class ListViewButton extends ImageButton {
 	 */
 	public ListViewButton(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -21,7 +20,6 @@ public class ListViewButton extends ImageButton {
 	 */
 	public ListViewButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -31,7 +29,6 @@ public class ListViewButton extends ImageButton {
 	 */
 	public ListViewButton(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		// TODO Auto-generated constructor stub
 	}
 	
 	/* (non-Javadoc)
