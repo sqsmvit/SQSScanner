@@ -75,7 +75,7 @@ public class UpdateLauncher
     public void startAppUpdate()
     {
         appConfig.accessString(DroidConfigManager.PRIOR_VERSION, Utilities.getVersion(context), "");
-        ProgressDialog.show(context, "Updating Application", "Scans have been committed. Please Stay in Wifi Range...", true);
+        ProgressDialog.show(context, "Updating Application", "Please Stay in Wifi Range...", true);
         Intent appUpdateIntent = new Intent(context, AppUpdateService.class);
         context.startService(appUpdateIntent);
     }

@@ -172,7 +172,10 @@ public class PullReviewActivity extends ListActivity
 				{
 					ScanExporter scanExporter = new ScanExporter(this, exportFile, exportModeChoice, true);
 					scanExporter.exportScan();
-                    appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
+					if(exportModeChoice == 6)
+					{
+						appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
+					}
                 }
                 catch (IOException e)
                 {

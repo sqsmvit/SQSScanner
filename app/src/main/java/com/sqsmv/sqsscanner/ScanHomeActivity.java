@@ -936,7 +936,10 @@ public class ScanHomeActivity extends Activity
         recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
         setPullNumbers();
         mPullNum.setText("");
-        quantity.setText("");
+		if(!isAutoScan)
+		{
+			quantity.setText("");
+		}
     }
 
 	private final BroadcastReceiver receiver = new BroadcastReceiver()
@@ -949,7 +952,7 @@ public class ScanHomeActivity extends Activity
 			String message = String.format("in onReceive");
 			Log.d(TAG, message);
 
-            if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_DECODED_DATA))
+            if(intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_DECODED_DATA))
             {
                 String data = new String(intent.getCharArrayExtra(ScanAPIApplication.EXTRA_DECODEDDATA));
 

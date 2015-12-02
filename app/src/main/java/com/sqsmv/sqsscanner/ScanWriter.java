@@ -154,11 +154,13 @@ public class ScanWriter
 		SimpleDateFormat fileFmt = new SimpleDateFormat("yyMMdd_kkmm", Locale.US);
 		fileName =  deviceId + "_" + fileFmt.format(today);
 		if(exportMode == 3)
-			fileName = "BB_"+ fileName;
+			fileName = "BB_" + fileName;
 		else if(exportMode == 4)
-			fileName = "DR_"+ fileName;
+			fileName = "DR_" + fileName;
         else if(exportMode == 5)
-            fileName = "RI_"+ fileName;
+            fileName = "RI_" + fileName;
+		else if(exportMode == 6)
+			fileName = "S_" + fileName;
 		fileName += ".txt";
 	}
 		

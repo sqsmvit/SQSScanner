@@ -18,7 +18,6 @@ import java.util.Locale;
 
 public class LoadActivity extends Activity
 {
-	 
 	private static final String TAG = "Load_Activity";
 
     private DroidConfigManager appConfig;
@@ -28,9 +27,9 @@ public class LoadActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState)
     {
 		super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_load);
 		String message = String.format("in onCreate and starting the LoadActivity!");
 		Log.d(TAG, message);
-		setContentView(R.layout.activity_load);
 
         appConfig = new DroidConfigManager(this);
         updateLauncher = new UpdateLauncher(this);
@@ -119,4 +118,3 @@ public class LoadActivity extends Activity
         startActivity(intent);
     }
 }
-
