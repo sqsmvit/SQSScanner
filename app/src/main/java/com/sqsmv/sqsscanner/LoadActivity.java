@@ -21,6 +21,7 @@ public class LoadActivity extends Activity
 	private static final String TAG = "Load_Activity";
 
     private DroidConfigManager appConfig;
+    private DropboxManager dropboxManager;
     private UpdateLauncher updateLauncher;
 
 	@Override
@@ -28,19 +29,51 @@ public class LoadActivity extends Activity
     {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
-		String message = String.format("in onCreate and starting the LoadActivity!");
-		Log.d(TAG, message);
+		Log.d(TAG, "in onCreate and starting the LoadActivity!");
 
         appConfig = new DroidConfigManager(this);
-        updateLauncher = new UpdateLauncher(this);
+        dropboxManager = new DropboxManager(this);
         setTitle(getTitle() + " v" + Utilities.getVersion(this));
     }
 
-	public void startScan(View v)
+    @Override
+    protected void onResume()
     {
-		String message = String.format("in startScan and for the LoadActivity!");
-		Log.d(TAG, message);
-		System.out.println(message);
+        super.onResume();
+
+        if(Utilities.checkWifi(this))
+        {
+            if(dropboxManager.finishAuthentication())
+            {
+                String accessToken = dropboxManager.getOAuth2AccessToken();
+                appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, "");
+            }
+            linkDropboxAccount();
+            updateLauncher = new UpdateLauncher(this);
+        }
+        else
+        {
+            Utilities.makeLongToast(this, getString(R.string.ERR_WIFI));
+            finish();
+        }
+    }
+
+    private void linkDropboxAccount()
+    {
+            String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, "");
+            if(!accessToken.isEmpty())
+            {
+                dropboxManager.setStaticOAuth2AccessToken(accessToken);
+            }
+            else
+            {
+                dropboxManager.linkDropboxAccount();
+            }
+    }
+
+    public void startScan(View v)
+    {
+		Log.d(TAG, "in startScan and for the LoadActivity!");
 
 		String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
 

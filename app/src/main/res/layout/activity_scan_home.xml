@@ -24,7 +24,7 @@
 	  	        android:id="@+id/reviewBtn"
 	  	        android:layout_width="wrap_content"
 	  	        android:layout_height="wrap_content"
-	  	        android:layout_weight="1.01"
+	  	        android:layout_weight="1"
 	  	        android:onClick="goToReview"
 	  	        android:text="@string/review_btn" />
 	
@@ -32,18 +32,9 @@
 	  	        android:id="@+id/configBtn"
 	  	        android:layout_width="wrap_content"
 	  	        android:layout_height="wrap_content"
-	  	        android:layout_weight="1.01"
+	  	        android:layout_weight="1"
 	  	        android:onClick="goToConfig"
 	  	        android:text="@string/configLbl" />
-	  	    <!-- 
-	  	    <Button
-	  	        android:id="@+id/btn_goTo_skid"
-	  	        android:layout_width="wrap_content"
-	  	        android:layout_height="wrap_content"
-	  	        android:layout_weight="1.01"
-	  	        android:onClick="goToMarkReview"
-	  	        android:text="Skids" />
-	  	    -->
 	  	</LinearLayout>
 	
 	    <LinearLayout
@@ -197,25 +188,19 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_margin="2dp" >
-	            <!-- 
-	            <TableRow
-	                android:id="@+id/titleRow"
-	                android:layout_width="wrap_content"
-	                android:layout_height="fill_parent" >
-	            -->
-	                <TextView
-	                    android:id="@+id/title"
-	                    android:layout_width="wrap_content"
-	                    android:layout_height="wrap_content"
-	                    android:layout_marginTop="@dimen/radTopMar"
-	                    android:layout_marginLeft="@dimen/radTopMar"
-	                    android:layout_marginRight="@dimen/radTopMar"
-	                    android:scrollHorizontally="true"
-	                    android:scrollbarAlwaysDrawHorizontalTrack="true"
-	                    android:scrollbars="horizontal"
-	                    android:singleLine="true"
-	                    android:textAppearance="?android:attr/textAppearanceLarge" />
-	            <!-- </TableRow>  -->      
+
+				<TextView
+					android:id="@+id/title"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/radTopMar"
+					android:layout_marginLeft="@dimen/radTopMar"
+					android:layout_marginRight="@dimen/radTopMar"
+					android:scrollHorizontally="true"
+					android:scrollbarAlwaysDrawHorizontalTrack="true"
+					android:scrollbars="horizontal"
+					android:singleLine="true"
+					android:textAppearance="?android:attr/textAppearanceLarge" />
 	        </HorizontalScrollView>
 	        
 	        <TableRow
@@ -290,16 +275,6 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="80dp" >
 	            
-	            <!--
-	            <ToggleButton
-	                android:id="@+id/tog_set_mark"
-	                android:layout_width="60dp"
-	                android:layout_height="60dp"
-	                android:text="skid"
-	                android:textOff="@string/noMark"
-	                android:textOn="@string/markSet"
-	                android:onClick="setSkidMode" />
-	            -->
 	            <LinearLayout
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
@@ -342,56 +317,6 @@
 	                        android:text="New Product Mode"
 	                        android:textAppearance="?android:attr/textAppearanceMedium" />
 	                </LinearLayout>
-	                <!--
-	                <LinearLayout
-	                    android:id="@+id/skidmode"
-	                    android:layout_width="match_parent"
-	                    android:layout_height="wrap_content"
-	                    android:layout_margin="2dp" >
-	                    
-	                    <TextView
-	                        android:id="@+id/lbl_skid_id"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:layout_marginRight="2dp"
-	                        android:text="Skid Id:"
-	                        android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	                    <TextView
-	                        android:id="@+id/skid_id"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:textAppearance="?android:attr/textAppearanceSmall" />
-	 
-	 	                <TextView
-	                        android:id="@+id/lbl_skid_scans"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:layout_marginRight="2dp"
-	                        android:text="Scans:"
-	                        android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	                    <TextView
-	                        android:id="@+id/skid_scans"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:textAppearance="?android:attr/textAppearanceSmall" />
-	                    	
-	                    <TextView
-	                        android:id="@+id/lbl_skid_total"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:layout_marginRight="2dp"
-	                        android:text="Total:"
-	                        android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	                    <TextView
-	                        android:id="@+id/skid_total"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:textAppearance="?android:attr/textAppearanceSmall" />
-	                </LinearLayout>
-	                 -->
 	            </LinearLayout>
 	        </TableRow>
 	    </TableLayout>

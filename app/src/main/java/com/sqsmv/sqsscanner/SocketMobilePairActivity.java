@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.widget.ToggleButton;
 
 import com.onbarcode.barcode.android.AndroidColor;
@@ -82,17 +83,20 @@ public class SocketMobilePairActivity extends Activity
         // Unit of Measure, pixel, cm, or inch
         barcode.setUom(IBarcode.UOM_PIXEL);
         // barcode bar module width (X) in pixel
-        barcode.setX(1f);
+        TypedValue outValue = new TypedValue();
+        getResources().getValue(R.dimen.barcodeWidth, outValue, true);
+        float barcodeWidth = outValue.getFloat();
+        barcode.setX(barcodeWidth);
         // barcode bar module height (Y) in pixel
-        barcode.setY(75f);
+        barcode.setY(75);
         // set barcode width
         barcode.setBarcodeWidth(width);
 
         // barcode image margins
-        barcode.setLeftMargin(10f);
-        barcode.setRightMargin(10f);
-        barcode.setTopMargin(10f);
-        barcode.setBottomMargin(10f);
+        barcode.setLeftMargin(10);
+        barcode.setRightMargin(10);
+        barcode.setTopMargin(10);
+        barcode.setBottomMargin(10);
 
         // barcode image resolution in dpi
         barcode.setResolution(72);

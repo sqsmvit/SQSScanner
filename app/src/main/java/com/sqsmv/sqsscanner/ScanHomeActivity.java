@@ -2,7 +2,6 @@ package com.sqsmv.sqsscanner;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -50,8 +49,8 @@ public class ScanHomeActivity extends Activity
 	public int msgTime;
 	public int boxQty;
 	public boolean isBoxQty;
-    private boolean isSkidScanMode;
-    private String lensId;
+	private boolean isSkidScanMode;
+	private String lensId;
 
 	public Pattern sqsRegEx;
 	public Pattern upcRegEx;
@@ -60,13 +59,12 @@ public class ScanHomeActivity extends Activity
 
 	private String thisMasNum;
 
-    private DroidConfigManager appConfig;
+	private DroidConfigManager appConfig;
 
 	private boolean isMasNum = false;
 	public boolean isManQty;
 	public boolean isNewProduct;
 
-	private String mark = "";
 	private Toast titleMessage;
 	private EditText mScanId;
 	private EditText mPullNum;
@@ -78,7 +76,6 @@ public class ScanHomeActivity extends Activity
 	private TextView pullLines;
 	private TextView pullPieceCount;
 	private TextView mRating;
-	//private LinearLayout mSkidMode;
 
 	private TextView titleCount;
 
@@ -90,29 +87,29 @@ public class ScanHomeActivity extends Activity
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
-		
+
 		String message = String.format("in onCreate");
 		Log.d(TAG, message);
-		
+
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_scan_home);
 
-		this.productDataSource = new ProductDataSource(this);
-		this.upcDataSource = new UPCDataSource(this);
-		this.scanDataSource = new ScanDataSource(this);
+		productDataSource = new ProductDataSource(this);
+		upcDataSource = new UPCDataSource(this);
+		scanDataSource = new ScanDataSource(this);
 
-        msgTime = 3;
+		msgTime = 3;
 		upcRegEx = Pattern.compile(getString(R.string.upcRegEx));
 		sqsRegEx = Pattern.compile(getString(R.string.sqsRegEx));
 
 		// find all the views
-		//mSkidMode = (LinearLayout) findViewById(R.id.skidmode);
 		mScanId = (EditText) findViewById(R.id.scanId);
 		mPullNum = (EditText) findViewById(R.id.pullNum);
 		mRating = (TextView) findViewById(R.id.rating);
@@ -125,14 +122,14 @@ public class ScanHomeActivity extends Activity
 		pullPieceCount = (TextView) findViewById(R.id.totalCount);
 		titleCount = (TextView) findViewById(R.id.totalTitleCount);
 
-        appConfig = new DroidConfigManager(this);
+		appConfig = new DroidConfigManager(this);
 
 
 		titleMessage = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 		titleMessage.setGravity(Gravity.BOTTOM, 5, 5);
 
 		imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		
+
 		//handler for entering data into pull number field
 		mPullNum.setOnEditorActionListener(new OnEditorActionListener()
 		{
@@ -165,18 +162,18 @@ public class ScanHomeActivity extends Activity
 					{
 						goToAdmin();
 					}
-                    else if(isSkidScanMode)
-                    {
-                        if(mPullNum.getText().toString().isEmpty())
-                        {
-                            mPullNum.requestFocus();
-                            quantity.clearFocus();
-                        }
-                        else
-                        {
-                            insertSkidScan();
-                        }
-                    }
+					else if(isSkidScanMode)
+					{
+						if(mPullNum.getText().toString().isEmpty())
+						{
+							mPullNum.requestFocus();
+							quantity.clearFocus();
+						}
+						else
+						{
+							insertSkidScan();
+						}
+					}
 					else if(mScanId.getText().length() == 0)
 					{
 						mScanId.requestFocus();
@@ -238,72 +235,69 @@ public class ScanHomeActivity extends Activity
 		});
 	}
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
 
-        regBroadCastReceivers();
-    }
+		regBroadCastReceivers();
+	}
 
-    @Override
-    protected void onStop()
-    {
-        boolean scannerLock = appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, null, false);
-        // unregister the scanner
-        unregisterReceiver(receiver);
+	@Override
+	protected void onStop()
+	{
+		boolean scannerLock = appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, null, false);
+		// unregister the scanner
+		unregisterReceiver(receiver);
 
-        if(!scannerLock)
-        {
+		if(!scannerLock)
+		{
+			// indicate this view has been destroyed
+			// if the reference count becomes 0 ScanAPI can
+			// be closed if this is not a screen rotation scenario
+			ScanAPIApplication.getApplicationInstance().forceRelease();
+		}
 
-            // indicate this view has been destroyed
-            // if the reference count becomes 0 ScanAPI can
-            // be closed if this is not a screen rotation scenario
-            ScanAPIApplication.getApplicationInstance().forceRelease();
-        }
-
-        super.onStop();
-    }
+		super.onStop();
+	}
 
 
-    /*
+	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see android.app.Activity#onPause()
 	 */
 	@Override
-	protected void onPause() {
-
+	protected void onPause()
+	{
 		String message = String.format("in onPause");
 		Log.d(TAG, message);
-		
-		this.productDataSource.close();
-		this.upcDataSource.close();
-		this.scanDataSource.close();
-        ScanAPIApplication.getApplicationInstance().currPullNum = mPullNum.getText().toString();
+
+		productDataSource.close();
+		upcDataSource.close();
+		scanDataSource.close();
+		ScanAPIApplication.getApplicationInstance().currPullNum = mPullNum.getText().toString();
 		super.onPause();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
 	protected void onResume()
 	{
-        super.onResume();
+		super.onResume();
 		String message = String.format("in onResume");
 		Log.d(TAG, message);
-		
+
 		setConfig();
 		setLocation();
 
-		this.productDataSource.read();
-		this.upcDataSource.read();
-		this.scanDataSource.open();
-        //this.mSkidMode.setVisibility(View.INVISIBLE);
-		//checkMarkIntent(getIntent());
+		productDataSource.read();
+		upcDataSource.read();
+		scanDataSource.open();
 
 		mPullNum.setText(ScanAPIApplication.getApplicationInstance().currPullNum);
 
@@ -335,35 +329,32 @@ public class ScanHomeActivity extends Activity
 			PullReviewActivity.FILE_EXPORTED = false;
 		}
 
-        if(appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1) == 6)
-        {
-            isSkidScanMode = true;
+		if(appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1) == 6)
+		{
+			isSkidScanMode = true;
 			hideProduct();
-        }
-        else
-        {
+		}
+		else
+		{
 			if(isSkidScanMode)
 			{
 				isSkidScanMode = false;
 				showProduct();
 			}
-        }
+		}
 
-        String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
-        if(!(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, ""))))
-        {
-            finish();
-        }
+		String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
+		if(!(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, ""))))
+		{
+			finish();
+		}
 	}
 
-	/*
+	/**
 	 * Checks data sent read from scanner using regex. Ensures data is a MAS
 	 * number or a valid UPC. Sets the text ScanId view to a valid scan. The UPC
 	 * is not necessarily one that exists in the database.
-	 * 
-	 * @param String data
-	 */
-	/**
+	 *
 	 * @param data
 	 * @return
 	 */
@@ -374,20 +365,20 @@ public class ScanHomeActivity extends Activity
 			isMasNum = true;
 			mScanId.setText(data);
 			if(!isManQty && !isAutoScan && !data.substring(data.length() - 3).matches("000"))
+			{
 				commitRecord();
+			}
 			else if ((isManQty || !isAutoScan) && (quantity.getText().toString().isEmpty()))
 			{
 				enterQuantity();
-				//mScanId.setText("");
 			}
 			else if(!isAutoScan && data.substring(data.length() - 3).matches("000") && quantity.getText().toString().isEmpty())
 			{
 				enterQuantity();
-				//mScanId.setText("");
 			}
 			else
 				commitRecord();
-			
+
 			return true;
 		}
 		else if (upcRegEx.matcher(data).matches())
@@ -415,7 +406,7 @@ public class ScanHomeActivity extends Activity
 	 * @return
 	 */
 	public boolean commitRecord()
-    {
+	{
 		String tempId = getProductId();
 		processRecord();
 		showTitle();
@@ -431,8 +422,9 @@ public class ScanHomeActivity extends Activity
 	{
 		String tempId = getProductId();
 		int i = 0;
-		
-		do {
+
+		do
+		{
 			setThisMasNum(tempId);
 			setScanTitle();
 			createRecord();
@@ -442,43 +434,11 @@ public class ScanHomeActivity extends Activity
 				Toast.makeText(this, "Bring Copy of Title to Dave Kinn", Toast.LENGTH_LONG).show();
 			}
 			i++;
-		} while(i<this.boxQty && this.isBoxQty);
-        recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
-        setPullNumbers();
+		} while(i<boxQty && isBoxQty);
+		recordCount.setText(Integer.toString(scanDataSource.getAllScans().getCount()));
+		setPullNumbers();
 	}
-	/* Creates error with Box Quantity mode
-	private void confirmBoxQty(int boxQty)
-	{
-		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		
-		// set title
-		alertDialogBuilder.setTitle("Confirm Box Quantity");
-		
-		// set dialog message
-		alertDialogBuilder
-			.setMessage("Add " + boxQty+ "boxes?")
-			.setCancelable(false)
-			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,int id) {
-					
-					processRecord();
-												
-				}
-			  })
-			.setNegativeButton("No",new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,int id) {
-					// if this button is clicked, just close
-					// the dialog box and do nothing
-					dialog.cancel();
-				}
-			});
 
-			// create alert dialog
-			AlertDialog alertDialog = alertDialogBuilder.create();
-			alertDialog.show();
-	}
-	 */
 	public String getProductId()
 	{
 		String tempId = mScanId.getText().toString();
@@ -492,10 +452,6 @@ public class ScanHomeActivity extends Activity
 		return tempId;
 	}
 
-	/**
-	 * @param title
-	 * @return
-	 */
 	public String createMessage(String title)
 	{
 		String currmPullNum = mPullNum.getText().toString();
@@ -506,17 +462,14 @@ public class ScanHomeActivity extends Activity
 			currScanId = currScanId.substring(0, currScanId.length() - 3);
 		}
 
-		int[] counts = this.scanDataSource.getScanTotalCounts(currmPullNum, currScanId);
+		int[] counts = scanDataSource.getScanTotalCounts(currmPullNum, currScanId);
 
 		return String.format(Locale.US, "Pull#: %s \nScans: %d  Qty: %d \n %s",
 				currmPullNum, counts[0], counts[1], title);
 	}
 
-	/**
-	 * @return
-	 */
-	public boolean createRecord() {
-
+	public boolean createRecord()
+	{
 		String tempPull = mPullNum.getText().toString();
 		String tempmScanId = mScanId.getText().toString();
 		String tempQuantity = quantity.getText().toString();
@@ -525,25 +478,31 @@ public class ScanHomeActivity extends Activity
 		String tempPriceFilters = mPriceFilters.getText().toString();
 		String tempRating = mRating.getText().toString();
 
-		if (isMasNum) {
+		if (isMasNum)
+		{
 			if (!isAutoScan && !isManQty && !tempmScanId.substring(tempmScanId.length() - 3).matches("000"))
 			{
 				tempQuantity = tempmScanId.substring(tempmScanId.length() - 3);
 			}
-
 			tempmScanId = tempmScanId.substring(0, tempmScanId.length() - 3);
 		}
 
-        String location = "";
-        String defGateway = Utilities.getDefaultGateway(this);
-        if(defGateway.matches("3.150.168.192"))
-            location = "r";
-        else if(defGateway.matches("1.150.168.192"))
-            location = "p";
-        else
-            location = "o";
+		String location = "";
+		String defGateway = Utilities.getDefaultGateway(this);
+		if(defGateway.matches("3.150.168.192"))
+		{
+			location = "r";
+		}
+		else if(defGateway.matches("1.150.168.192"))
+		{
+			location = "p";
+		}
+		else
+		{
+			location = "o";
+		}
 		currentRecord = new ScanRecord(tempmScanId, tempQuantity, tempPull,
-				mark, tempTitle, tempPriceList, thisMasNum, tempPriceFilters, tempRating, location);
+				"", tempTitle, tempPriceList, thisMasNum, tempPriceFilters, tempRating, location);
 
 		return true;
 	}
@@ -560,14 +519,6 @@ public class ScanHomeActivity extends Activity
 	/**
 	 * @return
 	 */
-	public String getDeviceName() {
-
-		return BluetoothAdapter.getDefaultAdapter().getName();
-	}
-
-	/**
-	 * @return
-	 */
 	public String[] getProdInfo()
 	{
 		Product prod;
@@ -575,19 +526,19 @@ public class ScanHomeActivity extends Activity
 		String priceList;
 		String rating;
 		String priceFilters;
-		
-		prod = productDataSource.getJoinProduct(lensId, this.thisMasNum);
+
+		prod = productDataSource.getJoinProduct(lensId, thisMasNum);
 		title = prod.getTitle();
 		priceList = prod.getPriceList();
 		rating = prod.getRating();
 		priceFilters = prod.getPriceFilters();
-		
+
 		return new String[] {title, priceList, rating, priceFilters};
 	}
 
 	/*
 	 * Starts the Admin Activity.
-	 * 
+	 *
 	 * @param View v
 	 */
 	public void goToAdmin()
@@ -598,7 +549,7 @@ public class ScanHomeActivity extends Activity
 
 	/*
 	 * View OnClick event that starts the Scan Config Activity.
-	 * 
+	 *
 	 * @param View v
 	 */
 	public void goToConfig(View v)
@@ -607,15 +558,6 @@ public class ScanHomeActivity extends Activity
 		//startActivityForResult(intent, 3);
 		startActivity(intent);
 		finish();
-	}
-
-	/**
-	 * @param v
-	 */
-	public void goToSkidReview(View v)
-	{
-		Intent intent = new Intent(this, SkidScanActivity.class);
-		startActivity(intent);
 	}
 
 	/**
@@ -630,9 +572,9 @@ public class ScanHomeActivity extends Activity
 	/*
 	 * Reset all data that is displayed on the screen. Called only after a file
 	 * is exported.
-	 * 
+	 *
 	 * @param none
-	 * 
+	 *
 	 * @see onResume()
 	 */
 	private void resetViews()
@@ -651,7 +593,7 @@ public class ScanHomeActivity extends Activity
 
 	/*
 	 * Reads a config file and sets all configs for this activity
-	 * 
+	 *
 	 * @param none
 	 */
 	public void setConfig()
@@ -661,7 +603,7 @@ public class ScanHomeActivity extends Activity
 
 		isBoxQty = appConfig.accessBoolean(DroidConfigManager.IS_BOX_QTY, null, false);
 		String tempBox = appConfig.accessString(DroidConfigManager.BOX_QTY, null, "0");
-        lensId = appConfig.accessString(DroidConfigManager.LENS_SELECTION_ID, null, "1");
+		lensId = appConfig.accessString(DroidConfigManager.LENS_SELECTION_ID, null, "1");
 		if (tempBox == "")
 		{
 			tempBox = "1";
@@ -675,7 +617,7 @@ public class ScanHomeActivity extends Activity
 	public void setData() throws IOException
 	{
 		setQuantity(mScanId.getText().toString());
-		recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
+		recordCount.setText(Integer.toString(scanDataSource.getAllScans().getCount()));
 		setPullNumbers();
 
 		if (!(mScanId.getText().toString().isEmpty()))
@@ -689,15 +631,13 @@ public class ScanHomeActivity extends Activity
 	 */
 	private void setPullNumbers()
 	{
-		this.pullLines.setText(Integer.toString(this.scanDataSource
-				.getScansByPullId(mPullNum.getText().toString()).getCount()));
-		this.pullPieceCount.setText(Integer.toString(this.scanDataSource
-				.getTotalByPull(mPullNum.getText().toString())));
+		pullLines.setText(Integer.toString(scanDataSource.getScansByPullId(mPullNum.getText().toString()).getCount()));
+		pullPieceCount.setText(Integer.toString(scanDataSource.getTotalByPull(mPullNum.getText().toString())));
 	}
 
 	/*
 	 * Sets the quantity view to display the correct scan quantity
-	 * 
+	 *
 	 * @param id
 	 */
 	public void setQuantity(String id)
@@ -724,11 +664,15 @@ public class ScanHomeActivity extends Activity
 		String priceList = prodInfo[1];
 		String rating = prodInfo[2];
 		if(rating != null && rating.matches("0"))
+		{
 			rating = "";
+		}
 		String priceFilters = prodInfo[3];
 		if(priceFilters != null && priceFilters.matches("0"))
+		{
 			priceFilters = "";
-		
+		}
+
 		if (title == null || title.isEmpty())
 		{
 			title = (getString(R.string.err_scan));
@@ -750,30 +694,6 @@ public class ScanHomeActivity extends Activity
 	}
 
 	/**
-	 * @param v
-	 */
-	/*
-	 * public void setSkidMode(View v){
-	 * 
-	 * if(((ToggleButton) v).isChecked()){ //create skid id Calendar c =
-	 * Calendar.getInstance(); mark = Integer.toString(c.get(Calendar.HOUR)) +
-	 * Integer.toString(c.get(Calendar.MILLISECOND));
-	 * ((TextView)this.findViewById(R.id.skid_id)).setText(this.mark); } else{
-	 * 
-	 * mark = ""; ((TextView)this.findViewById(R.id.skid_id)).setText("");
-	 * updateMarks();
-	 * 
-	 * }
-	 * 
-	 * }
-	 */
-
-	/*
-	 * Sets all data displayed on the screen and underlying variables.
-	 * 
-	 * @param none
-	 */
-	/**
 	 * @param id
 	 */
 	private void setThisMasNum(String id)
@@ -781,23 +701,23 @@ public class ScanHomeActivity extends Activity
 		// SQSmasnumQTY
 		if (id.contains("SQS"))
 		{
-			this.thisMasNum = (id.substring(3, id.length() - 3));
+			thisMasNum = (id.substring(3, id.length() - 3));
 		}
 		// UPC
 		else if (id.length() >= 11)
 		{
-			this.thisMasNum = upcDataSource.getMasNumFromUPC(id);
+			thisMasNum = upcDataSource.getMasNumFromUPC(id);
 			if (thisMasNum.isEmpty())
 			{
 				// UPC not found
-				this.thisMasNum = id;
-				this.ERR_SCAN = true;
+				thisMasNum = id;
+				ERR_SCAN = true;
 			}
 		}
 		// MASNUM
 		else
 		{
-			this.thisMasNum = id;
+			thisMasNum = id;
 		}
 		return;
 	}
@@ -809,8 +729,7 @@ public class ScanHomeActivity extends Activity
 	{
 		String currmPullNum = mPullNum.getText().toString();
 		// [1] == total number of pcs.
-		int itemCount = this.scanDataSource.getScanTotalCounts(currmPullNum,
-				scanEntry)[1];
+		int itemCount = scanDataSource.getScanTotalCounts(currmPullNum, scanEntry)[1];
 		titleCount.setText(Integer.toString(itemCount));
 	}
 
@@ -819,7 +738,8 @@ public class ScanHomeActivity extends Activity
 		String title = mTitle.getText().toString();
 		titleMessage.setDuration(msgTime);
 
-		if (title.isEmpty()) {
+		if (title.isEmpty())
+		{
 			titleMessage.setText("Invalid Scan");
 			titleMessage.show();
 			mScanId.setText("");
@@ -834,65 +754,50 @@ public class ScanHomeActivity extends Activity
 
 		return true;
 	}
-	
+
 	public void setLocation()
 	{
 		String location = "Location: ";
 		String defGateway = Utilities.getDefaultGateway(this);
-		TextView deviceLocation = (TextView)findViewById(R.id.device_location); 
+		TextView deviceLocation = (TextView)findViewById(R.id.device_location);
 		if(defGateway.matches("3.150.168.192"))
+		{
 			location += "Reading";
+		}
 		else if(defGateway.matches("1.150.168.192"))
+		{
 			location += "PTown";
+		}
 		else
+		{
 			location += defGateway;
+		}
 		deviceLocation.setText(location);
 	}
 
-	/**
-	 * Updates the count of each skid if in SkidMode
-	 */
-	/*
-	public void updateMarks() {
-
-		if (this.mark != "") {
-
-			String[] vals = scanDataSource.getMarkValuesById(this.mark);
-
-			((TextView) this.findViewById(R.id.skid_scans)).setText(vals[0]);
-			((TextView) this.findViewById(R.id.skid_total)).setText(vals[1]);
-		}
-
-		else {
-
-			((TextView) this.findViewById(R.id.skid_scans)).setText("");
-			((TextView) this.findViewById(R.id.skid_total)).setText("");
-		}
-	}*/
-	
 	public void setNewProdMode(View v)
 	{
 		if(((ToggleButton) v).isChecked())
 		{
-			this.isNewProduct = true;
+			isNewProduct = true;
 		}
 		else
 		{
-			this.isNewProduct = false;
+			isNewProduct = false;
 		}
 	}
-	
+
 	public void setManQtyMode(View v)
 	{
 		if(((ToggleButton) v).isChecked())
 		{
-			this.isManQty = true;
+			isManQty = true;
 			quantity.setEnabled(true);
 			quantity.setText("");
 		}
 		else
 		{
-			this.isManQty = false;
+			isManQty = false;
 			if(isAutoScan)
 			{
 				quantity.setEnabled(false);
@@ -900,7 +805,7 @@ public class ScanHomeActivity extends Activity
 			}
 		}
 	}
-	
+
 	public void hideProduct()
 	{
 		View scanRow = findViewById(R.id.scanRow);
@@ -916,8 +821,8 @@ public class ScanHomeActivity extends Activity
 
 	}
 
-    public void showProduct()
-    {
+	public void showProduct()
+	{
 		View scanRow = findViewById(R.id.scanRow);
 		View tableRow3 = findViewById(R.id.tableRow3);
 		View titleScrollView = findViewById(R.id.titleScrollView);
@@ -928,118 +833,112 @@ public class ScanHomeActivity extends Activity
 		titleScrollView.setVisibility(View.VISIBLE);
 		priceListRow.setVisibility(View.VISIBLE);
 		priceFilterScrollView.setVisibility(View.VISIBLE);
-    }
+	}
 
-    public void insertSkidScan()
-    {
-        scanDataSource.insertScan(new ScanRecord(mPullNum.getText().toString(), quantity.getText().toString()));
-        recordCount.setText(Integer.toString(this.scanDataSource.getAllScans().getCount()));
-        setPullNumbers();
-        mPullNum.setText("");
+	public void insertSkidScan()
+	{
+		scanDataSource.insertScan(new ScanRecord(mPullNum.getText().toString(), quantity.getText().toString()));
+		recordCount.setText(Integer.toString(scanDataSource.getAllScans().getCount()));
+		setPullNumbers();
+		mPullNum.setText("");
 		if(!isAutoScan)
 		{
 			quantity.setText("");
 		}
-    }
+	}
 
 	private final BroadcastReceiver receiver = new BroadcastReceiver()
-    {
+	{
 		private static final String TAG = "BroadcastReceiver";
 
 		@Override
 		public void onReceive(Context c, Intent intent)
-        {
+		{
 			String message = String.format("in onReceive");
 			Log.d(TAG, message);
 
-            if(intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_DECODED_DATA))
-            {
-                String data = new String(intent.getCharArrayExtra(ScanAPIApplication.EXTRA_DECODEDDATA));
+			if(intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_DECODED_DATA))
+			{
+				String data = new String(intent.getCharArrayExtra(ScanAPIApplication.EXTRA_DECODEDDATA));
 
-                if(mPullNum.getText().toString().equals("1"))
-                {
-                    goToAdmin();
-                }
-                else if(isSkidScanMode)
-                {
-                    if (data.contains("P"))
-                    {
-                        mPullNum.setText(data.substring(1));
-                        if(quantity.getText().toString().isEmpty())
-                        {
-                            enterQuantity();
-                        }
-                        else
-                        {
-                            insertSkidScan();
-                        }
-                    }
-                }
-                else if (data.contains("P"))
-                {
-                    mPullNum.setText(data.substring(1));
-                    setPullNumbers();
-                }// end if
-                else if (mPullNum.getText().length() <= 0)
-                {
-                    Toast.makeText(getBaseContext(),
-                            "Enter Pull Number before Scanning",
-                            Toast.LENGTH_LONG).show();
-                }// end else if
-                else
-                {
-                    mScanId.setText("");
-                    titleCount.setText("");
-                    checkScan(data);
-                }// end else
-            }// end else if
+				if(mPullNum.getText().toString().equals("1"))
+				{
+					goToAdmin();
+				}
+				else if(isSkidScanMode)
+				{
+					if (data.contains("P"))
+					{
+						mPullNum.setText(data.substring(1));
+						if(quantity.getText().toString().isEmpty())
+						{
+							enterQuantity();
+						}
+						else
+						{
+							insertSkidScan();
+						}
+					}
+				}
+				else if (data.contains("P"))
+				{
+					mPullNum.setText(data.substring(1));
+					setPullNumbers();
+				}// end if
+				else if (mPullNum.getText().length() <= 0)
+				{
+					Toast.makeText(getBaseContext(),
+							"Enter Pull Number before Scanning",
+							Toast.LENGTH_LONG).show();
+				}// end else if
+				else
+				{
+					mScanId.setText("");
+					titleCount.setText("");
+					checkScan(data);
+				}// end else
+			}// end else if
 			else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_SCANNER_ARRIVAL))
-            {
-                Utilities.makeLongToast(c, intent.getStringExtra(ScanAPIApplication.EXTRA_DEVICENAME) + " Connected");
+			{
+				Utilities.makeLongToast(c, intent.getStringExtra(ScanAPIApplication.EXTRA_DEVICENAME) + " Connected");
 			}
-            else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_SCANPI_INITIALIZED))
-            {
-                Utilities.makeLongToast(c, "Ready to pair with scanner");
+			else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_SCANPI_INITIALIZED))
+			{
+				Utilities.makeLongToast(c, "Ready to pair with scanner");
 			}
-            else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_CLOSE_ACTIVITY))
-            {
+			else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_CLOSE_ACTIVITY))
+			{
 			}
-            else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_ERROR_MESSAGE))
-            {
-                Utilities.makeLongToast(c, intent.getStringExtra(ScanAPIApplication.EXTRA_ERROR_MESSAGE));
-            }
-        }// end on Recieve
+			else if (intent.getAction().equalsIgnoreCase(ScanAPIApplication.NOTIFY_ERROR_MESSAGE))
+			{
+				Utilities.makeLongToast(c, intent.getStringExtra(ScanAPIApplication.EXTRA_ERROR_MESSAGE));
+			}
+		}// end on Recieve
 	};
 
 	private void regBroadCastReceivers()
-    {
-        IntentFilter filter;
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANPI_INITIALIZED);
-        registerReceiver(this.receiver, filter);
+	{
+		IntentFilter filter;
+		filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANPI_INITIALIZED);
+		registerReceiver(receiver, filter);
 
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_ARRIVAL);
-        registerReceiver(this.receiver, filter);
+		filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_ARRIVAL);
+		registerReceiver(receiver, filter);
 
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_REMOVAL);
-        registerReceiver(this.receiver, filter);
+		filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_REMOVAL);
+		registerReceiver(receiver, filter);
 
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_DECODED_DATA);
-        registerReceiver(this.receiver, filter);
+		filter = new IntentFilter(ScanAPIApplication.NOTIFY_DECODED_DATA);
+		registerReceiver(receiver, filter);
 
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_ERROR_MESSAGE);
-        registerReceiver(this.receiver, filter);
+		filter = new IntentFilter(ScanAPIApplication.NOTIFY_ERROR_MESSAGE);
+		registerReceiver(receiver, filter);
 
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_CLOSE_ACTIVITY);
-        registerReceiver(this.receiver, filter);
+		filter = new IntentFilter(ScanAPIApplication.NOTIFY_CLOSE_ACTIVITY);
+		registerReceiver(receiver, filter);
 
-        filter = new IntentFilter(ScanAPIApplication.SET_SOUND_CONFIG_COMPLETE);
-        registerReceiver(this.receiver, filter);
-
-        filter = new IntentFilter(ScanAPIApplication.GET_SOUND_CONFIG_COMPLETE);
-        registerReceiver(this.receiver, filter);
-
-        // increasing the Application View count from 0 to 1 will
-        // cause the application to open and initialize ScanAPI
-        ScanAPIApplication.getApplicationInstance().increaseViewCount();
-    }
+		// increasing the Application View count from 0 to 1 will
+		// cause the application to open and initialize ScanAPI
+		ScanAPIApplication.getApplicationInstance().increaseViewCount();
+	}
 }

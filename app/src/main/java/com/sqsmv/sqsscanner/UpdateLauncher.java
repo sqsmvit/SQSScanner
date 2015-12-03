@@ -9,13 +9,11 @@ public class UpdateLauncher
 {
     private Context context;
     private DroidConfigManager appConfig;
-    private DropboxManager dropboxManager;
 
     public UpdateLauncher(Context activityContext)
     {
         context = activityContext;
         appConfig = new DroidConfigManager(activityContext);
-        dropboxManager = new DropboxManager(context);
     }
 
     public Thread startDBUpdate()
@@ -30,8 +28,6 @@ public class UpdateLauncher
 
         context.startService(popIntent);
 
-
-
         final ProgressDialog pausingDialog = ProgressDialog.show(context, "Updating Database", "Please Stay in Wifi Range...", true);
         Thread pausingDialogThread = new Thread()
         {
@@ -39,7 +35,7 @@ public class UpdateLauncher
             {
                 try
                 {
-                    Thread.sleep(10000);
+                    Thread.sleep(20000);
                 }
                 catch (InterruptedException e)
                 {
@@ -54,6 +50,7 @@ public class UpdateLauncher
 
     public boolean checkNeedAppUpdate()
     {
+        DropboxManager dropboxManager = new DropboxManager(context);
         boolean needUpdate = false;
 
         String apkFileName = context.getString(R.string.apk_file_name);
@@ -82,9 +79,7 @@ public class UpdateLauncher
 
     /**
      * Gets the resource Ids for the schemas of the xml files.
-     *
      * Located in xml_input.xml
-     *
      * @return
      */
     private int[] getSchemaResIds()
@@ -100,5 +95,4 @@ public class UpdateLauncher
         xmlArrays.recycle();
         return xmlSchemas;
     }
-
 }

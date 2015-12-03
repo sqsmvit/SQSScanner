@@ -71,7 +71,14 @@ public class PopDatabaseService extends IntentService
 			i += 1;
 		}
 
-        startUpdateThreads(updateThreads);
+        if(Utilities.totalDeviceMemory(this) <= 1024)
+        {
+            startSlowUpdateThreads(updateThreads);
+        }
+        else
+        {
+            startFastUpdateThreads(updateThreads);
+        }
 
         makeNotification("Database Update Finished", true);
 	}
@@ -148,8 +155,9 @@ public class PopDatabaseService extends IntentService
 		mNotificationManager.notify(0, mBuilder.build());
 	}
 
-    private void startUpdateThreads(ArrayList<Thread> updateThreads)
+    private void startSlowUpdateThreads(ArrayList<Thread> updateThreads)
     {
+        Log.d(TAG, "Slow Update");
         int count = 0;
         while(!updateThreads.isEmpty())
         {
@@ -171,6 +179,26 @@ public class PopDatabaseService extends IntentService
                     }
                 }
                 count = 0;
+            }
+        }
+    }
+
+    private void startFastUpdateThreads(ArrayList<Thread> updateThreads)
+    {
+        Log.d(TAG, "Fast Update");
+        for(Thread updateThread : updateThreads)
+        {
+            updateThread.start();
+        }
+        for(Thread updateThread : updateThreads)
+        {
+            try
+            {
+                updateThread.join();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
             }
         }
     }
