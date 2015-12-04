@@ -80,10 +80,6 @@
         </activity>
 
         <activity
-            android:name="com.sqsmv.sqsscanner.SkidScanActivity"
-            android:label="@string/title_activity_mark_scan" >
-        </activity>
-        <activity
             android:name="com.sqsmv.sqsscanner.SocketMobilePairActivity"
             android:label="@string/title_activity_socket_mobile_pair"
             android:screenOrientation="portrait" >

@@ -14,57 +14,60 @@ import java.util.HashMap;
 
 public class ScanDataSource implements DataSource
 {
-	private SQLiteDatabase db;
-	private DBAdapter dbAdapter;
-	private static String DB_TABLE = ScanTable.TABLE_NAME;
-	
-	private static String SCAN_FROM_PULL_QUERY = "SELECT * FROM " + ScanTable.TABLE_NAME + " WHERE " + ScanTable.COLUMN_NAME_FK_PULL_ID + " = ?";
-	
-	public ScanDataSource(Context ctx)
-	{
-		dbAdapter = new DBAdapter(ctx);
-	}
-	
-	@Override
-	public void open() throws SQLException
-	{
-		db = dbAdapter.getWritableDatabase();
-	}
-	
-	public void read() throws SQLException
-	{
-		db = dbAdapter.getReadableDatabase();
-	}
+    private SQLiteDatabase db;
+    private DBAdapter dbAdapter;
+    private static String DB_TABLE = ScanTable.TABLE_NAME;
 
-	@Override
-	public void close() { dbAdapter.close(); }
+    private static String SCAN_FROM_PULL_QUERY = "SELECT * FROM " + ScanTable.TABLE_NAME + " WHERE " + ScanTable.COLUMN_NAME_FK_PULL_ID + " = ?";
 
-	public void insertScan(ScanRecord rec)
+    public ScanDataSource(Context ctx)
     {
-		ContentValues values = new ContentValues();
-		values.put(ScanTable.COLUMN_NAME_SCAN_ENTRY, rec.getScanEntry());
-		values.put(ScanTable.COLUMN_NAME_FK_PULL_ID, rec.getPullNumber());
-		values.put(ScanTable.COLUMN_NAME_QUANTITY, rec.getQuantity());
-		values.put(ScanTable.COLUMN_NAME_DATE, rec.getScanDate());
-		values.put(ScanTable.COLUMN_NAME_MARK_ID,  rec.getMark());
-		values.put(ScanTable.COLUMN_NAME_TITLE, rec.getTitle());
-		values.put(ScanTable.COLUMN_NAME_PRICE_LIST, rec.getPriceList());
-		values.put(ScanTable.COLUMN_NAME_MASNUM, rec.getMasNum());
-		values.put(ScanTable.COLUMN_NAME_PRICEFILTERS, rec.getPriceFilters());
-		values.put(ScanTable.COLUMN_NAME_RATING, rec.getRating());
+        dbAdapter = new DBAdapter(ctx);
+    }
+
+    @Override
+    public void open() throws SQLException
+    {
+        db = dbAdapter.getWritableDatabase();
+    }
+
+    public void read() throws SQLException
+    {
+        db = dbAdapter.getReadableDatabase();
+    }
+
+    @Override
+    public void close()
+    {
+        dbAdapter.close();
+    }
+
+    public void insertScan(ScanRecord rec)
+    {
+        ContentValues values = new ContentValues();
+        values.put(ScanTable.COLUMN_NAME_SCAN_ENTRY, rec.getScanEntry());
+        values.put(ScanTable.COLUMN_NAME_FK_PULL_ID, rec.getPullNumber());
+        values.put(ScanTable.COLUMN_NAME_QUANTITY, rec.getQuantity());
+        values.put(ScanTable.COLUMN_NAME_DATE, rec.getScanDate());
+        values.put(ScanTable.COLUMN_NAME_MARK_ID,  rec.getMark());
+        values.put(ScanTable.COLUMN_NAME_TITLE, rec.getTitle());
+        values.put(ScanTable.COLUMN_NAME_PRICE_LIST, rec.getPriceList());
+        values.put(ScanTable.COLUMN_NAME_MASNUM, rec.getMasNum());
+        values.put(ScanTable.COLUMN_NAME_PRICEFILTERS, rec.getPriceFilters());
+        values.put(ScanTable.COLUMN_NAME_RATING, rec.getRating());
         values.put(ScanTable.COLUMN_NAME_LOCATION, rec.getLocation());
-		
-		long i = db.insert(ScanTable.TABLE_NAME, null, values);
-		System.out.println(i);
-	}
-	
-	public Cursor getAllScans()
+
+        long i = db.insert(ScanTable.TABLE_NAME, null, values);
+        System.out.println(i);
+    }
+
+    public Cursor getAllScans()
     {
-		return this.db.query(ScanTable.TABLE_NAME, null, null, null, null, null, null);
-	}
-	
-	public Cursor getScansForPrint(int exportMode)
-	{
+        return this.db.query(ScanTable.TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    public Cursor getScansForPrint(int exportMode)
+    {
         if(exportMode == 1)
         {
             //Normal Mode
@@ -77,13 +80,13 @@ public class ScanDataSource implements DataSource
             String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, "SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") As Total", ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_DATE, ScanTable.COLUMN_NAME_LOCATION, ScanTable.COLUMN_NAME_TITLE};
             return db.query(ScanTable.TABLE_NAME, cols, null, null, ScanTable.COLUMN_NAME_MASNUM +  ", " + ScanTable.COLUMN_NAME_FK_PULL_ID, null, ScanTable.COLUMN_NAME_FK_PULL_ID + ", " + ScanTable.COLUMN_NAME_MASNUM);
         }
-		else if(exportMode == 3)
-		{
+        else if(exportMode == 3)
+        {
             //BillB Mode
-			String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, "SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") As Total", ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_DATE, ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable.COLUMN_NAME_PRICEFILTERS, ScanTable.COLUMN_NAME_RATING};
-			return db.query(ScanTable.TABLE_NAME, cols, null, null, ScanTable.COLUMN_NAME_MASNUM +  ", " + ScanTable.COLUMN_NAME_FK_PULL_ID, null, ScanTable.COLUMN_NAME_FK_PULL_ID + ", " + ScanTable.COLUMN_NAME_TITLE);
-		}
-		else if(exportMode == 4)
+            String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, "SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") As Total", ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_DATE, ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable.COLUMN_NAME_PRICEFILTERS, ScanTable.COLUMN_NAME_RATING};
+            return db.query(ScanTable.TABLE_NAME, cols, null, null, ScanTable.COLUMN_NAME_MASNUM +  ", " + ScanTable.COLUMN_NAME_FK_PULL_ID, null, ScanTable.COLUMN_NAME_FK_PULL_ID + ", " + ScanTable.COLUMN_NAME_TITLE);
+        }
+        else if(exportMode == 4)
         {
             //Drew mode
             String[] cols = new String[]{ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_MASNUM, "SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") As Total"};
@@ -95,153 +98,97 @@ public class ScanDataSource implements DataSource
             String[] cols = new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_TITLE};
             return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, null);
         }
-		else if(exportMode == 6)
-		{
-			//Skid Mode
-			String[] cols = new String[]{ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_DATE};
-			return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, null);
-		}
+        else if(exportMode == 6)
+        {
+            //Skid Mode
+            String[] cols = new String[]{ScanTable.COLUMN_NAME_FK_PULL_ID, ScanTable.COLUMN_NAME_QUANTITY, ScanTable.COLUMN_NAME_DATE};
+            return db.query(ScanTable.TABLE_NAME, cols, null, null, null, null, null);
+        }
         else
         {
             //Fail for some reason
             return null;
         }
-	}
-	
-	public void delAllScans(){
-		
-		this.db.delete(ScanTable.TABLE_NAME, null, null);
-	}
-	
-	//get all scans under a pull id
-	public Cursor getScansByPullId(String pullId){
-		
-		String[] args = {pullId};
-		
-		Cursor dbCur = this.db.rawQuery(SCAN_FROM_PULL_QUERY, args);		
+    }
 
-		return dbCur;
-		
-	}
-	
-	public Cursor getMarkValues()
+    public void delAllScans()
     {
-		String query = "SELECT "+ ScanTable._ID + ", " + ScanTable.COLUMN_NAME_MARK_ID + ", COUNT(*) AS Lines, SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanTable.TABLE_NAME + " WHERE "  + ScanTable.COLUMN_NAME_MARK_ID + " IS NOT NULL AND "+ ScanTable.COLUMN_NAME_MARK_ID +" !='' " +" GROUP BY " + ScanTable.COLUMN_NAME_MARK_ID;
-		Cursor dbCur = this.db.rawQuery(query, null);
+        db.delete(ScanTable.TABLE_NAME, null, null);
+    }
 
-		return dbCur;
-	}
-	
-	public String[] getMarkValuesById(String markId){
-		String query = "SELECT "+ ScanTable.COLUMN_NAME_MARK_ID + ", COUNT(*) AS Lines, SUM(" + ScanTable.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanTable.TABLE_NAME + " WHERE " + ScanTable.COLUMN_NAME_MARK_ID + "= ? GROUP BY " + ScanTable.COLUMN_NAME_MARK_ID;
-		Cursor dbCur = this.db.rawQuery(query, new String[]{markId});
-		
-		String[] vals = new String[2];
-		
-		if(dbCur.moveToFirst()){
-			
-			do{
-				String lines = Integer.toString(dbCur.getInt(dbCur.getColumnIndex("Lines")));
-				String quantity = Integer.toString(dbCur.getInt(dbCur.getColumnIndex("Total")));
-				
-				vals[0] = lines;
-				vals[1] = quantity;
-				
-			}while(dbCur.moveToNext());
-			
-			
-		}
-		
-		return vals;
-		
-		
-	}
-	
-	//count of a scan of in a specific pull
-	public int[] getScanTotalCounts(String pullNum, String scanEntry){
-		
-		//Cursor cur = this.db.query(ScanTable.TABLE_NAME, null,ScanTable.COLUMN_NAME_SCAN_ENTRY + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ", new String[]{scanEntry, pullNum}, null, null, null, null );
-	    String query = "SELECT COUNT(*) AS Lines, SUM("+ ScanTable.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanTable.TABLE_NAME + " WHERE "+ ScanTable.COLUMN_NAME_SCAN_ENTRY + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ";
-		Cursor cur = this.db.rawQuery(query, new String[]{scanEntry, pullNum});
-	    int[] counts = new int[2];
-		if(cur.moveToFirst()){	
-			counts[0] = cur.getInt(cur.getColumnIndex("Lines"));
-			counts[1] = cur.getInt(cur.getColumnIndex("Total"));
-		}
-		
-		return counts;
-		
-	}
-	
-	public int delScansByMark(String mark){
-		
-		String[] args = {mark};
-		
-		return this.db.delete(ScanTable.TABLE_NAME, ScanTable.COLUMN_NAME_MARK_ID + " = ?", args);
-		
-	}
-	
-	public int delScansById(String id){
-		
-		String[] args = {id};
-		
-		return this.db.delete(ScanTable.TABLE_NAME, ScanTable._ID + " = ?", args);
-	}
-	
-	public int getTotalByPull(String pullId){
-		
-		Cursor cur = this.db.query(ScanTable.TABLE_NAME, new String[]{"SUM ("+ScanTable.COLUMN_NAME_QUANTITY +") As Total"} ,ScanTable.COLUMN_NAME_FK_PULL_ID + "=?", new String[]{pullId}, null, null, null, null );
-		int total = 0;
-		if(cur.moveToNext()){
-			
-			total = cur.getInt(cur.getColumnIndex("Total"));			
-		}
-		return total;
-		
-	}
-	
-	public String[] getPullNums(){
-		
-		
-		int i = 0;
-		Cursor cur = this.db.query(true, ScanTable.TABLE_NAME, new String[]{ScanTable.COLUMN_NAME_FK_PULL_ID}, null, null, null, null, null, null);
-		String[] pulls = new String[cur.getCount()];
-		if(cur.moveToFirst()){
-			do
+    //get all scans under a pull id
+    public Cursor getScansByPullId(String pullId)
+    {
+        String[] args = {pullId};
+        Cursor dbCur = this.db.rawQuery(SCAN_FROM_PULL_QUERY, args);
+        return dbCur;
+    }
+
+    //count of a scan of in a specific pull
+    public int[] getScanTotalCounts(String pullNum, String scanEntry)
+    {
+        //Cursor cur = this.db.query(ScanTable.TABLE_NAME, null,ScanTable.COLUMN_NAME_SCAN_ENTRY + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ", new String[]{scanEntry, pullNum}, null, null, null, null );
+        String query = "SELECT COUNT(*) AS Lines, SUM("+ ScanTable.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanTable.TABLE_NAME + " WHERE "+ ScanTable.COLUMN_NAME_SCAN_ENTRY + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ";
+        Cursor cur = this.db.rawQuery(query, new String[]{scanEntry, pullNum});
+        int[] counts = new int[2];
+        if(cur.moveToFirst())
+        {
+            counts[0] = cur.getInt(cur.getColumnIndex("Lines"));
+            counts[1] = cur.getInt(cur.getColumnIndex("Total"));
+        }
+
+        return counts;
+    }
+
+    public int delScansById(String id)
+    {
+        String[] args = {id};
+        return db.delete(ScanTable.TABLE_NAME, ScanTable._ID + " = ?", args);
+    }
+
+    public int getTotalByPull(String pullId)
+    {
+        Cursor cur = this.db.query(ScanTable.TABLE_NAME, new String[]{"SUM ("+ScanTable.COLUMN_NAME_QUANTITY +") As Total"} ,ScanTable.COLUMN_NAME_FK_PULL_ID + "=?", new String[]{pullId}, null, null, null, null );
+        int total = 0;
+        if(cur.moveToNext())
+        {
+            total = cur.getInt(cur.getColumnIndex("Total"));
+        }
+        return total;
+    }
+
+    public String[] getPullNums()
+    {
+        int i = 0;
+        Cursor cur = this.db.query(true, ScanTable.TABLE_NAME, new String[]{ScanTable.COLUMN_NAME_FK_PULL_ID}, null, null, null, null, null, null);
+        String[] pulls = new String[cur.getCount()];
+        if(cur.moveToFirst())
+        {
+            do
             {
-				pulls[i] = cur.getString(0);
-				i++;
-			}while(cur.moveToNext());
-		}
+                pulls[i] = cur.getString(0);
+                i++;
+            }while(cur.moveToNext());
+        }
         return pulls;
-		
-	}
-		
-	@Override
-	public HashMap<String, String> getSha() {
-		return null;
-	}
+    }
 
-	@Override
-	public void insertBatch(ArrayList<ArrayList<String>> batch) {
-		
-	}
-
-	public Cursor getValueByID(int id)
+    @Override
+    public HashMap<String, String> getSha()
     {
-		String query = new QueryBuilder().buildSelectQuery(DB_TABLE, new String[]{"*"}, new String[]{ScanTable._ID});
-		
-		return this.db.rawQuery(query, new String[]{Integer.toString(id)});
-		
-		//return this.db.rawQuery(query, new String[]{Integer.toString(id)});
-	}
-	
-	public Cursor getValueByMarkID(int id, String[] selCols){
-		String query = new QueryBuilder().buildSelectQuery(DB_TABLE, selCols, new String[]{ScanTable.COLUMN_NAME_MARK_ID});
-		
-		return this.db.rawQuery(query, new String[]{Integer.toString(id)});	
-		
-	}
+        return null;
+    }
+
+    @Override
+    public void insertBatch(ArrayList<ArrayList<String>> batch)
+    {}
+
+    public Cursor getValueByID(int id)
+    {
+        String query = new QueryBuilder().buildSelectQuery(DB_TABLE, new String[]{"*"}, new String[]{ScanTable._ID});
+
+        return db.rawQuery(query, new String[]{Integer.toString(id)});
+    }
 
     public int updateRecordByID(int id, ScanRecord editRecord)
     {

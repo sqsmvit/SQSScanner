@@ -46,8 +46,6 @@ public class DBAdapter extends SQLiteOpenHelper
 			ProductTable.COLUMN_NAME_THEATER_DATE + " TEXT" + COMMA_SEP +
 			ProductTable.COLUMN_NAME_STUDIO_NAME + " TEXT" + COMMA_SEP +
 			ProductTable.COLUMN_NAME_SHA + " TEXT " +
-			//"REFERENCES " + PriceListTable.TABLE_NAME +
-			//	"(" + PriceListTable.COLUMN_NAME_PK_PRICE_LIST +") " +
 			");";
 			
 	private static final String CREATE_TABLE_UPC= 
@@ -56,7 +54,6 @@ public class DBAdapter extends SQLiteOpenHelper
 			UPCTable.COLUMN_NAME_PK_UPC_ID + " TEXT PRIMARY KEY" + COMMA_SEP +
 			UPCTable.COLUMN_NAME_SHA + " TEXT " + COMMA_SEP +
 			UPCTable.COLUMN_NAME_FK_MAS_ID + " TEXT " + 
-			//"REFERENCES " + ProductTable.TABLE_NAME + "(" + ProductTable.COLUMN_NAME_PK_MAS_ID + ")" +
 			");";
 	
 	private static final String CREATE_TABLE_PRICE_LIST = 
