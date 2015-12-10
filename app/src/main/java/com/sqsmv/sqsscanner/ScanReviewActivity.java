@@ -112,16 +112,15 @@ public class ScanReviewActivity extends ExpandableListActivity
     {
           if (requestCode == 1)
           {
-             if(resultCode == RESULT_OK){
-                 //Bundle b = data.getExtras();
-                 //ScanRecord editScan = b.getParcelable("EDIT_RECORD");
-                 //scanDataSource.insertScan(editScan);
+             if(resultCode == RESULT_OK)
+             {
                  scanAdapter.changeCursor(scanDataSource.getScansByPullId(pullKey));
                  scanAdapter.notifyDataSetChanged();
              }
 
              if (resultCode == RESULT_CANCELED)
-             {}
+             {
+             }
           }
     }
 
@@ -144,13 +143,12 @@ public class ScanReviewActivity extends ExpandableListActivity
         alertDialogBuilder
             .setMessage("Delete Scan?")
             .setCancelable(false)
-            .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog,int id) {
-
+            .setPositiveButton("Yes",new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog,int id)
+                {
                     Cursor tempCursor = scanAdapter.getCursor();
                     tempCursor.moveToPosition(position);
-                    //pullRecs -= 1;
-                    //pullPcs -= Integer.parseInt(tempCursor.getString(tempCursor.getColumnIndex(ScanTable.COLUMN_NAME_QUANTITY)));
                     scanDataSource.delScansById(Integer.toString(tempCursor.getInt(tempCursor.getColumnIndex(ScanTable._ID))));
                     scanAdapter.changeCursor(scanDataSource.getScansByPullId(pullKey));
                     scanAdapter.notifyDataSetChanged();
@@ -158,7 +156,8 @@ public class ScanReviewActivity extends ExpandableListActivity
                 }
               })
             .setNegativeButton("No",new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog,int id) {
+                public void onClick(DialogInterface dialog,int id)
+                {
                     // if this button is clicked, just close
                     // the dialog box and do nothing
                     dialog.cancel();
@@ -185,7 +184,6 @@ public class ScanReviewActivity extends ExpandableListActivity
         Intent intent = new Intent(this, EditRecordActivity.class);
         Bundle b = new Bundle();
         b.putInt("EDIT_SCAN", scanPkey);
-        //b.putParcelable("EDIT_SCAN", editScan);
         intent.putExtras(b);
         startActivityForResult(intent, 1);
     }
