@@ -16,8 +16,8 @@ import com.sqsmv.sqsscanner.DB.ScanDataSource;
 
 import java.util.ArrayList;
 
-public class EditRecordActivity extends Activity {
-
+public class EditRecordActivity extends Activity
+{
     private ScanDataSource scanDataSource;
     private String editScanId;
     private String editOldQty;

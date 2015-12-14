@@ -127,8 +127,7 @@ public class ScanDataSource implements DataSource
     //count of a scan of in a specific pull
     public int[] getScanTotalCounts(String pullNum, String scanEntry)
     {
-        //Cursor cur = this.db.query(ScanTable.TABLE_NAME, null,ScanTable.COLUMN_NAME_SCAN_ENTRY + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ", new String[]{scanEntry, pullNum}, null, null, null, null );
-        String query = "SELECT COUNT(*) AS Lines, SUM("+ ScanTable.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanTable.TABLE_NAME + " WHERE "+ ScanTable.COLUMN_NAME_SCAN_ENTRY + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ";
+        String query = "SELECT COUNT(*) AS Lines, SUM("+ ScanTable.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanTable.TABLE_NAME + " WHERE "+ ScanTable.COLUMN_NAME_MASNUM + "=? AND " + ScanTable.COLUMN_NAME_FK_PULL_ID +"=? ";
         Cursor cur = this.db.rawQuery(query, new String[]{scanEntry, pullNum});
         int[] counts = new int[2];
         if(cur.moveToFirst())

@@ -45,7 +45,6 @@ public class ScanReviewActivity extends ExpandableListActivity
         protected Cursor getChildrenCursor(Cursor groupCursor)
         {
             int id = groupCursor.getInt(groupCursor.getColumnIndex(ScanTable._ID));
-            //Cursor childCursor =  scanDataSource.getValueByID(id, new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST});
             Cursor childCursor =  scanDataSource.getValueByID(id);
             childCursor.moveToFirst();
             return childCursor;
@@ -84,7 +83,7 @@ public class ScanReviewActivity extends ExpandableListActivity
         scanAdapter = new ScansCursorTreeAdapter(this, scanDataSource.getScansByPullId(pullKey),
                         R.layout.scan_row, new String[]{ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_QUANTITY},
                         new int[] {R.id.scanTitle, R.id.Scan_qty}, R.layout.scan_title,
-                        new String[]{ScanTable.COLUMN_NAME_SCAN_ENTRY, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable._ID},
+                        new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable._ID},
                         new int[] {R.id.scanID, R.id.pList});
 
         ListView listView = getExpandableListView();

@@ -410,7 +410,7 @@ public class ScanHomeActivity extends Activity
 		String tempId = getProductId();
 		processRecord();
 		showTitle();
-		setTitleCount(currentRecord.getScanEntry());
+		setTitleCount(currentRecord.getMasNum());
 
 		setQuantity(tempId);
 
@@ -429,7 +429,7 @@ public class ScanHomeActivity extends Activity
 			setScanTitle();
 			createRecord();
 			scanDataSource.insertScan(currentRecord);
-			if (ERR_SCAN)
+			if(ERR_SCAN)
 			{
 				Toast.makeText(this, "Bring Copy of Title to Dave Kinn", Toast.LENGTH_LONG).show();
 			}
