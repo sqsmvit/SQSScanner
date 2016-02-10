@@ -1,13 +1,23 @@
 package com.sqsmv.sqsscanner.database.productlens;
 
-import android.content.Context;
+import android.database.Cursor;
 
+import com.sqsmv.sqsscanner.database.DBAdapter;
+import com.sqsmv.sqsscanner.database.QueryBuilder;
 import com.sqsmv.sqsscanner.database.XMLDBAccess;
 
 public class ProductLensAccess extends XMLDBAccess
 {
-    public ProductLensAccess(Context context)
+    public ProductLensAccess(DBAdapter dbAdapter)
     {
-        super(context, new ProductLensContract());
+        super(dbAdapter, new ProductLensContract());
+    }
+
+    public Cursor selectByMasNumLensId(String masNum, String lensId)
+    {
+        String[] selectColumns = new String[]{"*"};
+        String[] whereColumns = new String[]{ProductLensContract.COLUMN_NAME_MASNUM, ProductLensContract.COLUMN_NAME_LENSID};
+        String[] args = new String[]{masNum, lensId};
+        return getDB().rawQuery(QueryBuilder.buildSelectQuery(getTableName(), selectColumns, whereColumns), args);
     }
 }

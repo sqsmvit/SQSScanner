@@ -1,38 +1,40 @@
 package com.sqsmv.sqsscanner;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.sqsmv.sqsscanner.DB.ScanDataSource;
+import com.sqsmv.sqsscanner.database.DBAdapter;
+import com.sqsmv.sqsscanner.database.scan.ScanAccess;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PullReviewActivity extends ListActivity
+public class PullReviewActivity extends Activity
 {
-    public static boolean FILE_EXPORTED;
-    private int exportModeChoice;
-    private int invAdjChoice;
-
-    private SimpleAdapter pullAdapter;
-    private ArrayList<HashMap<String, String>> pullNumberList = new ArrayList<HashMap<String, String>>();
+    private static final String TAG = "PullReviewActivity";
     private DroidConfigManager appConfig;
 
-    TextView commitModeView;
+    private DBAdapter dbAdapter;
+    private ScanAccess scanAccess;
+
+    private ListView pullListView;
+
+    private SimpleAdapter pullAdapter;
+    private ArrayList<HashMap<String, String>> pullNumberList;
+
+    private int exportModeChoice, invAdjChoice;
+    private boolean fileExported;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,207 +43,104 @@ public class PullReviewActivity extends ListActivity
         setContentView(R.layout.activity_pull_review);
 
         appConfig = new DroidConfigManager(this);
+
+        dbAdapter = new DBAdapter(this);
+        scanAccess = new ScanAccess(dbAdapter);
+
+        pullNumberList = new ArrayList<HashMap<String, String>>();
+
         setConfig();
+        fileExported = false;
 
-        ListView listView = getListView();
-        View header = getLayoutInflater().inflate(R.layout.pullrow_header, null);
-        listView.addHeaderView(header);
+        pullListView = (ListView)findViewById(R.id.pullListView);
 
-        commitModeView = (TextView)findViewById(R.id.commitMode);
+        pullNumberList = new ArrayList<HashMap<String, String>>();
 
-        listView.setOnItemClickListener(new OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View view, int position, long id)
-            {
-                int editPos = position - 1;
-                String pullNum = pullNumberList.get(editPos).get("pullNum");
-                goToScans(pullNum);
-            }
-        });
+        pullAdapter = new SimpleAdapter(this, pullNumberList, R.layout.pull_row,
+                new String[] {"pullNum", "pullLines", "pullCount"},
+                new int[]{R.id.Pull_Num, R.id.Pull_Lines, R.id.Pull_Count});
 
-        displayMode();
-    }
+        pullListView.setAdapter(pullAdapter);
 
-    /**
-     * @param v
-     */
-    public void onClickBack(View v)
-    {
-        onBackPressed();
+        setListeners();
+        showDisplayMode();
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
-        createAdapter();
-        getListView().setAdapter(pullAdapter);
+        scanAccess.open();
+
+        createAdapterDataset();
         pullAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onPause()
     {
+        dbAdapter.close();
         super.onPause();
-        pullNumberList.clear();
-        pullAdapter.notifyDataSetInvalidated();
     }
 
-    public File writeFromDB()
+    @Override
+    public void onBackPressed()
     {
-        ScanWriter scanWriter = new ScanWriter(this, exportModeChoice, invAdjChoice);
-
-        try
-        {
-            scanWriter.writeToFile();
-            scanWriter.writeBackup();
-            scanWriter.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        return scanWriter.getFile();
+        Intent data = new Intent();
+        data.putExtra("FILE_EXPORTED", fileExported);
+        setResult(RESULT_OK, data);
+        super.onBackPressed();
     }
 
-    /**
-     * @param v
-     */
-    public void onClickDelete(View v){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        // set title
-        alertDialogBuilder.setTitle("Confirm Mass Delete");
-
-        // set dialog message
-        alertDialogBuilder
-            .setMessage("Delete ALL Scans ?")
-            .setCancelable(false)
-            .setPositiveButton("Yes",new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog,int id)
-                {
-                    performMassDelete();
-                }
-              })
-            .setNegativeButton("No", new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    // if this button is clicked, just close
-                    // the dialog box and do nothing
-                    dialog.cancel();
-                }
-            });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-
-    }
-
-    public void performMassDelete()
+    private void setListeners()
     {
-        ScanDataSource scanDataSource = new ScanDataSource(this);
-        scanDataSource.open();
-        scanDataSource.delAllScans();
-        pullNumberList.clear();
-        pullAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * @param v
-     */
-    public void onClickCommit(View v)
-    {
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if(!(pullNumberList.isEmpty()))
+        findViewById(R.id.pullHeadBack).setOnClickListener(new View.OnClickListener()
         {
-            if (wifi.isConnected())
+            @Override
+            public void onClick(View v)
             {
-                File exportFile = writeFromDB();
-
-                try
-                {
-                    ScanExporter scanExporter = new ScanExporter(this, exportFile, exportModeChoice, true);
-                    scanExporter.exportScan();
-                    if(exportModeChoice == 6)
-                    {
-                        appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
-                    }
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-                pullNumberList.clear();
-                pullAdapter.notifyDataSetChanged();
-                FILE_EXPORTED = true;
+                onBackPressed();
             }
-            else
+        });
+
+        findViewById(R.id.massDelete).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
             {
-                Toast.makeText(this, "Not Connected to WIFI - cannot commit scan", Toast.LENGTH_LONG).show();
+                onClickDelete();
             }
-        }
-        else
+        });
+
+        findViewById(R.id.commitScan).setOnClickListener(new View.OnClickListener()
         {
-            Toast.makeText(this, "No Scan to Commit", Toast.LENGTH_LONG).show();
-        }
-    }
+            @Override
+            public void onClick(View v)
+            {
+                onClickCommit();
+            }
+        });
 
-    private void createAdapter()
-    {
-        createAdapterDataset();
-        pullAdapter = new SimpleAdapter(this, pullNumberList, R.layout.pull_row,
-                new String[] {"pullNum","pullLines","pullCount"},
-                new int[]{R.id.Pull_Num, R.id.Pull_Lines, R.id.Pull_Count});
-    }
-
-    /**
-     * @param pullNum
-     */
-    public void goToScans(String pullNum)
-    {
-        Intent intent = new Intent(this, ScanReviewActivity.class);
-
-        intent.putExtra("PULL_NUM", pullNum);
-        startActivity(intent);
-    }
-
-    private void createAdapterDataset()
-    {
-        HashMap<String, String> pullEntry;
-
-        ScanDataSource scanDataSource = new ScanDataSource(this);
-        scanDataSource.open();
-        String[] pulls = scanDataSource.getPullNums();
-
-        for (String pull : pulls)
+        pullListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
-            pullEntry = new HashMap<String, String>();
-            pullEntry.put("pullNum", pull);
-            pullEntry.put("pullLines", Integer.toString(scanDataSource.getScansByPullId(pull).getCount()));
-            pullEntry.put("pullCount", Integer.toString(scanDataSource.getTotalByPull(pull)));
-            pullNumberList.add(pullEntry);
-        }
-        scanDataSource.close();
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long id)
+            {
+                String pullNum = pullNumberList.get(position).get("pullNum");
+                goToScans(pullNum);
+            }
+        });
     }
 
-    /**
-     *
-     */
     private void setConfig()
     {
-        //default is DBX
         exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
         invAdjChoice = appConfig.accessInt(DroidConfigManager.INVENTORY_MODE_CHOICE, null, 1);
     }
 
-    private void displayMode()
+    private void showDisplayMode()
     {
+        TextView commitModeView = (TextView)findViewById(R.id.commitMode);
         switch(exportModeChoice)
         {
             case 1:
@@ -271,40 +170,105 @@ public class PullReviewActivity extends ListActivity
             default:
                 commitModeView.setText("Error");
         }
-        /*
-        if(exportModeChoice == 1)
+    }
+
+    private void createAdapterDataset()
+    {
+        pullNumberList.clear();
+        HashMap<String, String> pullEntry;
+
+        ArrayList<String> pulls = scanAccess.getPullNums();
+
+        for (String pull : pulls)
         {
-            //Normal Mode
-            commitModeView.setText("Normal Pull Mode");
+            pullEntry = new HashMap<String, String>();
+            pullEntry.put("pullNum", pull);
+            pullEntry.put("pullLines", Integer.toString(scanAccess.getTotalScansByPull(pull)));
+            pullEntry.put("pullCount", Integer.toString(scanAccess.getTotalByPull(pull)));
+            pullNumberList.add(pullEntry);
         }
-        else if(exportModeChoice == 2)
+    }
+
+    private void onClickDelete()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder
+                .setTitle("Confirm Mass Delete")
+                .setMessage("Delete ALL Scans?")
+                .setCancelable(false)
+                .setPositiveButton("Yes",new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog,int id)
+                    {
+                        performMassDelete();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    private void performMassDelete()
+    {
+        scanAccess.deleteAll();
+        pullNumberList.clear();
+        pullAdapter.notifyDataSetChanged();
+    }
+
+    private void onClickCommit()
+    {
+        if(!(pullNumberList.isEmpty()))
         {
-            //Consolidated Mode
-            commitModeView.setText("Consolidated Pull Mode");
-        }
-        else if(exportModeChoice == 3)
-        {
-            //BillB Mode
-            commitModeView.setText("Bill B. Mode");
-        }
-        else if(exportModeChoice == 4)
-        {
-            //Drew mode
-            commitModeView.setText("Drew Mode");
-        }
-        else if(exportModeChoice == 5)
-        {
-            //RI Mode
-            commitModeView.setText("RI Mode");
-        }
-        else if(exportModeChoice == 6)
-        {
-            //RI Mode
-            commitModeView.setText("Skid Mode");
+            if(Utilities.checkWifi(this))
+            {
+                try
+                {
+                    File exportFile = writeFromDB();
+                    ScanExporter.exportScan(this, exportFile, exportModeChoice, true);
+                    if(exportModeChoice == 6)
+                    {
+                        appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
+                    }
+                    performMassDelete();
+                    fileExported = true;
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                    Utilities.makeLongToast(this, "Error Writing Files.");
+                }
+            }
+            else
+            {
+                Utilities.makeLongToast(this, "Not Connected to WiFi - Cannot Commit Scan.");
+            }
         }
         else
         {
-            commitModeView.setText("Error");
-        }*/
+            Utilities.makeLongToast(this, "No Scan to Commit.");
+        }
+    }
+
+    private File writeFromDB() throws IOException
+    {
+        Cursor exportCursor = scanAccess.selectScansForPrint(exportModeChoice);
+        File exportFile = ScanWriter.createExportFile(this, exportCursor, exportModeChoice, invAdjChoice);
+        ScanWriter.writeBackupFile(exportFile);
+
+        return exportFile;
+    }
+
+    private void goToScans(String pullNum)
+    {
+        Intent intent = new Intent(this, ScanReviewActivity.class);
+
+        intent.putExtra("PULL_NUM", pullNum);
+        startActivity(intent);
     }
 }

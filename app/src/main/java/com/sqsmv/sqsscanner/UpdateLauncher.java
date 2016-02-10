@@ -3,32 +3,41 @@ package com.sqsmv.sqsscanner;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.TypedArray;
 
+/**
+ * Utility class for starting updates for the app.
+ */
 public class UpdateLauncher
 {
     private Context context;
     private DroidConfigManager appConfig;
 
-    public UpdateLauncher(Context activityContext)
+    /**
+     * Constructor.
+     * @param context    The Context of the Activity or Service UpdateLauncher was instantiated for.
+     */
+    public UpdateLauncher(Context context)
     {
-        context = activityContext;
-        appConfig = new DroidConfigManager(activityContext);
+        this.context = context;
+        appConfig = new DroidConfigManager(context);
     }
 
-    public Thread startDBUpdate()
+    /**
+     * Starts the Service used to update the database for the app.
+     * @param startBlockingThread    Whether the Thread for blocking user input needs to be started or not.
+     * @return The Thread for blocking user input.
+     */
+    public Thread startDBUpdate(boolean startBlockingThread)
     {
         Intent popIntent = new Intent(context, PopDatabaseService.class);
-        String[] xmlFiles = context.getResources().getStringArray(R.array.fmDumpFiles);
-        int[] xmlSchemas = getSchemaResIds();
-
-        popIntent.putExtra("XML_FILES", xmlFiles);
-        popIntent.putExtra("XML_SCHEMAS", xmlSchemas);
-        popIntent.putExtra("FORCE_UPDATE", 1);
 
         context.startService(popIntent);
 
-        final ProgressDialog pausingDialog = ProgressDialog.show(context, "Updating Database", "Please Stay in Wifi Range...", true);
+        final ProgressDialog pausingDialog = new ProgressDialog(context);
+        pausingDialog.setTitle("Updating Database");
+        pausingDialog.setMessage("Please Stay in Wifi Range...");
+        pausingDialog.setCancelable(true);
+
         Thread pausingDialogThread = new Thread()
         {
             public void run()
@@ -44,10 +53,18 @@ public class UpdateLauncher
                 pausingDialog.dismiss();
             }
         };
-        pausingDialogThread.start();
+        if(startBlockingThread)
+        {
+            pausingDialog.show();
+            pausingDialogThread.start();
+        }
         return pausingDialogThread;
     }
 
+    /**
+     * Checks Dropbox to see if a newer version of the apk has been uploaded.
+     * @return true if an update is needed, otherwise false.
+     */
     public boolean checkNeedAppUpdate()
     {
         DropboxManager dropboxManager = new DropboxManager(context);
@@ -69,30 +86,14 @@ public class UpdateLauncher
         return needUpdate;
     }
 
+    /**
+     * Starts the Service used to update the app.
+     */
     public void startAppUpdate()
     {
         appConfig.accessString(DroidConfigManager.PRIOR_VERSION, Utilities.getVersion(context), "");
         ProgressDialog.show(context, "Updating Application", "Please Stay in Wifi Range...", true);
         Intent appUpdateIntent = new Intent(context, AppUpdateService.class);
         context.startService(appUpdateIntent);
-    }
-
-    /**
-     * Gets the resource Ids for the schemas of the xml files.
-     * Located in xml_input.xml
-     * @return
-     */
-    private int[] getSchemaResIds()
-    {
-        TypedArray xmlArrays = context.getResources().obtainTypedArray(R.array.xml_list);
-        int[] xmlSchemas = new int[xmlArrays.length()];
-
-        for(int i = 0; i < xmlArrays.length(); i++)
-        {
-            xmlSchemas[i] = xmlArrays.getResourceId(i, 0);
-        }
-
-        xmlArrays.recycle();
-        return xmlSchemas;
     }
 }

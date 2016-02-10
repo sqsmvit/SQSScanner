@@ -12,15 +12,14 @@ public class UPCRecord extends XMLDBRecord
     public UPCRecord(String upc, String masNum, String sha)
     {
         super(new UPCContract());
-        this.upc = upc;
-        this.masNum = masNum;
+        setUPC(upc);
+        setMasNum(masNum);
         setSha(sha);
     }
 
     public UPCRecord(Cursor dbCursor)
     {
-        super(new UPCContract());
-        buildWithCursor(dbCursor);
+        super(new UPCContract(), dbCursor);
     }
 
     public String getUPC()
@@ -41,6 +40,23 @@ public class UPCRecord extends XMLDBRecord
     public void setMasNum(String masNum)
     {
         this.masNum = masNum;
+    }
+
+    public static UPCRecord buildNewUPCRecordFromCursor(Cursor dbCursor)
+    {
+        dbCursor.moveToFirst();
+        UPCRecord upcRecord = new UPCRecord(dbCursor);
+        dbCursor.close();
+        return upcRecord;
+    }
+
+    @Override
+    public void initRecord()
+    {
+        setUPC("");
+        setMasNum("");
+        setSha("");
+
     }
 
     @Override

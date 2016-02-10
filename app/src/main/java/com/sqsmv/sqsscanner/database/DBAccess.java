@@ -1,35 +1,25 @@
 package com.sqsmv.sqsscanner.database;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+
 //Data Access controls all actual interaction with the database
 public abstract class DBAccess
 {
-    private  SQLiteDatabase db;
+    private SQLiteDatabase db;
     private DBAdapter dbAdapter;
     private DBContract dbContract;
 
-    public DBAccess(Context activityContext, DBContract dbContract)
+    public DBAccess(DBAdapter dbAdapter, DBContract dbContract)
     {
-        dbAdapter = new DBAdapter(activityContext);
+        this.dbAdapter = dbAdapter;
         this.dbContract = dbContract;
     }
 
     public void open()
     {
         db = dbAdapter.getWritableDatabase();
-    }
-
-    public void read()
-    {
-        db = dbAdapter.getReadableDatabase();
-    }
-
-    public void close()
-    {
-        dbAdapter.close();
     }
 
     public void reset()
@@ -40,26 +30,22 @@ public abstract class DBAccess
 
     public Cursor selectAll()
     {
-        String selectQuery = QueryBuilder.buildSelectQuery(dbContract.getTableName(), new String[]{"*"}, new String[]{});
-        return getDB().rawQuery(selectQuery, null);
+        String[] selectColumns = new String[]{"*"};
+        return getDB().rawQuery(QueryBuilder.buildSelectQuery(getTableName(), selectColumns, null), null);
     }
 
     public Cursor selectByPk(String pKey)
     {
-        String selectQuery = QueryBuilder.buildSelectQuery(dbContract.getTableName(), new String[]{"*"}, new String[]{dbContract.getPrimaryKeyName()});
-        return getDB().rawQuery(selectQuery, new String[]{pKey});
-    }
-
-    public Cursor selectColumnsByPk(String pKey, String columns[])
-    {
-        String selectQuery = QueryBuilder.buildSelectQuery(dbContract.getTableName(), columns, new String[]{dbContract.getPrimaryKeyName()});
-        return getDB().rawQuery(selectQuery, new String[]{pKey});
+        String[] selectColumns = new String[]{"*"};
+        String[] whereColumns = new String[]{getPrimaryKeyName()};
+        String[] args = new String[]{pKey};
+        return getDB().rawQuery(QueryBuilder.buildSelectQuery(getTableName(), selectColumns, whereColumns), args);
     }
 
     public void insertRecord(DBRecord record)
     {
-        String INSERT_QUERY = QueryBuilder.buildInsertQuery(dbContract.getTableName(), getTableColumns());
-        SQLiteStatement query = getDB().compileStatement(INSERT_QUERY);
+        String insertQuery = QueryBuilder.buildInsertQuery(getTableName(), getTableColumns());
+        SQLiteStatement query = getDB().compileStatement(insertQuery);
         getDB().beginTransaction();
         for(int count = 0; count < getTableColumns().length; count++)
         {
@@ -94,7 +80,7 @@ public abstract class DBAccess
         return dbContract.getTableName();
     }
 
-    public String getPKeyName()
+    public String getPrimaryKeyName()
     {
         return dbContract.getPrimaryKeyName();
     }

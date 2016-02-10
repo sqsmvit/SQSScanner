@@ -1,14 +1,13 @@
 package com.sqsmv.sqsscanner.database.pricelist;
 
-import android.content.Context;
-
+import com.sqsmv.sqsscanner.database.DBAdapter;
 import com.sqsmv.sqsscanner.database.XMLDBAccess;
 
 
 public class PriceListAccess extends XMLDBAccess
 {
-	public PriceListAccess(Context context)
+	public PriceListAccess(DBAdapter dbAdapter)
 	{
-		super(context, new PriceListContract());
+		super(dbAdapter, new PriceListContract());
 	}
 }

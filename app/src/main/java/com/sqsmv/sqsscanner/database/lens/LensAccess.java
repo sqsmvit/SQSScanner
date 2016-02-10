@@ -1,27 +1,28 @@
 package com.sqsmv.sqsscanner.database.lens;
 
-import android.content.Context;
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.DB.LensContract.LensTable;
+import com.sqsmv.sqsscanner.database.DBAdapter;
+import com.sqsmv.sqsscanner.database.QueryBuilder;
 import com.sqsmv.sqsscanner.database.XMLDBAccess;
 
 import java.util.ArrayList;
 
 public class LensAccess extends XMLDBAccess
 {
-    public LensAccess(Context context)
+    public LensAccess(DBAdapter dbAdapter)
     {
-        super(context, new LensContract());
+        super(dbAdapter, new LensContract());
     }
 
     public String getLensId(String lensName)
     {
+        String[] selectColumns = new String[]{LensContract.COLUMN_NAME_LENSID};
+        String[] whereColumns = new String[]{LensContract.COLUMN_NAME_NAME};
         String[] args = {lensName};
         String lensId = "";
-        String lensIdQuery = "SELECT " + LensTable.COLUMN_NAME_PK_LENSID + " FROM " + LensContract.TABLE_NAME + " WHERE " + LensTable.COLUMN_NAME_NAME + " = ?";
 
-        Cursor cur = getDB().rawQuery(lensIdQuery, args);
+        Cursor cur = getDB().rawQuery(QueryBuilder.buildSelectQuery(getTableName(), selectColumns, whereColumns), args);
         if(cur.moveToFirst())
         {
             lensId = cur.getString(0);
@@ -33,9 +34,10 @@ public class LensAccess extends XMLDBAccess
     public ArrayList<String> getAllLensNames()
     {
         ArrayList<String> lensNames = new ArrayList<String>();
-        String[] args = {};
-        String lensNameQuery = "SELECT " + LensTable.COLUMN_NAME_NAME + " FROM " + LensContract.TABLE_NAME;
-        Cursor cur = getDB().rawQuery(lensNameQuery, args);
+        String[] selectColumns = new String[]{LensContract.COLUMN_NAME_NAME};
+        String[] whereColumns = new String[]{};
+
+        Cursor cur = getDB().rawQuery(QueryBuilder.buildSelectQuery(getTableName(), selectColumns, null), null);
         if (cur.moveToFirst())
         {
             lensNames.add(cur.getString(0));

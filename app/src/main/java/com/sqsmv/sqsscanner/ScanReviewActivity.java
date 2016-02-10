@@ -1,197 +1,238 @@
-/**
- *
- */
 package com.sqsmv.sqsscanner;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 
-import com.sqsmv.sqsscanner.DB.ProductDataSource;
-import com.sqsmv.sqsscanner.DB.ScanContract.ScanTable;
-import com.sqsmv.sqsscanner.DB.ScanDataSource;
-import com.sqsmv.sqsscanner.DB.UPCDataSource;
+import com.sqsmv.sqsscanner.database.DBAdapter;
+import com.sqsmv.sqsscanner.database.scan.ScanAccess;
+import com.sqsmv.sqsscanner.database.scan.ScanRecord;
 
-//import android.widget.TextView;
+import java.util.ArrayList;
 
-/**
- * @author ChrisS
- *
- */
-public class ScanReviewActivity extends ExpandableListActivity
+public class ScanReviewActivity extends Activity
 {
-    private class ScansCursorTreeAdapter extends SimpleCursorTreeAdapter
-    {
-        public ScansCursorTreeAdapter(Context context, Cursor cursor,
-                                      int groupLayout, String[] groupFrom,
-                                      int[] groupTo, int childLayout, String[] childFrom,
-                                      int[] childTo)
-                {
-
-                    super(context, cursor, groupLayout, groupFrom, groupTo, childLayout, childFrom, childTo);
-                }
-
-        @Override
-        protected Cursor getChildrenCursor(Cursor groupCursor)
-        {
-            int id = groupCursor.getInt(groupCursor.getColumnIndex(ScanTable._ID));
-            Cursor childCursor =  scanDataSource.getValueByID(id);
-            childCursor.moveToFirst();
-            return childCursor;
-        }
-    }
-
-    public static final String PULL_KEY = "com.sqsmv.sqsscanner.pullKey";
-    public static final String NEW_PULL_LINES = "com.sqsmv.sqsscanner.newPullLines";
-    public static final String NEW_PULL_PIECES = "com.sqsmv.sqsscanner.newPullPieces";
-    public static final String PULL_POS = "com.sqsmv.sqsscanner.pullPos";
-
     private String pullKey;
 
-    private ScansCursorTreeAdapter scanAdapter;
+    private DBAdapter dbAdapter;
+    private ScanAccess scanAccess;
 
-    private ProductDataSource productDataSource;
-    private UPCDataSource upcDataSource;
-    private ScanDataSource scanDataSource;
+    private ScanRecordExpandableListAdapter scanAdapter;
 
+    private ArrayList<ScanRecord> scanRecordList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_scan_review);
 
-        Intent intent = getIntent();
-        pullKey = intent.getStringExtra("PULL_NUM");
+        pullKey = getIntent().getStringExtra("PULL_NUM");
 
-        productDataSource = new ProductDataSource(this);
-        upcDataSource = new UPCDataSource(this);
-        scanDataSource = new ScanDataSource(this);
-        productDataSource.read();
-        upcDataSource.read();
-        scanDataSource.open();
+        dbAdapter = new DBAdapter(this);
+        scanAccess = new ScanAccess(dbAdapter);
 
-        scanAdapter = new ScansCursorTreeAdapter(this, scanDataSource.getScansByPullId(pullKey),
-                        R.layout.scan_row, new String[]{ScanTable.COLUMN_NAME_TITLE, ScanTable.COLUMN_NAME_QUANTITY},
-                        new int[] {R.id.scanTitle, R.id.Scan_qty}, R.layout.scan_title,
-                        new String[]{ScanTable.COLUMN_NAME_MASNUM, ScanTable.COLUMN_NAME_PRICE_LIST, ScanTable._ID},
-                        new int[] {R.id.scanID, R.id.pList});
+        ExpandableListView scanReviewList = ((ExpandableListView)findViewById(R.id.scanReviewList));
 
-        ListView listView = getExpandableListView();
+        scanRecordList = new ArrayList<ScanRecord>();
+        scanAdapter = new ScanRecordExpandableListAdapter(this, scanRecordList);
 
-        View header = getLayoutInflater().inflate(R.layout.scan_header, null);
+        scanReviewList.setAdapter(scanAdapter);
+        scanReviewList.setGroupIndicator(null);
 
-        listView.addHeaderView(header);
-
-
-        getExpandableListView().setGroupIndicator(null);
-
-        this.setListAdapter(scanAdapter);
-
-        TextView scansPull = (TextView) findViewById(R.id.headScanPull);
-        scansPull.setText(scansPull.getText().toString() + " " +pullKey);
-
+        setListeners();
+        ((TextView)findViewById(R.id.ScanReviewPullNum)).setText(pullKey);
     }
 
-
-    /* (non-Javadoc)
-     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
-     */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    protected void onResume()
     {
-          if (requestCode == 1)
-          {
-             if(resultCode == RESULT_OK)
-             {
-                 scanAdapter.changeCursor(scanDataSource.getScansByPullId(pullKey));
-                 scanAdapter.notifyDataSetChanged();
-             }
-
-             if (resultCode == RESULT_CANCELED)
-             {
-             }
-          }
+        super.onResume();
+        scanAccess.open();
+        createAdapterDataset();
+        scanAdapter.notifyDataSetChanged();
     }
 
-    public void onClickBack(View v)
+    @Override
+    protected void onPause()
     {
-        onBackPressed();
+        dbAdapter.close();
+        super.onPause();
     }
 
-    /**
-     * @param v
-     */
-    public void delRow(View v)
+    private void setListeners()
     {
-        final int position = getRowPosition(v);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        // set title
-        alertDialogBuilder.setTitle("Delete Scan");
-
-        // set dialog message
-        alertDialogBuilder
-            .setMessage("Delete Scan?")
-            .setCancelable(false)
-            .setPositiveButton("Yes",new DialogInterface.OnClickListener()
+        findViewById(R.id.scanHeadBack).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
             {
-                public void onClick(DialogInterface dialog,int id)
-                {
-                    Cursor tempCursor = scanAdapter.getCursor();
-                    tempCursor.moveToPosition(position);
-                    scanDataSource.delScansById(Integer.toString(tempCursor.getInt(tempCursor.getColumnIndex(ScanTable._ID))));
-                    scanAdapter.changeCursor(scanDataSource.getScansByPullId(pullKey));
-                    scanAdapter.notifyDataSetChanged();
+                onBackPressed();
+            }
+        });
+    }
 
-                }
-              })
-            .setNegativeButton("No",new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog,int id)
+    private void createAdapterDataset()
+    {
+        scanRecordList.clear();
+        Cursor scanCursor = scanAccess.selectScansByPullId(pullKey);
+        while(scanCursor.moveToNext())
+        {
+            scanRecordList.add(new ScanRecord(scanCursor));
+        }
+    }
+
+    private void deleteRow(final ScanRecord scanRecord)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder
+                .setTitle("Delete Scan")
+                .setMessage("Delete Scan?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
-                    // if this button is clicked, just close
-                    // the dialog box and do nothing
-                    dialog.cancel();
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        scanAccess.deleteByPk(scanRecord.getId());
+                        scanRecordList.remove(scanRecord);
+                        scanAdapter.notifyDataSetChanged();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    private void editRow(ScanRecord scanRecord)
+    {
+        Intent intent = new Intent(this, EditRecordActivity.class);
+        intent.putExtra("EDIT_SCAN", scanRecord.getId());
+        startActivity(intent);
+    }
+
+    private class ScanRecordExpandableListAdapter extends BaseExpandableListAdapter
+    {
+        private Context context;
+        private ArrayList<ScanRecord> scanRecords;
+
+        private ScanRecordExpandableListAdapter(Context context, ArrayList<ScanRecord> scanRecords)
+        {
+            this.context = context;
+            this.scanRecords = scanRecords;
+        }
+
+        @Override
+        public int getGroupCount()
+        {
+            return scanRecords.size();
+        }
+
+        @Override
+        public int getChildrenCount(int groupPosition)
+        {
+            return 1;
+        }
+
+        @Override
+        public Object getGroup(int groupPosition)
+        {
+            return scanRecords.get(groupPosition);
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition)
+        {
+            return scanRecords.get(groupPosition);
+        }
+
+        @Override
+        public long getGroupId(int groupPosition)
+        {
+            return groupPosition;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition)
+        {
+            return childPosition;
+        }
+
+        @Override
+        public boolean hasStableIds()
+        {
+            return true;
+        }
+
+        @Override
+        public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)
+        {
+            ScanRecord scanRecord = (ScanRecord)getGroup(groupPosition);
+            if (convertView == null)
+            {
+                LayoutInflater inf = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+                convertView = inf.inflate(R.layout.scan_row, null);
+            }
+            TextView titleView = (TextView)convertView.findViewById(R.id.scanTitle);
+            TextView quantityView = (TextView)convertView.findViewById(R.id.Scan_qty);
+            titleView.setText(scanRecord.getTitle());
+            quantityView.setText(scanRecord.getQuantity());
+
+            convertView.findViewById(R.id.editBtn).setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    editRow(scanRecords.get(groupPosition));
                 }
             });
+            convertView.findViewById(R.id.delBtn).setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    deleteRow(scanRecords.get(groupPosition));
+                }
+            });
+            return convertView;
+        }
 
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        @Override
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent)
+        {
+            ScanRecord scanRecord = (ScanRecord)getChild(groupPosition, childPosition);
+            if (convertView == null)
+            {
+                LayoutInflater infalInflater = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+                convertView = infalInflater.inflate(R.layout.scan_row_child, null);
+            }
+            TextView scanIDView = (TextView)convertView.findViewById(R.id.scanRowID);
+            TextView priceListView = (TextView)convertView.findViewById(R.id.pList);
+            scanIDView.setText(scanRecord.getMasNum());
+            priceListView.setText(scanRecord.getPriceList());
 
-        // show it
-        alertDialog.show();
-    }
+            return convertView;
+        }
 
-    public void clickGoToEdit(View v)
-    {
-        int pos = getRowPosition(v);
-
-        Cursor tempCursor = scanAdapter.getCursor();
-        tempCursor.moveToPosition(pos);
-        ScanRecord editScan = new ScanRecord(tempCursor);
-
-        int scanPkey = tempCursor.getInt(tempCursor.getColumnIndex(ScanTable._ID));
-
-        Intent intent = new Intent(this, EditRecordActivity.class);
-        Bundle b = new Bundle();
-        b.putInt("EDIT_SCAN", scanPkey);
-        intent.putExtras(b);
-        startActivityForResult(intent, 1);
-    }
-
-
-    public int getRowPosition(View v)
-    {
-        int rawPos = getExpandableListView().getPositionForView((LinearLayout) v.getParent());
-        long expPos = getExpandableListView().getExpandableListPosition(rawPos);
-        return ExpandableListView.getPackedPositionGroup(expPos);
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition)
+        {
+            return false;
+        }
     }
 }

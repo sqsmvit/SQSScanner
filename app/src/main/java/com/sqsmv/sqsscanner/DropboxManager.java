@@ -12,18 +12,25 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+/**
+ * Manager class for the Dropbox API. Controls linking, access, reading, and writing to an account.
+ */
 public class DropboxManager
 {
-    private static final String TAG = "CheckDropboxActivity";
+    private static final String TAG = "DropboxManager";
 
     private Context context;
     private DropboxAPI<AndroidAuthSession> dropboxAPI;
 
     private static String oAuth2AccessToken;
 
-    public DropboxManager(Context activityContext)
+    /**
+     * Constructor.
+     * @param context    The Context of the Activity or Service DropboxManager was instantiated for.
+     */
+    public DropboxManager(Context context)
     {
-        context = activityContext;
+        this.context = context;
 
         String dropboxAppKey = context.getString(R.string.DBX_APP_KEY);
         String dropboxAppSecret = context.getString(R.string.DBX_SECRET_KEY);
@@ -38,22 +45,38 @@ public class DropboxManager
         }
     }
 
+    /**
+     * Launches the Dropbox app if it is installed, the browser if not, for linking a Dropbox
+     * account. Access token is set when an account is successfully linked.
+     */
     public void linkDropboxAccount()
     {
         dropboxAPI.getSession().startOAuth2Authentication(context);
     }
 
+    /**
+     * Gets the access token stored in the API session.
+     * @return The access token stored in the API session.
+     */
     public String getOAuth2AccessToken()
     {
         return dropboxAPI.getSession().getOAuth2AccessToken();
     }
 
+    /**
+     * Sets the accessToken stored inside the DropboxManager, then sets the value to the API session's.
+     * @param accessToken    The access token to set.
+     */
     public void setStaticOAuth2AccessToken(String accessToken)
     {
         oAuth2AccessToken = accessToken;
         setOAuth2AccessToken(oAuth2AccessToken);
     }
 
+    /**
+     * Finishes the authentication process for linking a Dropbox account.
+     * @return true if linking was successful, otherwise false.
+     */
     public boolean finishAuthentication()
     {
         boolean success = true;
@@ -76,12 +99,23 @@ public class DropboxManager
         return success;
     }
 
+    /**
+     * Checks if the Dropbox API has a linked account already.
+     * @return true if there is a linked account, otherwise false.
+     */
     public boolean hasLinkedAccount()
     {
         return dropboxAPI.getSession().isLinked();
     }
 
-    public Thread writeToStorage(final String dbxFilePath, String downloadPath, boolean fromMainThread)
+    /**
+     * Writes a file from Dropbox to local storage.
+     * @param dbxFilePath        The path to the file on Dropbox.
+     * @param downloadPath       The path to the write location on local storage.
+     * @param isAsyncDownload    Whether the write should be done asynchronously or not.
+     * @return The Thread used to write the file.
+     */
+    public Thread writeToStorage(final String dbxFilePath, String downloadPath, boolean isAsyncDownload)
     {
         final File downloadFile = new File(downloadPath);
         Thread downloadThread = new Thread()
@@ -104,7 +138,7 @@ public class DropboxManager
                 }
             };
         };
-        if(fromMainThread)
+        if(isAsyncDownload)
         {
             downloadThread.start();
         }
@@ -115,7 +149,15 @@ public class DropboxManager
         return downloadThread;
     }
 
-    public Thread writeToDropbox(final File fileToWrite, final String dbxFilePath, final boolean shouldSteal, boolean fromMainThread)
+    /**
+     * Writes a file from local storage to Dropbox.
+     * @param fileToWrite        The File to write to Dropbox.
+     * @param dbxFilePath        The path to the write location on Dropbox.
+     * @param shouldSteal        Whether the file should be removed from local storage when the write is complete.
+     * @param isAsyncDownload    Whether the write should be done asynchronously or not.
+     * @return The Thread used to write the file.
+     */
+    public Thread writeToDropbox(final File fileToWrite, final String dbxFilePath, final boolean shouldSteal, boolean isAsyncDownload)
     {
         Thread uploadThread = new Thread()
         {
@@ -141,7 +183,7 @@ public class DropboxManager
                 }
             };
         };
-        if(fromMainThread)
+        if(isAsyncDownload)
         {
             uploadThread.start();
         }
@@ -153,6 +195,11 @@ public class DropboxManager
         return uploadThread;
     }
 
+    /**
+     * Gets the revision id metadata info of a file on Dropbox.
+     * @param dbxFilePath    The path on Dropbox to check.
+     * @return The revision id metadata info of the file.
+     */
     public String getDbxFileRev(final String dbxFilePath)
     {
         final dbxFileMetadata metadata = new dbxFileMetadata();
@@ -171,7 +218,6 @@ public class DropboxManager
                 }
             }
         };
-;
         metadataThread.start();
         try
         {
@@ -185,23 +231,38 @@ public class DropboxManager
         return metadata.getDropboxEntry().rev;
     }
 
+    /**
+     * Sets the access token to the API session.
+     * @param accessToken    The access token to set.
+     */
     private void setOAuth2AccessToken(String accessToken)
     {
         dropboxAPI.getSession().setOAuth2AccessToken(accessToken);
     }
 
+    /**
+     * Container class for storing metadata of a file on Dropbox.
+     */
     private class dbxFileMetadata
     {
         DropboxAPI.Entry dropboxEntry;
 
+        /**
+         * Gets the stored metadata.
+         * @return The stored metadata.
+         */
         public DropboxAPI.Entry getDropboxEntry()
         {
             return dropboxEntry;
         }
 
-        public void setDropboxEntry(DropboxAPI.Entry dbxEntry)
+        /**
+         * Sets the stored metadata.
+         * @param dropboxEntry    The metadata to store.
+         */
+        public void setDropboxEntry(DropboxAPI.Entry dropboxEntry)
         {
-            dropboxEntry = dbxEntry;
+            this.dropboxEntry = dropboxEntry;
         }
     }
 }

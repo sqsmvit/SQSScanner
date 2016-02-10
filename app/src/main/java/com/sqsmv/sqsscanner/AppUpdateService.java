@@ -7,6 +7,9 @@ import android.os.Environment;
 
 import java.io.File;
 
+/**
+ *
+ */
 public class AppUpdateService extends IntentService
 {
     private static final String TAG = "AppUpdateService";
@@ -34,13 +37,13 @@ public class AppUpdateService extends IntentService
 
     private void downloadAPK()
     {
-        dropboxManager.writeToStorage("/out/" + apkFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + File.separator + apkFileName, false);
+        dropboxManager.writeToStorage("/out/" + apkFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + apkFileName, false);
     }
 
     private void updateApp()
     {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + File.separator + apkFileName)),
+        intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + apkFileName)),
                               "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
         startActivity(intent);

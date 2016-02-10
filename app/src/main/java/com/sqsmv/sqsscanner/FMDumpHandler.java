@@ -3,7 +3,7 @@ package com.sqsmv.sqsscanner;
 import android.os.Environment;
 import android.util.Log;
 
-import com.sqsmv.sqsscanner.DB.DataSource;
+import com.sqsmv.sqsscanner.database.XMLDBAccess;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -17,171 +17,149 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class FMDumpHandler implements Runnable {
+public class FMDumpHandler implements Runnable
+{
+    private static final String TAG = "FMDumpHandler";
 
-	private static final String TAG = "FMDumpHandler";
-	private String file;
-	private String[] xmlTags;
-	private DataSource dataSource;
+    XMLDBAccess xmlDBAccess;
 
-	public FMDumpHandler(String file, DataSource dataSource, String[] xmlTags)
-	{
-		String message = String.format("in constructor %s!", TAG);
-		Log.d(TAG, message);
+    FMDumpHandler(XMLDBAccess fileDataAccess)
+    {
+        xmlDBAccess = fileDataAccess;
+    }
 
-		this.file = file;
-		this.dataSource = dataSource;
-		this.xmlTags = xmlTags;
-	}
+    @Override
+    public void run()
+    {
+        Log.d(TAG, "Running FMDumpHandler");
+        File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + xmlDBAccess.getXMLFileName());
+        try
+        {
+            InputStreamReader fileInput = new InputStreamReader(new FileInputStream(xmlFile));
+            try
+            {
+                XmlPullParser xpp = createXmlPullParser(fileInput);
+                buildTableFromXML(xpp);
+                xmlFile.delete();
+            }
+            catch(XmlPullParserException e)
+            {
+                e.printStackTrace();
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                fileInput.close();
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
-	private boolean buildTableFromXML() throws Exception
-	{
-		XmlPullParser xpp = null;
-		HashMap<String, String> dbItems = new HashMap<String, String>();
-		dataSource.open();
-		dbItems.putAll(this.dataSource.getSha());
+    private XmlPullParser createXmlPullParser(InputStreamReader fileInput) throws XmlPullParserException
+    {
+        XmlPullParser xpp;
 
-		File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + this.file);
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        factory.setNamespaceAware(true);
 
-		InputStreamReader in = new InputStreamReader(new FileInputStream(xmlFile));
+        xpp = factory.newPullParser();
 
-		try
-		{
-			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-			factory.setNamespaceAware(true);
+        xpp.setInput(fileInput);
 
-			xpp = factory.newPullParser();
+        return xpp;
+    }
 
-		}
-		catch (XmlPullParserException e)
-		{
-			e.printStackTrace();
-			Log.i(this.toString(), "XML ERROR", e);
-			in.close();
-			throw e;
-		}
+    private void buildTableFromXML(XmlPullParser xpp) throws XmlPullParserException, IOException
+    {
+        xmlDBAccess.open();
+        HashMap<String, String> dbItems = xmlDBAccess.getSha();
 
-		int eventType;
+        int eventType = xpp.getEventType();
 
-		try
-		{
-			xpp.setInput(in);
-		}
-		catch(Exception e)
-		{
-			Log.i(this.toString(), "XML ERROR", e);
-			return false;
-		}
+        ArrayList<ArrayList<String>> batch = new ArrayList<ArrayList<String>>();
+        String shaVal = "";
+        while(eventType != XmlPullParser.END_DOCUMENT)
+        {
+            //record
+            eventType = xpp.next();
+            switch(eventType)
+            {
+                case XmlPullParser.START_TAG:
+                    if(xpp.getName().equals("record"))
+                    {
+                        int recordEvent = xpp.getEventType();
+                        ArrayList<String> objVars = new ArrayList<String>();
+                        while(recordEvent != XmlPullParser.END_TAG && xpp.getName().equals("record"))
+                        {
+                            for(String tag : xmlDBAccess.getTableColumns())
+                            {
+                                //1st field
+                                eventType = xpp.nextTag();
+                                if(eventType == XmlPullParser.END_TAG)
+                                {
+                                    xpp.nextTag();
+                                }
 
-		//records
-		eventType = xpp.getEventType();
+                                String value;
+                                if(xpp.getName().equals(tag))
+                                {
+                                    value = xpp.nextText();
+                                    if(tag.toUpperCase().equals("SHA"))
+                                    {
+                                        shaVal = value;
+                                    }
+                                }
+                                else
+                                {
+                                    return;
+                                }
+                                objVars.add(value);
+                            }//end for
 
-		ArrayList<ArrayList<String>> batch = new ArrayList<ArrayList<String>>();
-		String shaVal = "";
-		int i = 0;
-		while(eventType != XmlPullParser.END_DOCUMENT)
-		{
-			//record
-			eventType = xpp.next();
-			 //System.out.println(xpp.getName());
-			switch(eventType)
-			{
-				case XmlPullParser.START_TAG:
-					if(xpp.getName().equals("record"))
-					{
-						int recordEvent = xpp.getEventType();
-						ArrayList<String> objVars = new ArrayList<String>();
-						while(recordEvent != XmlPullParser.END_TAG && xpp.getName().equals("record"))
-						{
-							for(String tag : this.xmlTags)
-							{
-								//1st field
-								eventType = xpp.nextTag();
-								if(eventType == XmlPullParser.END_TAG)
-								{
-									xpp.nextTag();
-								}
+                            if(canInsert(objVars, shaVal, dbItems))
+                            {
+                                batch.add(objVars);
+                            }
 
-								String value;
-								if(xpp.getName().equals(tag))
-								{
-									value = xpp.nextText();
-									if(tag.toUpperCase().equals("SHA"))
-									{
-										shaVal = value;
-									}
-								}
-								else
-								{
-									return false;
-								}
+                            if(batch.size() >= 1000)
+                            {
+                                insertBatch(batch);
+                            }
+                        }//end while
+                    }//end if
+            }//end switch
+        }// end while
+        if(!batch.isEmpty())
+        {
+            insertBatch(batch);
+        }
+    }
 
-								if(value.isEmpty() || value.toUpperCase().equals("N") || value.toUpperCase().equals("N1"))
-								{
-									value = "0";
-								}
+    private boolean canInsert(ArrayList<String> objVars, String shaVal, HashMap<String, String> dbItems)
+    {
+        boolean canInsert = false;
+        if(!dbItems.containsKey(objVars.get(0)))
+        {
+            canInsert = true;
+        }
+        else if(!dbItems.get(objVars.get(0)).equals(shaVal))
+        {
+            canInsert = true;
+        }
 
-								if(value.toUpperCase().equals("Y"))
-								{
-									value = "1";
-								}
-								objVars.add(value);
-							}//end for
+        return canInsert;
+    }
 
-						if(!(dbItems.containsKey(objVars.get(0))))
-						{
-							batch.add(objVars);
-							i += 1;
-						}
-						else if(!(dbItems.get(objVars.get(0)).equals(shaVal)))
-						{
-							batch.add(objVars);
-							i += 1;
-						}
-
-						if(batch.size() == 500)
-						{
-							System.out.println("Inserted 500");
-							dataSource.insertBatch(batch);
-							batch.clear();
-						}
-					}//end while
-				}//end if
-			}//end switch
-		}// end while
-		if (!batch.isEmpty())
-		{
-			System.out.println("Inserted " + batch.size());
-			dataSource.insertBatch(batch);
-		}
-		dataSource.close();
-		xmlFile.delete();
-		return true;
-	}
-
-	@Override
-	public void run()
-	{
-		String message = String.format("in run");
-		Log.d(TAG, message);
-		try
-		{
-			buildTableFromXML();
-		}
-		catch (XmlPullParserException e)
-		{
-			Log.i(this.toString(), "XML ERROR", e);
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			Log.i(this.toString(), "IO ERROR", e);
-			e.printStackTrace();
-		}
-		catch (Exception e)
-		{
-			Log.i(this.toString(), "Build DB ERROR", e);
-			e.printStackTrace();
-		}
-	}
+    private void insertBatch(ArrayList<ArrayList<String>> batch)
+    {
+        xmlDBAccess.insertBatch(batch);
+        System.out.println(xmlDBAccess.getTableName() + ": Inserted " + Integer.toString(batch.size()) + " records");
+        batch.clear();
+    }
 }

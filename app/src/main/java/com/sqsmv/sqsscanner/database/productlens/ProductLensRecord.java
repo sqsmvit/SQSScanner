@@ -10,21 +10,20 @@ public class ProductLensRecord extends XMLDBRecord
     private String masNum;
     private String lensId;
     private String priceListId;
-    
+
     public ProductLensRecord(String productLensId, String masNum, String lensId, String priceListId, String sha)
     {
         super(new ProductLensContract());
-        this.productLensId = productLensId;
-        this.masNum = masNum;
-        this.lensId = lensId;
-        this.priceListId = priceListId;
+        setProductLensId(productLensId);
+        setMasNum(masNum);
+        setLensId(lensId);
+        setPriceListId(priceListId);
         setSha(sha);
     }
 
     public ProductLensRecord(Cursor dbCursor)
     {
-        super(new ProductLensContract());
-        buildWithCursor(dbCursor);
+        super(new ProductLensContract(), dbCursor);
     }
 
     public String getProductLensId()
@@ -65,6 +64,24 @@ public class ProductLensRecord extends XMLDBRecord
     public void setPriceListId(String priceListId)
     {
         this.priceListId = priceListId;
+    }
+
+    public static ProductLensRecord buildNewProductLensRecordFromCursor(Cursor dbCursor)
+    {
+        dbCursor.moveToFirst();
+        ProductLensRecord productLensRecord = new ProductLensRecord(dbCursor);
+        dbCursor.close();
+        return productLensRecord;
+    }
+
+    @Override
+    public void initRecord()
+    {
+        setProductLensId("");
+        setMasNum("");
+        setLensId("");
+        setPriceListId("");
+        setSha("");
     }
 
     @Override

@@ -26,6 +26,12 @@ public class ProductRecord extends XMLDBRecord
     private String theaterDate;
     private String studioName;
 
+    public ProductRecord()
+    {
+        super(new ProductContract());
+        initRecord();
+    }
+
     public ProductRecord(String masNum, String name, String category, String rating,
                          String streetDate, int titleFilm, int noCover, String priceList,
                          int isNew, int isBoxSet, int multipack, String mediaFormat,
@@ -33,32 +39,31 @@ public class ProductRecord extends XMLDBRecord
                          int numberOfDiscs, String theaterDate, String studioName, String sha)
     {
         super(new ProductContract());
-        this.masNum = masNum;
-        this.name = name;
-        this.category = category;
-        this.rating = rating;
-        this.streetDate = streetDate;
-        this.titleFilm = titleFilm;
-        this.noCover = noCover;
-        this.priceList = priceList;
-        this.isNew = isNew;
-        this.isBoxSet = isBoxSet;
-        this.multipack = multipack;
-        this.mediaFormat = mediaFormat;
-        this.priceFilters = priceFilters;
-        this.specialFields = specialFields;
-        this.studio = studio;
-        this.season = season;
-        this.numberOfDiscs = numberOfDiscs;
-        this.theaterDate = theaterDate;
-        this.studioName = studioName;
+        setMasNum(masNum);
+        setName(name);
+        setCategory(category);
+        setRating(rating);
+        setStreetDate(streetDate);
+        setTitleFilm(titleFilm);
+        setNoCover(noCover);
+        setPriceList(priceList);
+        setIsNew(isNew);
+        setIsBoxSet(isBoxSet);
+        setMultipack(multipack);
+        setMediaFormat(mediaFormat);
+        setPriceFilters(priceFilters);
+        setSpecialFields(specialFields);
+        setStudio(studio);
+        setSeason(season);
+        setNumberOfDiscs(numberOfDiscs);
+        setTheaterDate(theaterDate);
+        setStudioName(studioName);
         setSha(sha);
     }
 
     public ProductRecord(Cursor dbCursor)
     {
-        super(new ProductContract());
-        buildWithCursor(dbCursor);
+        super(new ProductContract(), dbCursor);
     }
 
     public String getMasNum()
@@ -249,6 +254,39 @@ public class ProductRecord extends XMLDBRecord
     public void setStudioName(String studioName)
     {
         this.studioName = studioName;
+    }
+
+    public static ProductRecord buildNewProductRecordFromCursor(Cursor dbCursor)
+    {
+        dbCursor.moveToFirst();
+        ProductRecord productRecord = new ProductRecord(dbCursor);
+        dbCursor.close();
+        return productRecord;
+    }
+
+    @Override
+    public void initRecord()
+    {
+        setMasNum("");
+        setName("***ERR: NOT FOUND***");
+        setCategory("");
+        setRating("");
+        setStreetDate("");
+        setTitleFilm(-1);
+        setNoCover(-1);
+        setPriceList("");
+        setIsNew(-1);
+        setIsBoxSet(-1);
+        setMultipack(-1);
+        setMediaFormat("");
+        setPriceFilters("");
+        setSpecialFields("");
+        setStudio("");
+        setSeason("");
+        setNumberOfDiscs(-1);
+        setTheaterDate("");
+        setStudioName("");
+        setSha("");
     }
 
     @Override

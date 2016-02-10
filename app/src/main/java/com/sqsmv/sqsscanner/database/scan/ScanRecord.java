@@ -14,49 +14,69 @@ import java.util.Locale;
  */
 public class ScanRecord extends DBRecord
 {
-    public String id;
-    public String masNum;
-    public String quantity;
-    public String fkPullId;
-    public String scanDate;
-    public String title;
-    public String priceList;
-    public String priceFilters;
-    public String rating;
-    public String location;
+    private String id;
+    private String masNum;
+    private String quantity;
+    private String fkPullId;
+    private String scanDate;
+    private String title;
+    private String priceList;
+    private String rating;
+    private String location;
+    private String numBoxes;
+    private String initials;
 
-    public ScanRecord(String masNum, String quantity, String fkPullId, String title, String priceList, String priceFilters, String rating, String location)
+    public ScanRecord(String id, String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String initials)
     {
         super(new ScanContract());
-        this.quantity = quantity;
-        this.fkPullId = fkPullId;
-        this.scanDate = initDate();
-        this.title = title;
-        this.priceList = priceList;
-        this.masNum = masNum;
-        this.priceFilters = priceFilters;
-        this.rating = rating;
-        this.location = location;
+        setId(id);
+        setMasNum(masNum);
+        setQuantity(quantity);
+        setFkPullId(fkPullId);
+        setScanDate(initDate());
+        setTitle(title);
+        setPriceList(priceList);
+        setRating(rating);
+        setLocation(location);
+        setNumBoxes("1");
+        setInitials(initials);
     }
 
-    public ScanRecord(String fkPullId, String quantity)
+    public ScanRecord(String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String initials)
     {
         super(new ScanContract());
-        this.fkPullId = fkPullId;
-        this.quantity = quantity;
-        this.scanDate = initDate();
-        this.title = "Skid";
-        this.priceList = "";
-        this.masNum = "";
-        this.priceFilters = "";
-        this.rating = "";
-        this.location = "";
+        setId("null");
+        setMasNum(masNum);
+        setQuantity(quantity);
+        setFkPullId(fkPullId);
+        setScanDate(initDate());
+        setTitle(title);
+        setPriceList(priceList);
+        setRating(rating);
+        setLocation(location);
+        setNumBoxes("1");
+        setInitials(initials);
+    }
+
+    public ScanRecord(String fkPullId, String quantity, String initials)
+    {
+        super(new ScanContract());
+        setId("null");
+        setMasNum("");
+        setQuantity(quantity);
+        setFkPullId(fkPullId);
+        setScanDate(initDate());
+        setTitle("Skid");
+        setPriceList("");
+        setRating("");
+        setLocation("");
+        setNumBoxes("1");
+        setInitials(initials);
     }
 
     public ScanRecord(Cursor dbCursor)
     {
-        super(new ScanContract());
-        buildWithCursor(dbCursor);
+        super(new ScanContract(), dbCursor);
     }
 
     public String initDate()
@@ -101,11 +121,6 @@ public class ScanRecord extends DBRecord
         return priceList;
     }
 
-    public String getPriceFilters()
-    {
-        return priceFilters;
-    }
-
     public String getRating()
     {
         return rating;
@@ -114,6 +129,16 @@ public class ScanRecord extends DBRecord
     public String getLocation()
     {
         return location;
+    }
+
+    public String getNumBoxes()
+    {
+        return numBoxes;
+    }
+
+    public String getInitials()
+    {
+        return initials;
     }
 
     public void setId(String id)
@@ -151,11 +176,6 @@ public class ScanRecord extends DBRecord
         this.priceList = priceList;
     }
 
-    public void setPriceFilters(String priceFilters)
-    {
-        this.priceFilters = priceFilters;
-    }
-
     public void setRating(String rating)
     {
         this.rating = rating;
@@ -166,10 +186,46 @@ public class ScanRecord extends DBRecord
         this.location = location;
     }
 
+    public void setNumBoxes(String numBoxes)
+    {
+        this.numBoxes = numBoxes;
+    }
+
+    public void setInitials(String initials)
+    {
+        this.initials = initials;
+    }
+
+    public static ScanRecord buildNewScanRecordFromCursor(Cursor dbCursor)
+    {
+        dbCursor.moveToFirst();
+        ScanRecord scanRecord = new ScanRecord(dbCursor);
+        dbCursor.close();
+        return scanRecord;
+    }
+
+    @Override
+    public void initRecord()
+    {
+        setId("null");
+        setMasNum("");
+        setQuantity("");
+        setFkPullId("");
+        setScanDate("");
+        setTitle("");
+        setPriceList("");
+        setRating("");
+        setLocation("");
+        setNumBoxes("1");
+        setInitials("");
+    }
+
     @Override
     public String[] getTableInsertData()
     {
-        return new String[0];
+        return new String[] {
+                getId(), getMasNum(), getQuantity(), getFkPullId(), getScanDate(), getTitle(), getPriceList(), getRating(), getLocation(), getNumBoxes(), getInitials()
+        };
     }
 
     @Override
@@ -205,10 +261,6 @@ public class ScanRecord extends DBRecord
             {
                 setPriceList(dbCursor.getString(count));
             }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_PRICEFILTERS))
-            {
-                setPriceFilters(dbCursor.getString(count));
-            }
             else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_RATING))
             {
                 setRating(dbCursor.getString(count));
@@ -216,6 +268,14 @@ public class ScanRecord extends DBRecord
             else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_LOCATION))
             {
                 setLocation(dbCursor.getString(count));
+            }
+            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_NUMBOXES))
+            {
+                setNumBoxes(dbCursor.getString(count));
+            }
+            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_INITIALS))
+            {
+                setInitials(dbCursor.getString(count));
             }
         }
     }

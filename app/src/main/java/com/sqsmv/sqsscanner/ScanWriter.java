@@ -1,247 +1,117 @@
 package com.sqsmv.sqsscanner;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Environment;
 
-import com.sqsmv.sqsscanner.DB.ScanDataSource;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
+/**
+ * Utility class for translating data in the Scan table to a text file for export.
+ */
 public class ScanWriter
 {
-	private Cursor dbCur;
-    private int exportMode;
-	private boolean compactMode;
-	private boolean invAdjMode;
-	private int invAdjChoice;
-	private String fileName;
-	private Context callingContext;
-	private String[] colNames;
-	private ScanDataSource sds;
-	
-	/**
-	 * @param ctx
-	 * @param isCompact
-	 */
-	public ScanWriter(Context ctx, boolean isCompact, boolean invMode, int invModeChoice)
-	{
-		this.callingContext = ctx;
-		this.sds = new ScanDataSource(callingContext);
-		this.compactMode = isCompact;
-		this.invAdjMode = invMode;
-		this.invAdjChoice = invModeChoice;
-		getCursor();
-		setFileName();
-	}
-
-    public ScanWriter(Context ctx, int exportModeChoice, int invModeChoice)
+    /**
+     * Creates an export File in the file storage area for the app.
+     * @param context         The Context for the Activity or Service making the method call.
+     * @param dbCursor        The Cursor containing the export information.
+     * @param exportMode      The export mode being used.
+     * @param invAdjChoice    The inventory adjustment choice, relevant if the export is in RI mode.
+     * @return The File to be used for exporting.
+     * @throws IOException
+     */
+    public static File createExportFile(Context context, Cursor dbCursor, int exportMode, int invAdjChoice) throws IOException
     {
-        this.callingContext = ctx;
-        this.sds = new ScanDataSource(callingContext);
-        this.exportMode = exportModeChoice;
-        this.invAdjChoice = invModeChoice;
-        getCursor();
-        setFileName();
+        String fileName = buildFileName(exportMode);
+        File exportFile = new File(context.getFilesDir() + "/" + fileName);
+        FileOutputStream output = new FileOutputStream(exportFile, true);
+
+        while(dbCursor.moveToNext())
+        {
+            String writeString = buildStringFromCursor(dbCursor);
+            if(exportMode == 5)
+            {
+                if(invAdjChoice == 1)
+                {
+                    writeString = "add\t" + writeString;
+                }
+                else if(invAdjChoice == 2)
+                {
+                    writeString = "sub\t" + writeString;
+                }
+            }
+
+            output.write(writeString.getBytes());
+        }
+
+        output.close();
+        return exportFile;
     }
-	
-	/**
-	 * @param ctx
-	 * @param exportModeChoice
-	 * @param fileName
-	 */
-	public ScanWriter(Context ctx, int exportModeChoice, String fileName)
-	{
-		this.callingContext = ctx;
-		this.sds = new ScanDataSource(callingContext);
-		this.exportMode = exportModeChoice;
-		getCursor();
-		this.fileName = fileName;
-	}
-	
-	
-	/**
-	 * 
-	 */
-	private void getCursor()
-	{
-		this.sds.open();			
-		this.dbCur = sds.getScansForPrint(exportMode);
-		this.colNames = dbCur.getColumnNames();
-	}
-	
-	/**
-	 * @return
-	 * @throws IOException
-	 */
-	public boolean writeToFile() throws IOException
+
+    /**
+     * Traverses a row of a cursor to build a line of text for the export file.
+     * @param dbCursor    The Cursor to traverse, already moved to the appropriate row.
+     * @return The line of text for the export file.
+     */
+    private static String buildStringFromCursor(Cursor dbCursor)
     {
-		this.dbCur.getColumnCount();
-		String writeString;
-		FileOutputStream output = this.callingContext.openFileOutput(this.fileName, Context.MODE_APPEND);
+        String writeString = "";
+        int columnCount = dbCursor.getColumnCount();
 
-		while (dbCur.moveToNext())
-		{
-			writeString = buildString();
-			output.write(writeString.getBytes());
-		}
-		
-		output.close();	
-		return true;
-	}
-	
-	/**
-	 * @return
-	 */
-	private String buildString()
-	{
-		String writeString = "";
-		
-		int i = 0;
-		
-		if(exportMode == 5)
-		{
-			if(invAdjChoice == 1)
-				writeString = "add\t";
-			else if(invAdjChoice == 2)
-				writeString = "sub\t";
-			else if(invAdjChoice == 3)
-				writeString = "set\t";
-		}
-		
-		//if there is no masNum write the scanEntry
-		if(!dbCur.isNull(0))
-		{
-			writeString += dbCur.getString(0) + "\t";
-		}
-        i++;
+        for(int count = 0; count < columnCount; count++)
+        {
+            writeString += dbCursor.getString(count);
+            if(count < columnCount - 1)
+            {
+                writeString += "\t";
+            }
+            else
+            {
+                writeString += "\n";
+            }
+        }
+        return writeString;
+    }
 
-		while(i < colNames.length)
-		{
-			if(i == colNames.length-1)
-			{
-				writeString += this.dbCur.getString(dbCur.getColumnIndex(colNames[i])) + "\n";
-			}
-			else
-			{
-				writeString += this.dbCur.getString(dbCur.getColumnIndex(colNames[i])) + "\t";
-			}
-			i++;
-		}
-		return writeString;
-	}
-	
-	public void close()
-	{
-		this.sds.delAllScans();
-		this.sds.close();
-	}
-	
-	private void setFileName()
-	{
-	    String deviceId = getDeviceName();
-	      
-		Date today = new Date();
-		SimpleDateFormat fileFmt = new SimpleDateFormat("yyMMdd_kkmm", Locale.US);
-		fileName =  deviceId + "_" + fileFmt.format(today);
-		if(exportMode == 3)
-			fileName = "BB_" + fileName;
-		else if(exportMode == 4)
-			fileName = "DR_" + fileName;
-        else if(exportMode == 5)
-            fileName = "RI_" + fileName;
-		else if(exportMode == 6)
-			fileName = "S_" + fileName;
-		fileName += ".txt";
-	}
-		
-	
-	/**
-	 * @return
-	 */
-	private String getDeviceName()
-	{
-		return BluetoothAdapter.getDefaultAdapter().getName();
-	}
-	
-	/**
-	 * @throws IOException
-	 */
-	public void writeBackup() throws IOException
-	{
-		//File root = callingContext.getDir(callingContext.getString(R.string.BACKUP_DIR), Context.MODE_PRIVATE);
-		File root = new File(Environment.getExternalStorageDirectory().toString() + "/backups");
-		root.mkdirs();
-		File backupFile = new File(root.getAbsolutePath(), "B_" + this.fileName);
-		//File backupFile = new File(root, "B_" + this.fileName);
-		copyFile(backupFile);
-	}
-	
-	/**
-	 * @param dest
-	 * @throws IOException
-	 */
-	private void copyFile(File dest) throws IOException
-	{
-	    InputStream in = new FileInputStream(this.getFile());
-	    OutputStream out = new FileOutputStream(dest);
+    /**
+     * Builds the name of the export file.
+     * @param exportMode    The export mode being used.
+     * @return The name of the export file.
+     */
+    private static String buildFileName(int exportMode)
+    {
+        String fileName =  Utilities.getDeviceName() + "_" + Utilities.buildCurrentTimestamp() + ".txt";
+        switch(exportMode)
+        {
+            case 3:
+                fileName = "BB_" + fileName;
+                break;
+            case 4:
+                fileName = "DR_" + fileName;
+                break;
+            case 5:
+                fileName = "RI_" + fileName;
+                break;
+            case 6:
+                fileName = "S_" + fileName;
+                break;
+        }
 
-	    byte[] buf = new byte[1024];
-	    int len;
-	    
-	    while ((len = in.read(buf)) > 0)
-	    {
-	        out.write(buf, 0, len);
-	    }
-	    
-	    in.close();
-	    out.close();
-	}
-	
-	/**
-	 * @param src
-	 * @param dest
-	 * @throws IOException
-	 */
-	public void copyFile(File src, File dest) throws IOException{
-		
-	    InputStream in = new FileInputStream(src);
-	    OutputStream out = new FileOutputStream(dest);
+        return fileName;
+    }
 
-	    byte[] buf = new byte[1024];
-	    int len;
-	    
-	    while ((len = in.read(buf)) > 0) {
-	        out.write(buf, 0, len);
-	    }
-	    
-	    in.close();
-	    out.close();
-		
-	}
-	
-	/**
-	 * @return
-	 */
-	public String getFileName(){
-		
-		return this.fileName;
-	}
-	
-	/**
-	 * @return
-	 */
-	public File getFile(){
-		
-		return new File(this.callingContext.getFilesDir() + "/" + this.fileName);
-	}
+    /**
+     * Writes an export file into the backup directory.
+     * @param exportFile    The export file to write.
+     * @throws IOException
+     */
+    public static void writeBackupFile(File exportFile) throws IOException
+    {
+        File root = new File(Environment.getExternalStorageDirectory().toString() + "/backups");
+        root.mkdirs();
+        File backupFile = new File(root.getAbsolutePath(), "B_" + exportFile.getName());
+        Utilities.copyFile(exportFile, backupFile);
+    }
 }

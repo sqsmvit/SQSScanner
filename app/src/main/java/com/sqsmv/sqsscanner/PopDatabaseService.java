@@ -9,18 +9,21 @@ import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.sqsmv.sqsscanner.DB.DataSource;
-import com.sqsmv.sqsscanner.DB.LensDataSource;
-import com.sqsmv.sqsscanner.DB.PriceListDataSource;
-import com.sqsmv.sqsscanner.DB.ProductDataSource;
-import com.sqsmv.sqsscanner.DB.ProductLensDataSource;
-import com.sqsmv.sqsscanner.DB.UPCDataSource;
+import com.sqsmv.sqsscanner.database.DBAdapter;
+import com.sqsmv.sqsscanner.database.XMLDBAccess;
+import com.sqsmv.sqsscanner.database.lens.LensAccess;
+import com.sqsmv.sqsscanner.database.pricelist.PriceListAccess;
+import com.sqsmv.sqsscanner.database.product.ProductAccess;
+import com.sqsmv.sqsscanner.database.productlens.ProductLensAccess;
+import com.sqsmv.sqsscanner.database.upc.UPCAccess;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -40,94 +43,84 @@ public class PopDatabaseService extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent)
     {
-		Log.i(TAG, "Received an Intent: " + intent);
-		String[] xmlFiles = intent.getStringArrayExtra("XML_FILES");
-		int[] xmlSchemas = intent.getIntArrayExtra("XML_SCHEMAS");
-
-		DataSource[] dataSources = new DataSource[] {new LensDataSource(this), new ProductDataSource(this), new UPCDataSource(this),
-                                                     new PriceListDataSource(this), new ProductLensDataSource(this)};
-		makeNotification("Dropbox Download Started", false);
-
-        //Needed for X and X2
-        //resetDBs();
+        makeNotification("Dropbox Download Started", false);
+        DBAdapter dbAdapter = new DBAdapter(this);
 
         //Download files.zip from DropBox
         downloadDBXZip();
         File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
-        unzip(zipFile);
-        zipFile.delete();
-
-        makeNotification("Database Update Started", false);
-
-        int i = 0;
-        ArrayList<Thread> updateThreads = new ArrayList<Thread>();
-		for(DataSource dataSource : dataSources)
-		{
-			FMDumpHandler xmlHandler = new FMDumpHandler(xmlFiles[i], dataSource, getResources().getStringArray(xmlSchemas[i]));
-			//xmlHandler.run();
-            Thread updateThread = new Thread(xmlHandler, xmlFiles[i]);
-            updateThreads.add(updateThread);
-            //updateThread.start();
-			i += 1;
-		}
-
-        if(Utilities.totalDeviceMemory(this) <= 1024)
+        try
         {
-            startSlowUpdateThreads(updateThreads);
-        }
-        else
-        {
-            startFastUpdateThreads(updateThreads);
-        }
+            unzip(zipFile);
+            zipFile.delete();
 
+            resetTables(dbAdapter);
+            makeNotification("Database Update Started", false);
+
+            XMLDBAccess[] xmlDBAccesses = new XMLDBAccess[]{new LensAccess(dbAdapter), new ProductAccess(dbAdapter), new UPCAccess(dbAdapter),
+                                                            new PriceListAccess(dbAdapter), new ProductLensAccess(dbAdapter)};
+            ArrayList<Thread> updateThreads = new ArrayList<Thread>();
+            for(XMLDBAccess xmlDBAccess : xmlDBAccesses)
+            {
+                FMDumpHandler xmlHandler = new FMDumpHandler(xmlDBAccess);
+                Thread updateThread = new Thread(xmlHandler, xmlDBAccess.getTableName());
+                updateThreads.add(updateThread);
+            }
+
+            if(Utilities.totalDeviceMemory(this) <= 1024)
+            {
+                startSlowUpdateThreads(updateThreads);
+            }
+            else
+            {
+                startFastUpdateThreads(updateThreads);
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        dbAdapter.close();
         makeNotification("Database Update Finished", true);
 	}
 
     private void downloadDBXZip()
     {
-        String message = String.format("in copyDBXFile");
-        Log.d(TAG, message);
+        Log.d(TAG, "in copyDBXFile");
         DropboxManager dbxMan = new DropboxManager(this);
 
-        dbxMan.writeToStorage("/out/" + zipFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + File.separator + zipFileName, false);
+        dbxMan.writeToStorage("/out/" + zipFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName, false);
     }
 
-    private void unzip(File zipFile)
+    private void unzip(File zipFile) throws IOException
     {
         byte[] buffer = new byte[1024];
 
-        try
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
+        //get the zipped file list entry
+        ZipEntry ze = zis.getNextEntry();
+        String fileDirectory = zipFile.getParent();
+
+        while(ze!=null)
         {
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-            //get the zipped file list entry
-            ZipEntry ze = zis.getNextEntry();
-            String fileDirectory = zipFile.getParent();
+            String fileName = ze.getName();
+            File newFile = new File(fileDirectory + "/" + fileName);
+            new File(newFile.getParent()).mkdirs();
 
-            while(ze!=null)
+            FileOutputStream fos = new FileOutputStream(newFile);
+
+            int len;
+            while ((len = zis.read(buffer)) > 0)
             {
-                String fileName = ze.getName();
-                File newFile = new File(fileDirectory + File.separator + fileName);
-                new File(newFile.getParent()).mkdirs();
-
-                FileOutputStream fos = new FileOutputStream(newFile);
-
-                int len;
-                while ((len = zis.read(buffer)) > 0)
-                {
-                    fos.write(buffer, 0, len);
-                }
-
-                fos.close();
-                ze = zis.getNextEntry();
+                fos.write(buffer, 0, len);
             }
 
-            zis.closeEntry();
-            zis.close();
+            fos.close();
+            ze = zis.getNextEntry();
         }
-        catch(IOException ex)
-        {
-            ex.printStackTrace();
-        }
+
+        zis.closeEntry();
+        zis.close();
     }
 
 	private void makeNotification(String message, boolean finished)
@@ -144,7 +137,9 @@ public class PopDatabaseService extends IntentService
 			mBuilder.setVibrate(pattern);
 		}
 		else
-			mBuilder.setSmallIcon(R.drawable.ic_pen);
+        {
+            mBuilder.setSmallIcon(R.drawable.ic_pen);
+        }
 		// Creates an explicit intent for an Activity in your app
 		Intent emptyIntent = new Intent();
 
@@ -203,16 +198,30 @@ public class PopDatabaseService extends IntentService
         }
     }
 
-    private void resetDBs()
+    private void resetTables(DBAdapter dbAdapter)
     {
-        LensDataSource lds = new LensDataSource(this);
-        lds.open();
-        lds.resetDB();
-        lds.close();
+        DroidConfigManager droidConfigManager = new DroidConfigManager(this);
+        Date currentDate = new Date();
 
-        ProductLensDataSource plds = new ProductLensDataSource(this);
-        plds.open();
-        plds.resetDB();
-        plds.close();
+        LensAccess lensAccess = new LensAccess(dbAdapter);
+        lensAccess.open();
+        lensAccess.reset();
+
+        try
+        {
+            Date lastDropDate = Utilities.parseYYMMDDString(droidConfigManager.accessString(DroidConfigManager.PRODUCTLENS_RESET_DATE, null, ""));
+
+            if(((currentDate.getTime() - lastDropDate.getTime()) / 86400000) >= 7)
+            {
+                ProductLensAccess productLensAccess = new ProductLensAccess(dbAdapter);
+                productLensAccess.open();
+                productLensAccess.reset();
+                droidConfigManager.accessString(DroidConfigManager.PRODUCTLENS_RESET_DATE, Utilities.formatYYMMDDDate(currentDate), "");
+            }
+        }
+        catch(ParseException e)
+        {
+            droidConfigManager.accessString(DroidConfigManager.PRODUCTLENS_RESET_DATE, Utilities.formatYYMMDDDate(currentDate), "");
+        }
     }
 }

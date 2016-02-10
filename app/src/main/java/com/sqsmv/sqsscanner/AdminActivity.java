@@ -1,22 +1,19 @@
 package com.sqsmv.sqsscanner;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
-import com.sqsmv.sqsscanner.DB.DBAdapter;
+import com.sqsmv.sqsscanner.database.DBAdapter;
 
 import java.io.File;
-import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,107 +21,133 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * @author ChrisS
- *
- *Admin Activity
- *
- *This Activity is used primarily by the admin for the device.
- *This Activity can be accessed by scanning the Admin bar-code
- *or by enter '1' as the value for the Pull Number.
- *
- *
- *In this Activity the admin can:
- *
- *Review a list of the previous pull files.
- *
- *Select a Pull File and send it to the internal device storage
- *
- *Set the export location for the device for the Commit Activity
- */
-public class AdminActivity extends ListActivity
+public class AdminActivity extends Activity
 {
-	private ArrayList<HashMap<String, String>>backupList = new ArrayList<HashMap<String, String>>();
-	private Context context;
-	private SimpleAdapter backupAdapter;
-	private File root;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		//setContentView(R.layout.activity_admin);
-		
-		context = this;
-		
-		View header = getLayoutInflater().inflate(R.layout.admin_header, null);
+    private UpdateLauncher updateLauncher;
 
-		root = new File(Environment.getExternalStorageDirectory().toString() + "/backups");
-		root.mkdir();
-		createAdapterDataset(root);
-		//ListDir(root);
-		
-		backupAdapter = new SimpleAdapter(this, backupList, R.layout.admin_file_row,
-				new String[] {"fileName","fileDate","fileSize"}, 
-				new int[]{R.id.adminFileName, R.id.adminFileDate, R.id.adminFileSize});
-		
-/*		ArrayAdapter<String> dirList = new ArrayAdapter<String>(this,
-				R.layout.activity_admin, 
-				backupList);*/
-		
-		
-		ListView listView = getListView();
-		listView.setTextFilterEnabled(true);
-		listView.addHeaderView(header);
-		listView.setAdapter(backupAdapter);
+    private ListView listView;
+    private SimpleAdapter backupAdapter;
 
-	}
-	
-	/**
-	 * onClickSort will sort the column represented by the header
-	 * view slected in ascending order.
-	 * 
-	 * @param v - the view that triggered the event
-	 */
-	public void onClickSort(View v){
-		
-		String key;
-		
-		if(v.getId() == R.id.headBackupName){key = "fileName";}
-		else if (v.getId() == R.id.headBackupDate){key = "fileDate";}
-		else {key = "fileSize";}
-		
-		sortList(backupList, key);
-		backupAdapter.notifyDataSetChanged();
-		
-	}
-	
-	public void onClickUpdate(View v)
-	{
-		
-		Intent popIntent = new Intent(this, PopDatabaseService.class);
-		String[] xmlFiles = this.getResources().getStringArray(R.array.fmDumpFiles);
-		int[] xmlSchemas = getSchemaResIds();
-		
-   		popIntent.putExtra("XML_FILES", xmlFiles);
-   		popIntent.putExtra("XML_SCHEMAS", xmlSchemas);
-   		popIntent.putExtra("FORCE_UPDATE", 1);
-		
-   		this.startService(popIntent);
-		
-   		Toast.makeText(this, "DB Update starting...", Toast.LENGTH_LONG).show();
-   		
-	}
+    private ArrayList<HashMap<String, String>> backupList;
+    private File backupDirectory;
+    private SimpleDateFormat fileDateFormat;
 
-    public void onClickResetDB(View v)
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
     {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_admin);
+        backupList = new ArrayList<HashMap<String, String>>();
 
-        // set title
-        alertDialogBuilder.setTitle("Reset DB");
+        updateLauncher = new UpdateLauncher(this);
 
-        // set dialog message
+        fileDateFormat = new SimpleDateFormat("MM-dd-yy", Locale.US);
+
+        backupDirectory = new File(Environment.getExternalStorageDirectory().toString() + "/backups");
+        backupDirectory.mkdir();
+        createAdapterDataset();
+
+        backupAdapter = new SimpleAdapter(this, backupList, R.layout.admin_file_row,
+                new String[] {"fileName","fileDate","fileSize"},
+                new int[]{R.id.adminFileName, R.id.adminFileDate, R.id.adminFileSize});
+
+        listView = (ListView)findViewById(R.id.fileListView);
+        listView.setTextFilterEnabled(true);
+        listView.setAdapter(backupAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                onListItemClick(position);
+            }
+        });
+        setListeners();
+    }
+
+    private void setListeners()
+    {
+        findViewById(R.id.adminHeadBack).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onBackPressed();
+            }
+        });
+        findViewById(R.id.btnForceAppUpdate).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                forceAppUpdate();
+            }
+        });
+
+        findViewById(R.id.btnForceUpdate).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                forceDBUpdate();
+            }
+        });
+
+        findViewById(R.id.ResetDB).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                forceResetDB();
+            }
+        });
+
+        findViewById(R.id.headBackupName).setOnClickListener(sortListener);
+        findViewById(R.id.headBackupDate).setOnClickListener(sortListener);
+        findViewById(R.id.headBackupSize).setOnClickListener(sortListener);
+    }
+
+    private void forceAppUpdate()
+    {
+        if(Utilities.checkWifi(this))
+        {
+            if(updateLauncher.checkNeedAppUpdate())
+            {
+                updateLauncher.startAppUpdate();
+            }
+            else
+            {
+                Utilities.makeToast(this, "Already at the latest version.");
+            }
+        }
+        else
+        {
+            Utilities.makeToast(this, "Error: WiFi Not Connected.");
+        }
+    }
+
+    private void forceDBUpdate()
+    {
+        if(Utilities.checkWifi(this))
+        {
+            updateLauncher.startDBUpdate(false);
+            Utilities.makeLongToast(this, "DB Update starting...");
+        }
+        else
+        {
+            Utilities.makeToast(this, "Error: WiFi Not Connected.");
+        }
+    }
+
+    private void forceResetDB()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
         alertDialogBuilder
+                .setTitle("Reset DB")
                 .setMessage("Are you sure you want to reset the database?")
                 .setCancelable(false)
                 .setPositiveButton("Yes",new DialogInterface.OnClickListener()
@@ -132,159 +155,155 @@ public class AdminActivity extends ListActivity
                     @Override
                     public void onClick(DialogInterface dialog,int id)
                     {
-                        DBAdapter dbAdapter = new DBAdapter(context);
-                        dbAdapter.resetAll();
+                        resetDB();
                     }
                 })
-                .setNegativeButton("No",new DialogInterface.OnClickListener()
+                .setNegativeButton("No", new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int id)
                     {
-                        // if this button is clicked, just close
-                        // the dialog box and do nothing
                         dialog.cancel();
                     }
-                });
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+                })
+                .show();
     }
-	
-	private int[] getSchemaResIds(){
-		
-		TypedArray xmlArrays = this.getResources().obtainTypedArray(R.array.xml_list);
-		
-		int[] xmlSchemas = new int[xmlArrays.length()];
-		
-		for(int i = 0; i < xmlArrays.length(); i++){
-			
-			xmlSchemas[i] = xmlArrays.getResourceId(i, 0);	
-		}
-		
-		xmlArrays.recycle();
-		return xmlSchemas;
-	}
-	/**
-	 * sortList sorts the list of hashmaps by the key chosen in the onClickSort
-	 * event
-	 * 
-	 * 
-	 * @param list - the list to be sorted
-	 * @param key - the key to sort on
-	 */
-	private void sortList(ArrayList<HashMap<String, String>> list,
-			final String key) {
-		
-		Comparator<HashMap<String, String>> comp = new Comparator<HashMap<String, String>>(){
 
-			@Override
-			public int compare(HashMap<String, String> lhs,
-					HashMap<String, String> rhs) {
-				
-				String val1 = lhs.get(key);
-				String val2 = rhs.get(key);
-				
-				return val1.compareTo(val2);
-			}
-			
-			
-		};
-		
-		Collections.sort(list, comp);
-	}
+    public void onClickSort(int id)
+    {
+        String key = "";
 
-	/**
-	 * Creates the data set for the list view.  This dataset
-	 * consists of the filename, the date the file was created,
-	 * and the size of the file.
-	 * 
-	 * @param root - the root file path to where the backups are stored
-	 */
-	private void createAdapterDataset(File root){
-		
-		SimpleDateFormat fileFmt = new SimpleDateFormat(" MM-dd-yy", Locale.US);
-		HashMap<String, String> backupEntry; 
-		File[] files = root.listFiles();
-		//String[] pulls = scanDataSource.getPullNums();
-		
-		for (File file : files){
-			backupEntry = new HashMap<String, String>();
-			backupEntry.put("fileName", file.getName());
-			backupEntry.put("fileDate", fileFmt.format(new Date(file.lastModified())));
-			backupEntry.put("fileSize", String.format("%.2f",(file.length()/1024.0)) + "kb");
-			this.backupList.add(backupEntry);
-			
-		}
-		
-	}
-	
-	/* (non-Javadoc)
-	 * 
-	 * Selects which file to export.
-	 * 
-	 * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
-	 */
-	@Override
-	protected void onListItemClick(ListView l, View v, int pos, long id){
-		
-		final File selected = new File(root, backupList.get(pos-1).get("fileName"));
-		final String fileName = selected.getName();
+        if(id == R.id.headBackupName)
+        {
+            key = "fileName";
+        }
+        else if(id == R.id.headBackupDate)
+        {
+            key = "fileDate";
+        }
+        else if(id == R.id.headBackupSize)
+        {
+            key = "fileSize";
+        }
+        sortList(key);
+        backupAdapter.notifyDataSetChanged();
+    }
 
-			
-	    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-			 
-		// set title
-		alertDialogBuilder.setTitle("Export Backup");
- 
-		// set dialog message
-		alertDialogBuilder
-			.setMessage("Send Backup to DropBox?")
-			.setCancelable(false)
-			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    try {
-                        exportBackup(selected);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+    private void sortList(final String key)
+    {
+        Comparator<HashMap<String, String>> comp = new Comparator<HashMap<String, String>>()
+        {
+            @Override
+            public int compare(HashMap<String, String> lhs, HashMap<String, String> rhs)
+            {
+                int compareVal = 0;
+                if(key.equals("fileName"))
+                {
+                    String val1 = lhs.get("fileName");
+                    String val2 = rhs.get("fileName");
+                    compareVal = val1.compareTo(val2);
+                }
+                else if(key.equals("fileDate"))
+                {
+                    try
+                    {
+                        Date val1 = fileDateFormat.parse(lhs.get("fileDate"));
+                        Date val2 = fileDateFormat.parse(rhs.get("fileDate"));
+                        compareVal = val1.compareTo(val2);
+                    }
+                    catch(ParseException e)
+                    {}
+                }
+                else if(key.equals("fileSize"))
+                {
+                    Pattern fileSizeRegEx = Pattern.compile("^(.*)kb$");
+                    Matcher val1Matcher = fileSizeRegEx.matcher(lhs.get("fileSize"));
+                    Matcher val2Matcher = fileSizeRegEx.matcher(rhs.get("fileSize"));
+                    if(val1Matcher.find() && val2Matcher.find())
+                    {
+                        Float val1 = Float.parseFloat(val1Matcher.group(1));
+                        Float val2 = Float.parseFloat(val2Matcher.group(1));
+                        compareVal = val1.compareTo(val2);
                     }
                 }
-            })
-			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                return compareVal;
+            }
+        };
+        Collections.sort(backupList, comp);
+    }
+
+    private void createAdapterDataset()
+    {
+        HashMap<String, String> backupEntry;
+        File[] files = backupDirectory.listFiles();
+
+        for (File file : files)
+        {
+            backupEntry = new HashMap<String, String>();
+            backupEntry.put("fileName", file.getName());
+            backupEntry.put("fileDate", fileDateFormat.format(new Date(file.lastModified())));
+            backupEntry.put("fileSize", String.format("%.2f",(file.length()/1024.0)) + "kb");
+            backupList.add(backupEntry);
+        }
+    }
+
+    protected void onListItemClick(int position)
+    {
+        final File selected = new File(backupDirectory, backupList.get(position).get("fileName"));
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // set title
+        alertDialogBuilder.setTitle("Export Backup");
+
+        // set dialog message
+        alertDialogBuilder
+            .setMessage("Send Backup to DropBox?")
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+            {
                 @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    // if this button is clicked, just close
-                    // the dialog box and do nothing
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    exportBackup(selected);
+                }
+            })
+            .setNegativeButton("No", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int id)
+                {
                     dialog.cancel();
                 }
             });
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		alertDialog.show();
-	}
+        alertDialogBuilder.show();
+    }
 
-	/**
-	 * 
-	 * Send the user back to the ScanHomeActivity.
-	 * 
-	 * @param v - the view that triggered the event
-	 */
-	public void onClickBack(View v)
+    private void resetDB()
     {
-		super.onBackPressed();
-		//writePref();
-	}
+        DBAdapter dbAdapter = new DBAdapter(this);
+        dbAdapter.resetImportData();
+        dbAdapter.close();
+    }
 
-	/**
-	 * Exports a backup to the internal storage on the device
-	 * 
-	 * @param src - where the file is coming from
-	 * @throws IOException
-	 */
-	private void exportBackup(File src) throws IOException
-	{
-		ScanExporter scanExporter = new ScanExporter(this, src, 0, false);
-		scanExporter.exportScan();
-	}
+    private void exportBackup(File backupFile)
+    {
+        if(Utilities.checkWifi(this))
+        {
+            ScanExporter.exportScan(this, backupFile, 0, false);
+        }
+        else
+        {
+            Utilities.makeToast(this, "Error: WiFi Not Connected.");
+        }
+    }
+
+    View.OnClickListener sortListener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View v)
+        {
+            onClickSort(v.getId());
+        }
+    };
 }

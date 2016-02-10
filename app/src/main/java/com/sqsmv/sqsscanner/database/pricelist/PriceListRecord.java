@@ -10,19 +10,24 @@ public class PriceListRecord extends XMLDBRecord
     private String priceList;
     private int active;
 
+    public PriceListRecord()
+    {
+        super(new PriceListContract());
+        initRecord();
+    }
+
     public PriceListRecord(String priceListId, String priceList, int active, String sha)
     {
         super(new PriceListContract());
-        this.priceListId = priceListId;
-        this.priceList = priceList;
-        this.active = active;
+        setPriceListId(priceListId);
+        setPriceList(priceList);
+        setActive(active);
         setSha(sha);
     }
 
     public PriceListRecord(Cursor dbCursor)
     {
-        super(new PriceListContract());
-        buildWithCursor(dbCursor);
+        super(new PriceListContract(), dbCursor);
     }
 
     public String getPriceListId()
@@ -53,6 +58,23 @@ public class PriceListRecord extends XMLDBRecord
     public void setActive(int active)
     {
         this.active = active;
+    }
+
+    public static PriceListRecord buildNewPriceListRecordFromCursor(Cursor dbCursor)
+    {
+        dbCursor.moveToFirst();
+        PriceListRecord priceListRecord = new PriceListRecord(dbCursor);
+        dbCursor.close();
+        return priceListRecord;
+    }
+
+    @Override
+    public void initRecord()
+    {
+        setPriceListId("");
+        setPriceList("");
+        setActive(-1);
+        setSha("");
     }
 
     @Override

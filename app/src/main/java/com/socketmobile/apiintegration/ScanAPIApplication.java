@@ -162,7 +162,6 @@ public class ScanAPIApplication extends Application {
     private final int CLOSE_SCAN_API=1;
 
     private DeviceInfo _softScanDevice;
-    public static String currPullNum;
     private static ScanAPIApplication _singleton;
     private ScanApiHelper _scanApiHelper;
     private SktScanApiOwnership _scanApiOwnership;

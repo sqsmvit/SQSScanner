@@ -14,16 +14,16 @@ import com.sqsmv.sqsscanner.database.upc.UPCContract;
 
 public class DBAdapter extends SQLiteOpenHelper
 {
-    public static final String DATABASE_NAME = "PullDB";
+    private static final String DATABASE_NAME = "PullDB";
 
-    public static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private static final XMLDBContract[] xmlContracts = {new ProductContract(), new UPCContract(), new PriceListContract(), new LensContract(), new ProductLensContract()};
     private static final DBContract[] scanContracts = {new ScanContract()};
 
-    public DBAdapter(Context ctx)
+    public DBAdapter(Context context)
     {
-        super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -37,7 +37,6 @@ public class DBAdapter extends SQLiteOpenHelper
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
         resetTables(db, xmlContracts);
-        resetTables(db, scanContracts);
     }
 
     public void resetImportData()

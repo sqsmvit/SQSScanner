@@ -2,74 +2,77 @@ package com.sqsmv.sqsscanner.database;
 
 public class QueryBuilder
 {
-	public static String buildInsertQuery(String tableName, String[] tableColumns)
+    public static String buildInsertQuery(String tableName, String[] tableColumns)
     {
         StringBuilder sb = new StringBuilder();
 
-		sb.append("INSERT OR REPLACE INTO ");
-		sb.append(tableName);
-		sb.append("(");
-		
-		for(String col : tableColumns)
-        {
-			sb.append(col);
-			sb.append(", ");
-		}
-		
-		int len = sb.length();
-		sb.delete(len - 2, len);
-		sb.append(")");
-		
-		sb.append(" VALUES(");
-		
-		for(int n = 0; n < tableColumns.length; n++)
-        {
-			sb.append(" ?,");
-		}
-		len = sb.length();
-		sb.delete(len - 1, len);
-		sb.append(")");
+        sb.append("INSERT OR REPLACE INTO ");
+        sb.append(tableName);
+        sb.append("(");
 
-		return sb.toString();
-	}
-	
-	public static String buildSelectQuery(String tableName, String[] selCols, String whereCols[])
+        sb.append(buildColumnList(tableColumns));
+        
+        sb.append(")");
+        
+        sb.append(" VALUES(");
+        
+        for(int count = 0; count < tableColumns.length; count++)
+        {
+            sb.append("?");
+            if(count != tableColumns.length - 1)
+            {
+                sb.append(", ");
+            }
+        }
+        sb.append(")");
+
+        return sb.toString();
+    }
+    
+    public static String buildSelectQuery(String tableName, String[] selectColumns, String[] whereColumns)
     {
         StringBuilder sb = new StringBuilder();
-		
-		sb.append("SELECT ");
-		
-		buildColList(sb, selCols);
-		sb.append(" FROM ");
-		sb.append(tableName);
-		
-		if(whereCols.length > 0)
+        
+        sb.append("SELECT ");
+
+        sb.append(buildColumnList(selectColumns));
+        sb.append(" FROM ");
+        sb.append(tableName);
+        
+        if(whereColumns != null && whereColumns.length > 0)
         {
             sb.append(" WHERE ");
-			buildWhereClause(sb, whereCols);
-		}
-		return sb.toString();
-	}
+            sb.append(buildWhereClause(whereColumns));
+        }
+        return sb.toString();
+    }
 
-	private static void buildWhereClause(StringBuilder sb, String[] whereCols)
+    private static String buildColumnList(String[] columns)
     {
-		for(String whereCol : whereCols)
+        StringBuilder sb = new StringBuilder();
+        for(int count = 0; count < columns.length; count++)
         {
-			sb.append(whereCol);
-			sb.append(" = ?, ");
-		}
-		int len = sb.length();
-		sb.delete(len - 2, len);
-	}
+            sb.append(columns[count]);
+            if(count != columns.length - 1)
+            {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
 
-	private static void buildColList(StringBuilder sb, String[] columns)
+    private static String buildWhereClause(String[] whereColumns)
     {
-		for(String col : columns)
+        StringBuilder sb = new StringBuilder();
+        for(int count = 0; count < whereColumns.length; count++)
         {
-			sb.append(col);
-			sb.append(", ");
-		}
-		int len = sb.length();
-		sb.delete(len - 2, len);
-	}
+            sb.append(whereColumns[count]);
+            sb.append(" = ?");
+            if(count != whereColumns.length - 1)
+            {
+                sb.append(" AND ");
+            }
+        }
+        return sb.toString();
+    }
 }

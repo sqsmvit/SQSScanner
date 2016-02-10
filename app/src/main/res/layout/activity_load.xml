@@ -20,7 +20,7 @@
         android:id="@+id/instruction_lines"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/testButton"
+        android:layout_above="@+id/scanHomeButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/testTitle"
@@ -37,21 +37,11 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button
-        android:id="@+id/testButton"
+        android:id="@+id/scanHomeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/reminder"
         android:layout_alignLeft="@+id/reminder"
         android:layout_alignRight="@+id/reminder"
-        android:onClick="startScan"
         android:text="@string/startScan" />
-    <!--
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/testButton"
-        android:layout_centerInParent="true"
-        android:onClick="testFunction"
-        android:text="Test"/>
-    -->
 </RelativeLayout>

@@ -13,16 +13,15 @@ public class LensRecord extends XMLDBRecord
     public LensRecord(String lensId, String name, String description, String sha)
     {
         super(new LensContract());
-        this.lensId = lensId;
-        this.name = name;
-        this.description = description;
+        setLensId(lensId);
+        setName(name);
+        setDescription(description);
         setSha(sha);
     }
 
     public LensRecord(Cursor dbCursor)
     {
-        super(new LensContract());
-        buildWithCursor(dbCursor);
+        super(new LensContract(), dbCursor);
     }
 
     public String getLensId()
@@ -53,6 +52,23 @@ public class LensRecord extends XMLDBRecord
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public static LensRecord buildNewLensRecordFromCursor(Cursor dbCursor)
+    {
+        dbCursor.moveToFirst();
+        LensRecord lensRecord = new LensRecord(dbCursor);
+        dbCursor.close();
+        return lensRecord;
+    }
+
+    @Override
+    public void initRecord()
+    {
+        setLensId("");
+        setName("");
+        setDescription("");
+        setSha("");
     }
 
     @Override

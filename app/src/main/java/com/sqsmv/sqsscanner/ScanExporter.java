@@ -1,80 +1,72 @@
 package com.sqsmv.sqsscanner;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 
-/**ScanExport class handles all exports from the device to 
- * either the DropBox or the SD Card.  First create the object
- * then make a call to exportScan() to export the file.
- * 
- * 
- * @author ChrisS
- *
+/**
+ * Utility class for exporting a file to Dropbox. This class contains the functionality determining which
+ * directory the file should go into based off of settings used.
  */
 public class ScanExporter
 {
-	private File exportFile;
-	private boolean fromCommit;
-	private Context callingContext;
-	private DropboxManager dropboxManager;
-    private int exportMode;
-	
-	/**Creates a ScanExporter object which is used to export a
-	 * scan to DropBox through the DropBox Sync API or to the External
-	 * SD card.
-	 * 
-	 * @param ctx			context of calling application
-	 * @param exportFile	the file to export
-	 * @param exportMode	true - export to SD Card
-	 * 						false - export to DropBox
-	 */
-	public ScanExporter(Context ctx, File exportFile, int exportMode, boolean fromCommit)
+    /**
+     * Exports a File to Dropbox, determining the appropriate sub directory for the File.
+     * @param context       The Context of the Activity or Service making the method call.
+     * @param exportFile    The File to export.
+     * @param exportMode    The export mode being used.
+     * @param fromCommit    Whether the call is being made from the initial commit or not.
+     * @return true if the File was successfully exported, otherwise false.
+     */
+    public static boolean exportScan(Context context, File exportFile, int exportMode, boolean fromCommit)
     {
-		this.exportFile = exportFile;
-		this.exportMode = exportMode;
-		this.fromCommit = fromCommit;
-		this.callingContext = ctx;
-		this.dropboxManager = new DropboxManager(ctx);
-	}
-	
-	public boolean exportScan() throws IOException
-	{
         String exportPath = "/Default/";
         if(exportMode == 1 || exportMode == 2)
+        {
             exportPath = "/PullScan/";
+        }
         else if(exportMode == 3)
+        {
             exportPath = "/BB/";
+        }
         else if(exportMode == 4)
+        {
             exportPath = "/Drew/";
+        }
         else if(exportMode == 5)
+        {
             exportPath = "/RI/";
-		else if(exportMode == 6)
-			exportPath = "/Skid/";
+        }
+        else if(exportMode == 6)
+        {
+            exportPath = "/Skid/";
+        }
 
-        return exportDBX(exportPath);
-	}
-	
-	/**
-     * Exports the file to DropBox.
-	 * @return if export is successful
-	 * @throws IOException
-	 */
-	private boolean exportDBX(String exportPath) throws IOException
-	{
-		if(dropboxManager.hasLinkedAccount())
-		{
-			String scanPath = exportPath + this.exportFile.getName();
-            dropboxManager.writeToDropbox(this.exportFile, scanPath, fromCommit, true);
-			Toast.makeText(this.callingContext, "File exported to DropBox", Toast.LENGTH_SHORT).show();
-			return true;
-		}
-		else
-		{
-			Toast.makeText(this.callingContext, "Error exporting to DropBox" , Toast.LENGTH_SHORT).show();
-			return false;
-		}
-	}
+        return exportDBX(context, exportFile, exportPath, fromCommit);
+    }
+
+    /**
+     * Exports the File to the appropriate subdirectory on Dropbox.
+     * @param context       The Context of the Activity or Service making the method call.
+     * @param exportFile    The File to export.
+     * @param exportPath    The path to the subdirectory to export to.
+     * @param fromCommit    Whether the call is being made from the initial commit or not.
+     * @return true if the File was successfully exported, otherwise false.
+     */
+    private static boolean exportDBX(Context context, File exportFile, String exportPath, boolean fromCommit)
+    {
+        DropboxManager dropboxManager = new DropboxManager(context);
+        if(dropboxManager.hasLinkedAccount())
+        {
+            String scanPath = exportPath + exportFile.getName();
+            dropboxManager.writeToDropbox(exportFile, scanPath, fromCommit, true);
+            Utilities.makeToast(context, "File exported to DropBox");
+            return true;
+        }
+        else
+        {
+            Utilities.makeToast(context, "Error exporting to DropBox");
+            return false;
+        }
+    }
 }

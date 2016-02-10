@@ -2,23 +2,21 @@ package com.sqsmv.sqsscanner;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
-import com.sqsmv.sqsscanner.DB.LensDataSource;
-import com.sqsmv.sqsscanner.DB.ProductLensDataSource;
-
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
+/**
+ * Entry Activity into SQSScanner. Dropbox linking is launched from this screen if it has not been
+ * done yet. Automatic app and database updates are also launched from this screen.
+ */
 public class LoadActivity extends Activity
 {
-	private static final String TAG = "Load_Activity";
+	private static final String TAG = "LoadActivity";
 
     private DroidConfigManager appConfig;
     private DropboxManager dropboxManager;
@@ -34,6 +32,17 @@ public class LoadActivity extends Activity
         appConfig = new DroidConfigManager(this);
         dropboxManager = new DropboxManager(this);
         setTitle(getTitle() + " v" + Utilities.getVersion(this));
+
+        updateLauncher = new UpdateLauncher(this);
+
+        findViewById(R.id.scanHomeButton).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startScan();
+            }
+        });
     }
 
     @Override
@@ -45,11 +54,11 @@ public class LoadActivity extends Activity
         {
             if(dropboxManager.finishAuthentication())
             {
+                //Entered if the app is resumed after linking with a Dropbox account
                 String accessToken = dropboxManager.getOAuth2AccessToken();
                 appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, "");
             }
             linkDropboxAccount();
-            updateLauncher = new UpdateLauncher(this);
         }
         else
         {
@@ -58,6 +67,11 @@ public class LoadActivity extends Activity
         }
     }
 
+    /**
+     * Checks if an account has been linked to the app by checking the config for a saved access token.
+     * If one exists, then it sets the token. Otherwise the Dropbox app if it is installed, the browser if not,
+     * to link an account.
+     */
     private void linkDropboxAccount()
     {
             String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, "");
@@ -71,11 +85,16 @@ public class LoadActivity extends Activity
             }
     }
 
-    public void startScan(View v)
+    /**
+     * Checks the config file to see when the app was already updated on the current day. If not, it checks
+     * Dropbox for a new update to the app and launches an update if there is one. If there isn't, then it
+     * launches the update for the database. ScanHomeActivity is launched if the update has already been done.
+     */
+    public void startScan()
     {
 		Log.d(TAG, "in startScan and for the LoadActivity!");
 
-		String buildDate = new SimpleDateFormat("yyMMdd", Locale.US).format(new Date());
+        String buildDate = Utilities.formatYYMMDDDate(new Date());
 
 		if(!(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, ""))))
 		{
@@ -85,48 +104,25 @@ public class LoadActivity extends Activity
             }
             else
             {
-                try
-                {
-                    appConfig.accessString(DroidConfigManager.PRIOR_VERSION, "", "");
-
-                    Utilities.cleanFolder(new File(Environment.getExternalStorageDirectory().toString() + "/backups"), 180);
-                    appConfig.accessString(DroidConfigManager.BUILD_DATE, buildDate, "");
-
-                    long productLensResetMilli = Long.parseLong(appConfig.accessString(DroidConfigManager.PRODUCTLENS_RESET_MILLI, null, "0"));
-
-                    LensDataSource lds = new LensDataSource(this);
-                    lds.open();
-                    lds.resetDB();
-                    lds.close();
-                    long currentTimeMIllis = System.currentTimeMillis();
-                    if(((currentTimeMIllis - productLensResetMilli) / 86400000) >= 7)
-                    {
-                        ProductLensDataSource plds = new ProductLensDataSource(this);
-                        plds.open();
-                        plds.resetDB();
-                        plds.close();
-                    }
-
-                    appConfig.accessString(DroidConfigManager.PRODUCTLENS_RESET_MILLI, Long.toString(currentTimeMIllis), "");
-
-                    launchDBUpdate();
-                }
-                catch(NotFoundException e)
-                {
-                    Log.i(TAG, "Crash during db pop", e);
-                    e.printStackTrace();
-                }
+                appConfig.accessString(DroidConfigManager.PRIOR_VERSION, "", "");
+                Utilities.cleanFolder(new File(Environment.getExternalStorageDirectory().toString() + "/backups"), 180);
+                launchDBUpdate();
+                appConfig.accessString(DroidConfigManager.BUILD_DATE, buildDate, "");
             }
 		}
         else
         {
-            startScanHomeActivity();
+            goToScanHomeActivity();
         }
 	}
 
+    /**
+     * Launches the database update, joining the blocking thread so ScanHomeActivity can be launched
+     * when the blocking thread finishes.
+     */
     private void launchDBUpdate()
     {
-        final Thread blockingThread = updateLauncher.startDBUpdate();
+        final Thread blockingThread = updateLauncher.startDBUpdate(true);
         new Thread()
         {
             @Override
@@ -135,7 +131,7 @@ public class LoadActivity extends Activity
                 try
                 {
                     blockingThread.join();
-                    startScanHomeActivity();
+                    goToScanHomeActivity();
                 }
                 catch(InterruptedException e)
                 {
@@ -145,7 +141,10 @@ public class LoadActivity extends Activity
         }.start();
     }
 
-    private void startScanHomeActivity()
+    /**
+     * Launches ScanHomeActivity.
+     */
+    private void goToScanHomeActivity()
     {
         Intent intent = new Intent(this, ScanHomeActivity.class);
         startActivity(intent);

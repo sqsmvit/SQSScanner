@@ -1,6 +1,5 @@
 package com.sqsmv.sqsscanner.database;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
@@ -11,9 +10,9 @@ public abstract class XMLDBAccess extends DBAccess
 {
     private XMLDBContract xmlDBContract;
 
-    public XMLDBAccess(Context activityContext, XMLDBContract xmlDBContract)
+    public XMLDBAccess(DBAdapter dbAdapter, XMLDBContract xmlDBContract)
     {
-        super(activityContext, xmlDBContract);
+        super(dbAdapter, xmlDBContract);
         this.xmlDBContract = xmlDBContract;
     }
 

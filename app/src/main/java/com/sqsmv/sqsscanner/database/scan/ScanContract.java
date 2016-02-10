@@ -13,9 +13,10 @@ public class ScanContract implements DBContract, BaseColumns
     protected static final String COLUMN_NAME_SCANDATE = "scanDate";
     protected static final String COLUMN_NAME_TITLE = "title";
     protected static final String COLUMN_NAME_PRICELIST = "priceList";
-    protected static final String COLUMN_NAME_PRICEFILTERS = "priceFilters";
     protected static final String COLUMN_NAME_RATING = "rating";
     protected static final String COLUMN_NAME_LOCATION = "location";
+    protected static final String COLUMN_NAME_NUMBOXES = "numBoxes";
+    protected static final String COLUMN_NAME_INITIALS = "initials";
 
     @Override
     public String getTableName()
@@ -34,9 +35,10 @@ public class ScanContract implements DBContract, BaseColumns
                 COLUMN_NAME_SCANDATE + " TEXT NOT NULL, " +
                 COLUMN_NAME_TITLE + " TEXT, " +
                 COLUMN_NAME_PRICELIST + " TEXT, " +
-                COLUMN_NAME_PRICEFILTERS + " TEXT, " +
                 COLUMN_NAME_RATING + " TEXT, " +
-                COLUMN_NAME_LOCATION + " TEXT);";
+                COLUMN_NAME_LOCATION + " TEXT, " +
+                COLUMN_NAME_NUMBOXES + " TEXT, " +
+                COLUMN_NAME_INITIALS + " TEXT);";
     }
 
     @Override
@@ -62,9 +64,10 @@ public class ScanContract implements DBContract, BaseColumns
                 COLUMN_NAME_SCANDATE,
                 COLUMN_NAME_TITLE,
                 COLUMN_NAME_PRICELIST,
-                COLUMN_NAME_PRICEFILTERS,
                 COLUMN_NAME_RATING,
-                COLUMN_NAME_LOCATION
+                COLUMN_NAME_LOCATION,
+                COLUMN_NAME_NUMBOXES,
+                COLUMN_NAME_INITIALS
         };
     }
 }
