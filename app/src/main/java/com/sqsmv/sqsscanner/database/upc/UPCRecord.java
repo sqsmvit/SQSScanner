@@ -56,7 +56,6 @@ public class UPCRecord extends XMLDBRecord
         setUPC("");
         setMasNum("");
         setSha("");
-
     }
 
     @Override
