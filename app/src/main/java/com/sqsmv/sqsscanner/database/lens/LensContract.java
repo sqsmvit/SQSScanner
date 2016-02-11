@@ -25,7 +25,7 @@ public class LensContract implements XMLDBContract
                 COLUMN_NAME_DESCRIPTION + " TEXT, " +
                 COLUMN_NAME_SHA + " TEXT);";
     }
-
+    
     @Override
     public String getTableDropString()
     {
