@@ -82,24 +82,8 @@ public class ScanWriter
      */
     private static String buildFileName(int exportMode)
     {
-        String fileName =  Utilities.getDeviceName() + "_" + Utilities.buildCurrentTimestamp() + ".txt";
-        switch(exportMode)
-        {
-            case 3:
-                fileName = "BB_" + fileName;
-                break;
-            case 4:
-                fileName = "DR_" + fileName;
-                break;
-            case 5:
-                fileName = "RI_" + fileName;
-                break;
-            case 6:
-                fileName = "S_" + fileName;
-                break;
-        }
-
-        return fileName;
+        return ExportModeHandler.getFilePrefix(exportMode) + Utilities.getDeviceName() + "_" +
+                Utilities.buildCurrentTimestamp() + ".txt";
     }
 
     /**

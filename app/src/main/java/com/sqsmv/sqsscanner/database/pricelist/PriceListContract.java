@@ -19,7 +19,7 @@ public class PriceListContract implements XMLDBContract
     @Override
     public String getTableCreateString()
     {
-        return "CREATE TABLE " + getTableName() + " (" +
+        return "CREATE TABLE IF NOT EXISTS " + getTableName() + " (" +
                 COLUMN_NAME_PRICELISTID + " TEXT PRIMARY KEY, " +
                 COLUMN_NAME_PRICELIST + " TEXT, " +
                 COLUMN_NAME_ACTIVE + " INTEGER, " +

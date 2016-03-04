@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.sqsmv.sqsscanner.database.DBAdapter;
@@ -31,9 +32,9 @@ public class ScanConfigActivity  extends Activity
     private ScanAccess scanAccess;
 
     private ToggleButton autoCountModeToggle, boxQuantityModeToggle;
-    private Spinner autoCountSelect, lensSelect;
+    private Spinner autoCountSelect, lensSelect, exportModeSelect;
     private EditText boxQuantityInput;
-    private RadioGroup exportModeRGroup, invModeRGroup;
+    private RadioGroup invModeRGroup;
 
     private String customAutoValue;
     private int exportModeChoice, invModeChoice;
@@ -54,10 +55,10 @@ public class ScanConfigActivity  extends Activity
         autoCountSelect = (Spinner)findViewById(R.id.autoCountSelect);
         boxQuantityInput = (EditText)findViewById(R.id.boxQty);
         lensSelect = (Spinner)findViewById(R.id.LensSelect);
-        exportModeRGroup = (RadioGroup)findViewById(R.id.exportModeGroup);
+        exportModeSelect = (Spinner)findViewById(R.id.exportModeSelect);
         invModeRGroup = (RadioGroup)findViewById(R.id.invModeGroup);
 
-        customAutoValue = appConfig.accessString(DroidConfigManager.CUSTOM_AUTO_COUNT, null, "0");
+        customAutoValue = appConfig.accessString(DroidConfigManager.CUSTOM_AUTO_COUNT, null, "1");
         exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
         invModeChoice = appConfig.accessInt(DroidConfigManager.INVENTORY_MODE_CHOICE, null, 1);
 
@@ -70,6 +71,7 @@ public class ScanConfigActivity  extends Activity
     {
         lensAccess.open();
         scanAccess.open();
+
         super.onResume();
     }
 
@@ -123,41 +125,25 @@ public class ScanConfigActivity  extends Activity
             }
         });
 
+        exportModeSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                setExportMode(ExportModeHandler.getExportModeIndexFromSpinner(((TextView)view).getText().toString()));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {}
+        });
+
         findViewById(R.id.backBtn).setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 onBackPressed();
-            }
-        });
-
-        exportModeRGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int checkedId)
-            {
-                switch(checkedId)
-                {
-                    case R.id.normalMode:
-                        setExportMode(1);
-                        break;
-                    case R.id.consolidateMode:
-                        setExportMode(2);
-                        break;
-                    case R.id.billBMode:
-                        setExportMode(3);
-                        break;
-                    case R.id.drewMode:
-                        setExportMode(4);
-                        break;
-                    case R.id.skidMode:
-                        setExportMode(6);
-                        break;
-                    case R.id.invAdjustMode:
-                        setExportMode(5);
-                        break;
-                }
             }
         });
 
@@ -200,15 +186,15 @@ public class ScanConfigActivity  extends Activity
             }
             if(Integer.parseInt(boxQuantityInput.getText().toString()) < 1 || Integer.parseInt(boxQuantityInput.getText().toString()) > 100)
             {
-                Utilities.makeLongToast(this, "Box Quantity Value must be between 1-100");
+                Utilities.makeLongToast(this, "Box Quantity Value must be from 1-100");
                 hasGoodValues = false;
             }
         }
         else if(autoCountModeToggle.isChecked())
         {
-            if(autoCountSelect.getSelectedItem().toString().equals("...") && Integer.parseInt(customAutoValue) > 410)
+            if(autoCountSelect.getSelectedItem().toString().equals("...") && (Integer.parseInt(customAutoValue) < 1 || Integer.parseInt(customAutoValue) > 410))
             {
-                Utilities.makeLongToast(this, "Auto Quantity must be between 0-410");
+                Utilities.makeLongToast(this, "Auto Quantity must be from 1-410");
                 hasGoodValues = false;
             }
         }
@@ -227,6 +213,8 @@ public class ScanConfigActivity  extends Activity
         {
             autoCountSelect.setSelection(0);
         }
+        exportModeSelect.setAdapter(Utilities.createSpinnerAdapter(this, ExportModeHandler.getExportModesForSpinner()));
+        initExportChoice();
 
         boxQuantityModeToggle.setChecked(appConfig.accessBoolean(DroidConfigManager.IS_BOX_QTY, null, false));
         boxQuantityInput.setText(Integer.toString(appConfig.accessInt(DroidConfigManager.BOX_QTY, null, 1)));
@@ -234,16 +222,6 @@ public class ScanConfigActivity  extends Activity
         lensSelect.setAdapter(Utilities.createSpinnerAdapter(this, lensAccess.getAllLensNames()));
         dbAdapter.close();
         lensSelect.setSelection(appConfig.accessInt(DroidConfigManager.LENS_SELECT_IDX, null, 0));
-        initExportRadio();
-
-        if(((RadioButton)findViewById(R.id.invAdjustMode)).isChecked())
-        {
-            invModeRGroup.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            invModeRGroup.setVisibility(View.GONE);
-        }
 
         if(invModeChoice == 1)
         {
@@ -255,29 +233,9 @@ public class ScanConfigActivity  extends Activity
         }
     }
 
-    private void initExportRadio()
+    private void initExportChoice()
     {
-        switch(exportModeChoice)
-        {
-            case 1:
-                ((RadioButton)findViewById(R.id.normalMode)).setChecked(true);
-                break;
-            case 2:
-                ((RadioButton)findViewById(R.id.consolidateMode)).setChecked(true);
-                break;
-            case 3:
-                ((RadioButton)findViewById(R.id.billBMode)).setChecked(true);
-                break;
-            case 4:
-                ((RadioButton)findViewById(R.id.drewMode)).setChecked(true);
-                break;
-            case 5:
-                ((RadioButton)findViewById(R.id.invAdjustMode)).setChecked(true);
-                break;
-            case 6:
-                ((RadioButton)findViewById(R.id.skidMode)).setChecked(true);
-                break;
-        }
+        exportModeSelect.setSelection(exportModeChoice - 1);
     }
 
     private void setExportMode(int modeChoice)
@@ -288,10 +246,11 @@ public class ScanConfigActivity  extends Activity
             case 2:
             case 3:
             case 4:
+            case 7:
                 if(exportModeChoice == 6 && scanAccess.getTotalScans() > 0)
                 {
                     Utilities.makeToast(this, "Please commit scans first.");
-                    initExportRadio();
+                    initExportChoice();
                 }
                 else
                 {
@@ -303,7 +262,7 @@ public class ScanConfigActivity  extends Activity
                 if(exportModeChoice == 6 && scanAccess.getTotalScans() > 0)
                 {
                     Utilities.makeToast(this, "Please commit scans first.");
-                    initExportRadio();
+                    initExportChoice();
                 }
                 else
                 {
@@ -315,7 +274,7 @@ public class ScanConfigActivity  extends Activity
                 if(exportModeChoice != 6 && scanAccess.getTotalScans() > 0)
                 {
                     Utilities.makeToast(this, "Please commit scans first.");
-                    initExportRadio();
+                    initExportChoice();
                 }
                 else
                 {
@@ -340,9 +299,9 @@ public class ScanConfigActivity  extends Activity
             appConfig.accessInt(DroidConfigManager.AUTO_COUNT_IDX, autoCountSelect.getSelectedItemPosition(), 0);
             if(appConfig.accessString(DroidConfigManager.AUTO_COUNT, autoCountSelect.getSelectedItem().toString(), "0").equals("..."))
             {
-                appConfig.accessString(DroidConfigManager.AUTO_COUNT, customAutoValue, "0");
+                appConfig.accessString(DroidConfigManager.AUTO_COUNT, customAutoValue, "1");
             }
-            appConfig.accessString(DroidConfigManager.CUSTOM_AUTO_COUNT, customAutoValue, "0");
+            appConfig.accessString(DroidConfigManager.CUSTOM_AUTO_COUNT, customAutoValue, "1");
         }
 
         if(appConfig.accessBoolean(DroidConfigManager.IS_BOX_QTY, boxQuantityModeToggle.isChecked(), false))

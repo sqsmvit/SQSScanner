@@ -140,36 +140,7 @@ public class PullReviewActivity extends Activity
 
     private void showDisplayMode()
     {
-        TextView commitModeView = (TextView)findViewById(R.id.commitMode);
-        switch(exportModeChoice)
-        {
-            case 1:
-                //Normal Mode
-                commitModeView.setText("Normal Pull Mode");
-                break;
-            case 2:
-                //Consolidated Mode
-                commitModeView.setText("Consolidated Pull Mode");
-                break;
-            case 3:
-                //BillB Mode
-                commitModeView.setText("Bill B. Mode");
-                break;
-            case 4:
-                //Drew mode
-                commitModeView.setText("Drew Mode");
-                break;
-            case 5:
-                //RI Mode
-                commitModeView.setText("RI Mode");
-                break;
-            case 6:
-                //RI Mode
-                commitModeView.setText("Skid Mode");
-                break;
-            default:
-                commitModeView.setText("Error");
-        }
+        ((TextView)findViewById(R.id.commitMode)).setText(ExportModeHandler.getExportMode(exportModeChoice));
     }
 
     private void createAdapterDataset()
@@ -223,7 +194,7 @@ public class PullReviewActivity extends Activity
 
     private void onClickCommit()
     {
-        if(!(pullNumberList.isEmpty()))
+        if(!pullNumberList.isEmpty())
         {
             if(Utilities.checkWifi(this))
             {

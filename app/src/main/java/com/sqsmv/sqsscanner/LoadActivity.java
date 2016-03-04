@@ -50,21 +50,13 @@ public class LoadActivity extends Activity
     {
         super.onResume();
 
-        if(Utilities.checkWifi(this))
+        if(dropboxManager.finishAuthentication())
         {
-            if(dropboxManager.finishAuthentication())
-            {
-                //Entered if the app is resumed after linking with a Dropbox account
-                String accessToken = dropboxManager.getOAuth2AccessToken();
-                appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, "");
-            }
-            linkDropboxAccount();
+            //Entered if the app is resumed after linking with a Dropbox account
+            String accessToken = dropboxManager.getOAuth2AccessToken();
+            appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, "");
         }
-        else
-        {
-            Utilities.makeLongToast(this, getString(R.string.ERR_WIFI));
-            finish();
-        }
+        linkDropboxAccount();
     }
 
     /**
@@ -74,15 +66,20 @@ public class LoadActivity extends Activity
      */
     private void linkDropboxAccount()
     {
-            String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, "");
-            if(!accessToken.isEmpty())
-            {
-                dropboxManager.setStaticOAuth2AccessToken(accessToken);
-            }
-            else
-            {
-                dropboxManager.linkDropboxAccount();
-            }
+        String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, "");
+        if(!accessToken.isEmpty())
+        {
+            dropboxManager.setStaticOAuth2AccessToken(accessToken);
+        }
+        else if(Utilities.checkWifi(this))
+        {
+            dropboxManager.linkDropboxAccount();
+        }
+        else
+        {
+            Utilities.makeLongToast(this, "Must be connected to WiFi to link to Dropbox!");
+            finish();
+        }
     }
 
     /**
@@ -95,9 +92,8 @@ public class LoadActivity extends Activity
 		Log.d(TAG, "in startScan and for the LoadActivity!");
 
         String buildDate = Utilities.formatYYMMDDDate(new Date());
-
-		if(!(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, ""))))
-		{
+        if(!buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, "")) && Utilities.checkWifi(this))
+        {
             if(updateLauncher.checkNeedAppUpdate())
             {
                 updateLauncher.startAppUpdate();
@@ -109,10 +105,14 @@ public class LoadActivity extends Activity
                 launchDBUpdate();
                 appConfig.accessString(DroidConfigManager.BUILD_DATE, buildDate, "");
             }
-		}
-        else
+        }
+        else if(buildDate.equals(appConfig.accessString(DroidConfigManager.BUILD_DATE, null, "")))
         {
             goToScanHomeActivity();
+        }
+        else
+        {
+            Utilities.makeToast(this, getString(R.string.ERR_WIFI));
         }
 	}
 

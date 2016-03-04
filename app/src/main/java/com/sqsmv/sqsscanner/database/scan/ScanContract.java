@@ -27,7 +27,7 @@ public class ScanContract implements DBContract, BaseColumns
     @Override
     public String getTableCreateString()
     {
-        return "CREATE TABLE " + getTableName() + " (" +
+        return "CREATE TABLE IF NOT EXISTS " + getTableName() + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NAME_MASNUM + " TEXT, " +
                 COLUMN_NAME_QUANTITY + " TEXT, " +

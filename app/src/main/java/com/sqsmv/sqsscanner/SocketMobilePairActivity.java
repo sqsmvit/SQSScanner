@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.ToggleButton;
 
 import com.onbarcode.barcode.android.AndroidColor;
@@ -45,6 +46,15 @@ public class SocketMobilePairActivity extends Activity
 
         makeBarcode(btaddrBarcode, btAddr, 0);
         btaddrBarcodeView.drawBarcode(btaddrBarcode);
+
+        findViewById(R.id.pairBackButton).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onBackPressed();
+            }
+        });
     }
 
     @Override

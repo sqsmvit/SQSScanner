@@ -18,7 +18,7 @@ public class UPCContract implements XMLDBContract
     @Override
     public String getTableCreateString()
     {
-        return "CREATE TABLE " + getTableName() + " (" +
+        return "CREATE TABLE IF NOT EXISTS " + getTableName() + " (" +
                 COLUMN_NAME_UPC + " TEXT PRIMARY KEY, " +
                 COLUMN_NAME_MASNUM + " TEXT, " +
                 COLUMN_NAME_SHA + " TEXT);";

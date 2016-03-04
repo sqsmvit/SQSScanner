@@ -20,29 +20,7 @@ public class ScanExporter
      */
     public static boolean exportScan(Context context, File exportFile, int exportMode, boolean fromCommit)
     {
-        String exportPath = "/Default/";
-        if(exportMode == 1 || exportMode == 2)
-        {
-            exportPath = "/PullScan/";
-        }
-        else if(exportMode == 3)
-        {
-            exportPath = "/BB/";
-        }
-        else if(exportMode == 4)
-        {
-            exportPath = "/Drew/";
-        }
-        else if(exportMode == 5)
-        {
-            exportPath = "/RI/";
-        }
-        else if(exportMode == 6)
-        {
-            exportPath = "/Skid/";
-        }
-
-        return exportDBX(context, exportFile, exportPath, fromCommit);
+        return exportDBX(context, exportFile, ExportModeHandler.getExportDirectory(exportMode), fromCommit);
     }
 
     /**

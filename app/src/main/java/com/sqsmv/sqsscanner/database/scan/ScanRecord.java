@@ -26,7 +26,7 @@ public class ScanRecord extends DBRecord
     private String numBoxes;
     private String initials;
 
-    public ScanRecord(String id, String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String initials)
+    public ScanRecord(String id, String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String numBoxes, String initials)
     {
         super(new ScanContract());
         setId(id);
@@ -38,40 +38,18 @@ public class ScanRecord extends DBRecord
         setPriceList(priceList);
         setRating(rating);
         setLocation(location);
-        setNumBoxes("1");
+        setNumBoxes(numBoxes);
         setInitials(initials);
     }
 
-    public ScanRecord(String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String initials)
+    public ScanRecord(String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String numBoxes, String initials)
     {
-        super(new ScanContract());
-        setId("null");
-        setMasNum(masNum);
-        setQuantity(quantity);
-        setFkPullId(fkPullId);
-        setScanDate(initDate());
-        setTitle(title);
-        setPriceList(priceList);
-        setRating(rating);
-        setLocation(location);
-        setNumBoxes("1");
-        setInitials(initials);
+        this("null", masNum, quantity, fkPullId, title, priceList, rating, location, numBoxes, initials);
     }
 
     public ScanRecord(String fkPullId, String quantity, String initials)
     {
-        super(new ScanContract());
-        setId("null");
-        setMasNum("");
-        setQuantity(quantity);
-        setFkPullId(fkPullId);
-        setScanDate(initDate());
-        setTitle("Skid");
-        setPriceList("");
-        setRating("");
-        setLocation("");
-        setNumBoxes("1");
-        setInitials(initials);
+        this("null", "", quantity, fkPullId, "Skid", "", "", "", "", initials);
     }
 
     public ScanRecord(Cursor dbCursor)

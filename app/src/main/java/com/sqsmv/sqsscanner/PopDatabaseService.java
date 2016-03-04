@@ -24,29 +24,41 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-
-/* special note ... this is a service ... woot woot! */
+/**
+ * Service that coordinates the steps for updating the database using the export files on FileMaker.
+ */
 public class PopDatabaseService extends IntentService
 {
 	private static final String TAG = "PopDatabaseService";
 
     private String zipFileName = "files.zip";
-	
+
+    /**
+     * Constructor.
+     */
 	public PopDatabaseService()
     {
 		super(TAG);
 	}
 
+    /**
+     *
+     * @param intent
+     */
 	@Override
 	protected void onHandleIntent(Intent intent)
     {
         makeNotification("Dropbox Download Started", false);
         DBAdapter dbAdapter = new DBAdapter(this);
+        Semaphore popDBSemaphore = new Semaphore(2);
 
-        //Download files.zip from DropBox
+        boolean isSlowUpdate = Utilities.totalDeviceMemory(this) <= 1024;
+
+        //Download files.zip from Dropbox
         downloadDBXZip();
         File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
         try
@@ -62,12 +74,13 @@ public class PopDatabaseService extends IntentService
             ArrayList<Thread> updateThreads = new ArrayList<Thread>();
             for(XMLDBAccess xmlDBAccess : xmlDBAccesses)
             {
-                FMDumpHandler xmlHandler = new FMDumpHandler(xmlDBAccess);
-                Thread updateThread = new Thread(xmlHandler, xmlDBAccess.getTableName());
-                updateThreads.add(updateThread);
+                updateThreads.add(new FMDumpHandler(xmlDBAccess, isSlowUpdate, popDBSemaphore));
             }
 
-            if(Utilities.totalDeviceMemory(this) <= 1024)
+            startUpdateThreads(updateThreads);
+
+            /*
+            if(isSlowUpdate)
             {
                 startSlowUpdateThreads(updateThreads);
             }
@@ -75,6 +88,7 @@ public class PopDatabaseService extends IntentService
             {
                 startFastUpdateThreads(updateThreads);
             }
+            */
         }
         catch(IOException e)
         {
@@ -84,6 +98,9 @@ public class PopDatabaseService extends IntentService
         makeNotification("Database Update Finished", true);
 	}
 
+    /**
+     * Downloads the .zip file that contains all of the exported FileMaker XML data.
+     */
     private void downloadDBXZip()
     {
         Log.d(TAG, "in copyDBXFile");
@@ -92,6 +109,11 @@ public class PopDatabaseService extends IntentService
         dbxMan.writeToStorage("/out/" + zipFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName, false);
     }
 
+    /**
+     * Uncompresses a specified file in the directory it is currently in. The file is assumed to be a compressed zip file.
+     * @param zipFile    The File to uncompress.
+     * @throws IOException
+     */
     private void unzip(File zipFile) throws IOException
     {
         byte[] buffer = new byte[1024];
@@ -123,6 +145,11 @@ public class PopDatabaseService extends IntentService
         zis.close();
     }
 
+    /**
+     * Makes an Android notification that will alert the user to the current status the import is in.
+     * @param message     Message to put on the notification.
+     * @param finished    Whether the import is finished or not.
+     */
 	private void makeNotification(String message, boolean finished)
 	{
 		NotificationCompat.Builder mBuilder =
@@ -145,40 +172,16 @@ public class PopDatabaseService extends IntentService
 
 		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, emptyIntent, PendingIntent.FLAG_UPDATE_CURRENT); 
 		mBuilder.setContentIntent(resultPendingIntent);
-		NotificationManager mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		// mId allows you to update the notification later on.
 		mNotificationManager.notify(0, mBuilder.build());
 	}
 
-    private void startSlowUpdateThreads(ArrayList<Thread> updateThreads)
-    {
-        Log.d(TAG, "Slow Update");
-        int count = 0;
-        while(!updateThreads.isEmpty())
-        {
-            Thread updateThread = updateThreads.get(count);
-            Log.d(TAG, "Staring thread " + updateThread.getName());
-            updateThread.start();
-            count++;
-            if((count % 2) == 0 || updateThreads.size() < 2)
-            {
-                for(int i = 0; i < count; i++)
-                {
-                    try
-                    {
-                        updateThreads.remove(0).join();
-                    }
-                    catch(InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                count = 0;
-            }
-        }
-    }
-
-    private void startFastUpdateThreads(ArrayList<Thread> updateThreads)
+    /**
+     * Loops through an ArrayList of Threads and starts each thread, then joins each of them.
+     * @param updateThreads    The ArrayList of Threads to loop through.
+     */
+    private void startUpdateThreads(ArrayList<Thread> updateThreads)
     {
         Log.d(TAG, "Fast Update");
         for(Thread updateThread : updateThreads)
@@ -198,6 +201,11 @@ public class PopDatabaseService extends IntentService
         }
     }
 
+    /**
+     * Controls the resetting of tables that need to be recreated to compensate for records that were
+     * deleted from the FileMaker database.
+     * @param dbAdapter    The DBAdapter to use for access to the database.
+     */
     private void resetTables(DBAdapter dbAdapter)
     {
         DroidConfigManager droidConfigManager = new DroidConfigManager(this);

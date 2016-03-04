@@ -102,12 +102,7 @@
 
     <!-- ScanApi -->
     <string name="scanner_NoDevice">No Scanner Connected!</string>
-    <string name="title_activity_check_dbx">CheckDBX</string>
-    <string name="title_activity_dbtest">DBTest</string>
-    <string name="title_activity_init">InitActivity</string>
-    <string name="markSet">Skid Set</string>
     <string name="noMark">No Skid</string>
-    <string name="title_activity_mark_scan">MarkScanActivity</string>
     <string name="title_activity_load">LoadActivity</string>
     <string name="ERR_WIFI">Must be connected to WiFi to start scan!</string>
     <string name="ERR_DROPBOX">Error connecting to DropBox!</string>

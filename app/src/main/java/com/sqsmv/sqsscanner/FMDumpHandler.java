@@ -15,23 +15,53 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
-
-public class FMDumpHandler implements Runnable
+/**
+ * Handler class that takes the export files from FileMaker that have already been downloaded through
+ * Dropbox and imports the data into the app's database. It is assumed that the files can be found
+ * in the Downloads directory on the phone.
+ */
+public class FMDumpHandler extends Thread
 {
     private static final String TAG = "FMDumpHandler";
 
     XMLDBAccess xmlDBAccess;
+    private Semaphore popDBSemaphore;
+    private boolean isSlowUpdate;
 
-    FMDumpHandler(XMLDBAccess fileDataAccess)
+    /**
+     * Constructor.
+     * @param xmlDBAccess       The XMLDBAccess class for the table that is to be populated.
+     * @param isSlowUpdate      Whether the FMDumpHandler needs to synchronize with other threads or not.
+     * @param popDBSemaphore    The Semaphore to synchronize for synchronization with other threads.
+     */
+    FMDumpHandler(XMLDBAccess xmlDBAccess, boolean isSlowUpdate, Semaphore popDBSemaphore)
     {
-        xmlDBAccess = fileDataAccess;
+        super(xmlDBAccess.getTableName());
+        this.xmlDBAccess = xmlDBAccess;
+        this.isSlowUpdate = isSlowUpdate;
+        this.popDBSemaphore = popDBSemaphore;
     }
 
+    /**
+     * Overridden run method. Runs the import process for the table.
+     */
     @Override
     public void run()
     {
-        Log.d(TAG, "Running FMDumpHandler");
+        if(isSlowUpdate)
+        {
+            try
+            {
+                popDBSemaphore.acquire();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        Log.d(TAG, "run: start " + xmlDBAccess.getTableName());
         File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + xmlDBAccess.getXMLFileName());
         try
         {
@@ -39,7 +69,7 @@ public class FMDumpHandler implements Runnable
             try
             {
                 XmlPullParser xpp = createXmlPullParser(fileInput);
-                buildTableFromXML(xpp);
+                importFromXML(xpp);
                 xmlFile.delete();
             }
             catch(XmlPullParserException e)
@@ -59,8 +89,22 @@ public class FMDumpHandler implements Runnable
         {
             e.printStackTrace();
         }
+        finally
+        {
+            if(isSlowUpdate)
+            {
+                popDBSemaphore.release();
+            }
+        }
+        Log.d(TAG, "run: end " + xmlDBAccess.getTableName());
     }
 
+    /**
+     * Creates the XmlPullParser for parsing the FileMaker export file.
+     * @param fileInput    The InputStreamReader containing information to the FileMaker export file.
+     * @return The created XmlPullParser.
+     * @throws XmlPullParserException
+     */
     private XmlPullParser createXmlPullParser(InputStreamReader fileInput) throws XmlPullParserException
     {
         XmlPullParser xpp;
@@ -75,7 +119,13 @@ public class FMDumpHandler implements Runnable
         return xpp;
     }
 
-    private void buildTableFromXML(XmlPullParser xpp) throws XmlPullParserException, IOException
+    /**
+     * Imports the information from FileMaker export file into a table.
+     * @param xpp    The XmlPullParser containing information for parsing the FileMaker export file.
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
+    private void importFromXML(XmlPullParser xpp) throws XmlPullParserException, IOException
     {
         xmlDBAccess.open();
         HashMap<String, String> dbItems = xmlDBAccess.getSha();
@@ -122,7 +172,7 @@ public class FMDumpHandler implements Runnable
                                 objVars.add(value);
                             }//end for
 
-                            if(canInsert(objVars, shaVal, dbItems))
+                            if(canInsert(objVars.get(0), shaVal, dbItems))
                             {
                                 batch.add(objVars);
                             }
@@ -141,21 +191,29 @@ public class FMDumpHandler implements Runnable
         }
     }
 
-    private boolean canInsert(ArrayList<String> objVars, String shaVal, HashMap<String, String> dbItems)
+    /**
+     * Checks if a record needs to be inserted by seeing if the primary key and and sha match
+     * any records already in the database.
+     * @param pKey       The primary key to use for the check.
+     * @param shaVal     The sha value to use for the check.
+     * @param dbItems    The HashMap containing the primary key mapped to a matching sha for the database.
+     * @return true if the key and sha do not match any record already in the database, otherwise false.
+     */
+    private boolean canInsert(String pKey, String shaVal, HashMap<String, String> dbItems)
     {
-        boolean canInsert = false;
-        if(!dbItems.containsKey(objVars.get(0)))
+        boolean canInsert = true;
+        if(dbItems.containsKey(pKey) && dbItems.get(pKey).equals(shaVal))
         {
-            canInsert = true;
-        }
-        else if(!dbItems.get(objVars.get(0)).equals(shaVal))
-        {
-            canInsert = true;
+            canInsert = false;
         }
 
         return canInsert;
     }
 
+    /**
+     * Inserts a batch of records parsed from the FileMaker export file into the database.
+     * @param batch    The ArrayList containing information for batch insertion.
+     */
     private void insertBatch(ArrayList<ArrayList<String>> batch)
     {
         xmlDBAccess.insertBatch(batch);

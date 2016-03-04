@@ -55,6 +55,7 @@ public class EditRecordActivity extends Activity
         ((TextView)findViewById(R.id.editMasnum)).setText(currentScanRecord.getMasNum());
         ((TextView)findViewById(R.id.editScanTitle)).setText(currentScanRecord.getTitle());
         ((TextView)findViewById(R.id.editDate)).setText(currentScanRecord.getScanDate());
+        ((TextView)findViewById(R.id.editBoxQuantity)).setText(currentScanRecord.getNumBoxes());
         ((TextView)findViewById(R.id.editScannerInitials)).setText(currentScanRecord.getInitials());
 
         setListeners();

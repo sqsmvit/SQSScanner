@@ -24,6 +24,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The Activity that allows access to administrative functions for the app. Users will be able to reset
+ * the import tables in the database and force both database updates and app updates from this screen.
+ * A list of export backups are also available for reuploading to Dropbox from this screen.
+ */
 public class AdminActivity extends Activity
 {
     private UpdateLauncher updateLauncher;
@@ -68,6 +73,9 @@ public class AdminActivity extends Activity
         setListeners();
     }
 
+    /**
+     * Sets the listeners used for the current Activity's GUI elements.
+     */
     private void setListeners()
     {
         findViewById(R.id.adminHeadBack).setOnClickListener(new View.OnClickListener()
@@ -110,6 +118,10 @@ public class AdminActivity extends Activity
         findViewById(R.id.headBackupSize).setOnClickListener(sortListener);
     }
 
+    /**
+     * Checks if there is a new version of the app's apk file on Dropbox and starts the update process
+     * if one exists.
+     */
     private void forceAppUpdate()
     {
         if(Utilities.checkWifi(this))
@@ -129,6 +141,9 @@ public class AdminActivity extends Activity
         }
     }
 
+    /**
+     * Starts the database update process.
+     */
     private void forceDBUpdate()
     {
         if(Utilities.checkWifi(this))
@@ -142,6 +157,9 @@ public class AdminActivity extends Activity
         }
     }
 
+    /**
+     * Displays a prompt to confirm if the import tables in the database should be reset or not.
+     */
     private void forceResetDB()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -169,26 +187,31 @@ public class AdminActivity extends Activity
                 .show();
     }
 
+    /**
+     * Sorts the backup file information displayed according to the header pressed.
+     * @param id    The id of the header pressed.
+     */
     public void onClickSort(int id)
     {
-        String key = "";
-
         if(id == R.id.headBackupName)
         {
-            key = "fileName";
+            sortList("fileName");
         }
         else if(id == R.id.headBackupDate)
         {
-            key = "fileDate";
+            sortList("fileDate");
         }
         else if(id == R.id.headBackupSize)
         {
-            key = "fileSize";
+            sortList("fileSize");
         }
-        sortList(key);
         backupAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sorts the ArrayList of HashMaps containing backup file information according to a key.
+     * @param key    The key to sort by.
+     */
     private void sortList(final String key)
     {
         Comparator<HashMap<String, String>> comp = new Comparator<HashMap<String, String>>()
@@ -232,6 +255,9 @@ public class AdminActivity extends Activity
         Collections.sort(backupList, comp);
     }
 
+    /**
+     * Creates the ArrayList of HashMaps of backup file information for display.
+     */
     private void createAdapterDataset()
     {
         HashMap<String, String> backupEntry;
@@ -245,8 +271,13 @@ public class AdminActivity extends Activity
             backupEntry.put("fileSize", String.format("%.2f",(file.length()/1024.0)) + "kb");
             backupList.add(backupEntry);
         }
+        sortList("fileDate");
     }
 
+    /**
+     * Displays a prompt to confirm if a backup file should be exported to Dropbox or not.
+     * @param position
+     */
     protected void onListItemClick(int position)
     {
         final File selected = new File(backupDirectory, backupList.get(position).get("fileName"));
@@ -254,31 +285,32 @@ public class AdminActivity extends Activity
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
-        alertDialogBuilder.setTitle("Export Backup");
-
-        // set dialog message
         alertDialogBuilder
-            .setMessage("Send Backup to DropBox?")
-            .setCancelable(false)
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int id)
+                .setTitle("Export Backup")
+                .setMessage("Send Backup to DropBox?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
-                    exportBackup(selected);
-                }
-            })
-            .setNegativeButton("No", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int id)
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        exportBackup(selected);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener()
                 {
-                    dialog.cancel();
-                }
-            });
-        alertDialogBuilder.show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 
+    /**
+     * Resets the import tables in the database.
+     */
     private void resetDB()
     {
         DBAdapter dbAdapter = new DBAdapter(this);
@@ -286,6 +318,10 @@ public class AdminActivity extends Activity
         dbAdapter.close();
     }
 
+    /**
+     * Exports a File to Dropbox.
+     * @param backupFile    The File to export.
+     */
     private void exportBackup(File backupFile)
     {
         if(Utilities.checkWifi(this))
@@ -298,6 +334,9 @@ public class AdminActivity extends Activity
         }
     }
 
+    /**
+     * OnClickListener for the headers, used for sorting the list of backup files.
+     */
     View.OnClickListener sortListener = new View.OnClickListener()
     {
         @Override

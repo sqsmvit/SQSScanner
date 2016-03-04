@@ -32,14 +32,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:weightSum="1"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/scannerInitials"
             android:layout_width="0dp"
             android:layout_height="36dp"
-            android:layout_weight=".4"
+            android:layout_weight=".3"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:gravity="bottom|center_horizontal"
             android:singleLine="true"
@@ -47,15 +46,20 @@
             android:selectAllOnFocus="true"
             android:hint="Enter Initials"/>
 
-        <View
+        <TextView
+            android:id="@+id/homeExportDisplay"
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight=".6"/>
+            android:layout_height="wrap_content"
+            android:layout_weight=".4"
+            android:gravity="center_horizontal"
+            android:singleLine="true"/>
 
         <TextView
             android:id="@+id/device_location"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight=".3"
+            android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
     </LinearLayout>
 
@@ -113,7 +117,9 @@
                     android:id="@+id/pullRow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/listMar">
+                    android:layout_marginTop="@dimen/listMar"
+                    android:layout_marginLeft="@dimen/listMar"
+                    android:layout_marginRight="@dimen/listMar">
 
                     <TextView
                         android:id="@+id/pullLbl"
@@ -263,27 +269,6 @@
                         android:singleLine="true"
                         android:textAppearance="?android:attr/textAppearanceLarge"/>
                 </TableRow>
-                <!--
-                <HorizontalScrollView
-                    android:id="@+id/priceFiltersScrollView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="2dp">
-
-                    <TextView
-                        android:id="@+id/priceFilters"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/radTopMar"
-                        android:layout_marginLeft="@dimen/radTopMar"
-                        android:layout_marginRight="@dimen/radTopMar"
-                        android:scrollHorizontally="true"
-                        android:scrollbarAlwaysDrawHorizontalTrack="true"
-                        android:scrollbars="horizontal"
-                        android:singleLine="true"
-                        android:textAppearance="?android:attr/textAppearanceLarge"/>
-                </HorizontalScrollView>
-                -->
                 <TableRow
                     android:id="@+id/qtyRow"
                     android:layout_width="wrap_content"
@@ -294,7 +279,7 @@
                         android:id="@+id/qtyLbl"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1.25"
+                        android:layout_weight="1"
                         android:text="Quantity:"
                         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
@@ -302,13 +287,38 @@
                         android:id="@+id/qtyNum"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2.75"
+                        android:layout_weight="1.5"
+                        android:gravity="center"
                         android:ems="10"
                         android:imeOptions="actionDone"
                         android:inputType="number"
                         android:selectAllOnFocus="true"/>
                 </TableRow>
+                <TableRow
+                    android:id="@+id/boxQtyRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/listMar">
 
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Box Quantity:"
+                        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                    <EditText
+                        android:id="@+id/boxQtyNum"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:gravity="center"
+                        android:ems="10"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:hint="1"/>
+                </TableRow>
             </TableLayout>
 
             <LinearLayout

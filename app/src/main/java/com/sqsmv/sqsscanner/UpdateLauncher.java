@@ -36,7 +36,7 @@ public class UpdateLauncher
         final ProgressDialog pausingDialog = new ProgressDialog(context);
         pausingDialog.setTitle("Updating Database");
         pausingDialog.setMessage("Please Stay in Wifi Range...");
-        pausingDialog.setCancelable(true);
+        pausingDialog.setCancelable(false);
 
         Thread pausingDialogThread = new Thread()
         {
