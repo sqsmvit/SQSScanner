@@ -109,6 +109,10 @@ public class ProdLocRecord extends XMLDBRecord
 
     public void setLocCode(String locCode)
     {
+        if(locCode.isEmpty())
+        {
+            locCode = "NF";
+        }
         this.locCode = locCode;
     }
 

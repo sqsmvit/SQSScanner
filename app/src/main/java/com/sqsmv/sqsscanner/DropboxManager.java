@@ -113,9 +113,8 @@ public class DropboxManager
      * @param dbxFilePath        The path to the file on Dropbox.
      * @param downloadPath       The path to the write location on local storage.
      * @param isAsyncDownload    Whether the write should be done asynchronously or not.
-     * @return The Thread used to write the file.
      */
-    public Thread writeToStorage(final String dbxFilePath, String downloadPath, boolean isAsyncDownload)
+    public void writeToStorage(final String dbxFilePath, String downloadPath, boolean isAsyncDownload)
     {
         final File downloadFile = new File(downloadPath);
         Thread downloadThread = new Thread()
@@ -138,15 +137,18 @@ public class DropboxManager
                 }
             };
         };
-        if(isAsyncDownload)
+        downloadThread.start();
+        if(!isAsyncDownload)
         {
-            downloadThread.start();
+            try
+            {
+                downloadThread.join();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
-        else
-        {
-            downloadThread.run();
-        }
-        return downloadThread;
     }
 
     /**
@@ -154,11 +156,12 @@ public class DropboxManager
      * @param fileToWrite        The File to write to Dropbox.
      * @param dbxFilePath        The path to the write location on Dropbox.
      * @param shouldSteal        Whether the file should be removed from local storage when the write is complete.
-     * @param isAsyncDownload    Whether the write should be done asynchronously or not.
-     * @return The Thread used to write the file.
+     * @return true if the write to Dropbox was successful, otherwise false.
      */
-    public Thread writeToDropbox(final File fileToWrite, final String dbxFilePath, final boolean shouldSteal, boolean isAsyncDownload)
+    public boolean writeToDropbox(final File fileToWrite, final String dbxFilePath, final boolean shouldSteal)
     {
+        final boolean[] writeSuccessful = new boolean[1];
+        writeSuccessful[0] = false;
         Thread uploadThread = new Thread()
         {
             @Override
@@ -168,10 +171,7 @@ public class DropboxManager
                 {
                     FileInputStream inputStream = new FileInputStream(fileToWrite);
                     dropboxAPI.putFile(dbxFilePath, inputStream, fileToWrite.length(), null, null);
-                    if(shouldSteal)
-                    {
-                        fileToWrite.delete();
-                    }
+                    writeSuccessful[0] = true;
                 }
                 catch(FileNotFoundException e)
                 {
@@ -183,26 +183,31 @@ public class DropboxManager
                 }
             };
         };
-        if(isAsyncDownload)
+        uploadThread.start();
+        try
         {
-            uploadThread.start();
+            uploadThread.join();
         }
-        else
+        catch(InterruptedException e)
         {
-            uploadThread.run();
+            e.printStackTrace();
+        }
+        if(shouldSteal)
+        {
+            fileToWrite.delete();
         }
 
-        return uploadThread;
+        return writeSuccessful[0];
     }
 
     /**
      * Gets the revision id metadata info of a file on Dropbox.
-     * @param dbxFilePath    The path on Dropbox to check.
+     * @param dbxFilePath    The path to the file on Dropbox to check.
      * @return The revision id metadata info of the file.
      */
     public String getDbxFileRev(final String dbxFilePath)
     {
-        final dbxFileMetadata metadata = new dbxFileMetadata();
+        final DropboxAPI.Entry[] metadata = new DropboxAPI.Entry[1];
         Thread metadataThread = new Thread()
         {
             @Override
@@ -210,7 +215,7 @@ public class DropboxManager
             {
                 try
                 {
-                    metadata.setDropboxEntry(dropboxAPI.metadata(dbxFilePath, 1, null, false, null));
+                    metadata[0] = dropboxAPI.metadata(dbxFilePath, 1, null, false, null);
                 }
                 catch(DropboxException e)
                 {
@@ -228,7 +233,7 @@ public class DropboxManager
             e.printStackTrace();
         }
 
-        return metadata.getDropboxEntry().rev;
+        return metadata[0].rev;
     }
 
     /**
@@ -238,31 +243,5 @@ public class DropboxManager
     private void setOAuth2AccessToken(String accessToken)
     {
         dropboxAPI.getSession().setOAuth2AccessToken(accessToken);
-    }
-
-    /**
-     * Container class for storing metadata of a file on Dropbox.
-     */
-    private class dbxFileMetadata
-    {
-        DropboxAPI.Entry dropboxEntry;
-
-        /**
-         * Gets the stored metadata.
-         * @return The stored metadata.
-         */
-        public DropboxAPI.Entry getDropboxEntry()
-        {
-            return dropboxEntry;
-        }
-
-        /**
-         * Sets the stored metadata.
-         * @param dropboxEntry    The metadata to store.
-         */
-        public void setDropboxEntry(DropboxAPI.Entry dropboxEntry)
-        {
-            this.dropboxEntry = dropboxEntry;
-        }
     }
 }

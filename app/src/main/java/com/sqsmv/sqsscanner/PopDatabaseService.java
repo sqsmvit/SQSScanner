@@ -13,6 +13,7 @@ import com.sqsmv.sqsscanner.database.DBAdapter;
 import com.sqsmv.sqsscanner.database.XMLDBAccess;
 import com.sqsmv.sqsscanner.database.lens.LensAccess;
 import com.sqsmv.sqsscanner.database.pricelist.PriceListAccess;
+import com.sqsmv.sqsscanner.database.prodloc.ProdLocAccess;
 import com.sqsmv.sqsscanner.database.product.ProductAccess;
 import com.sqsmv.sqsscanner.database.productlens.ProductLensAccess;
 import com.sqsmv.sqsscanner.database.upc.UPCAccess;
@@ -70,7 +71,7 @@ public class PopDatabaseService extends IntentService
             makeNotification("Database Update Started", false);
 
             XMLDBAccess[] xmlDBAccesses = new XMLDBAccess[]{new LensAccess(dbAdapter), new ProductAccess(dbAdapter), new UPCAccess(dbAdapter),
-                                                            new PriceListAccess(dbAdapter), new ProductLensAccess(dbAdapter)};
+                                                            new PriceListAccess(dbAdapter), new ProdLocAccess(dbAdapter), new ProductLensAccess(dbAdapter)};
             ArrayList<Thread> updateThreads = new ArrayList<Thread>();
             for(XMLDBAccess xmlDBAccess : xmlDBAccesses)
             {
@@ -78,17 +79,6 @@ public class PopDatabaseService extends IntentService
             }
 
             startUpdateThreads(updateThreads);
-
-            /*
-            if(isSlowUpdate)
-            {
-                startSlowUpdateThreads(updateThreads);
-            }
-            else
-            {
-                startFastUpdateThreads(updateThreads);
-            }
-            */
         }
         catch(IOException e)
         {
@@ -214,6 +204,10 @@ public class PopDatabaseService extends IntentService
         LensAccess lensAccess = new LensAccess(dbAdapter);
         lensAccess.open();
         lensAccess.reset();
+
+        ProdLocAccess prodLocAccess = new ProdLocAccess(dbAdapter);
+        prodLocAccess.open();
+        prodLocAccess.reset();
 
         try
         {

@@ -5,12 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,6 +21,8 @@ import com.socketmobile.apiintegration.ScanAPIApplication;
 import com.sqsmv.sqsscanner.database.DBAdapter;
 import com.sqsmv.sqsscanner.database.pricelist.PriceListAccess;
 import com.sqsmv.sqsscanner.database.pricelist.PriceListRecord;
+import com.sqsmv.sqsscanner.database.prodloc.ProdLocAccess;
+import com.sqsmv.sqsscanner.database.prodloc.ProdLocRecord;
 import com.sqsmv.sqsscanner.database.product.ProductAccess;
 import com.sqsmv.sqsscanner.database.product.ProductRecord;
 import com.sqsmv.sqsscanner.database.productlens.ProductLensAccess;
@@ -55,11 +52,12 @@ public class ScanHomeActivity extends Activity
     private UPCAccess upcAccess;
     private ProductLensAccess productLensAccess;
     private PriceListAccess priceListAccess;
+    private ProdLocAccess prodLocAccess;
     private ScanAccess scanAccess;
 
     private Pattern pullScanRegEx, sqsRegEx, upcRegEx;
 
-    private TextView recordCountView, numPullLinesView, pullPieceCountView, titleCountView, titleView, priceListView, ratingView;
+    private TextView recordCountView, numPullLinesView, pullPieceCountView, titleCountView, titleView, priceListView, ratingView, wh1LocView, oLocView, readingLocView;
     private EditText pullNumberInput, scanIdInput, quantityInput, scannerInitialsInput;
     private ToggleButton manualQuantityModeToggle, newProductModeToggle;
 
@@ -83,6 +81,7 @@ public class ScanHomeActivity extends Activity
         upcAccess = new UPCAccess(dbAdapter);
         productLensAccess = new ProductLensAccess(dbAdapter);
         priceListAccess = new PriceListAccess(dbAdapter);
+        prodLocAccess = new ProdLocAccess(dbAdapter);
         scanAccess = new ScanAccess(dbAdapter);
 
 
@@ -100,6 +99,9 @@ public class ScanHomeActivity extends Activity
         titleView = (TextView)findViewById(R.id.title);
         priceListView = (TextView)findViewById(R.id.priceList);
         ratingView = (TextView)findViewById(R.id.rating);
+        wh1LocView = (TextView)findViewById(R.id.wh1Loc);
+        oLocView = (TextView)findViewById(R.id.oLoc);
+        readingLocView = (TextView)findViewById(R.id.readingLoc);
         quantityInput = (EditText)findViewById(R.id.qtyNum);
         scannerInitialsInput = (EditText)findViewById(R.id.scannerInitials);
         manualQuantityModeToggle = (ToggleButton)findViewById(R.id.manualQty);
@@ -131,6 +133,7 @@ public class ScanHomeActivity extends Activity
         upcAccess.open();
         productLensAccess.open();
         priceListAccess.open();
+        prodLocAccess.open();
         scanAccess.open();
 
         updateExportModeViews();
@@ -195,15 +198,7 @@ public class ScanHomeActivity extends Activity
                 {
                     if(data.getBooleanExtra("FILE_EXPORTED", false))
                     {
-                        pullNumberInput.setText("");
-                        scanIdInput.setText("");
-                        scannerInitialsInput.setText("");
-                        titleCountView.setText("");
-                        titleView.setText("");
-                        priceListView.setText("");
-                        ratingView.setText("");
-                        manualQuantityModeToggle.setChecked(false);
-                        newProductModeToggle.setChecked(false);
+                        resetAllInputs();
                     }
                 }
             }
@@ -387,6 +382,9 @@ public class ScanHomeActivity extends Activity
         titleView.setText(scanRecord.getTitle());
         priceListView.setText(scanRecord.getPriceList());
         ratingView.setText(scanRecord.getRating());
+        wh1LocView.setText((ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumWH1(scanRecord.getMasNum()))).getLocCode());
+        oLocView.setText((ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumOther(scanRecord.getMasNum()))).getLocCode());
+        readingLocView.setText((ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumReading(scanRecord.getMasNum()))).getLocCode());
     }
 
     private void updateExportModeViews()
@@ -408,7 +406,7 @@ public class ScanHomeActivity extends Activity
         findViewById(R.id.tableRow3).setVisibility(visibilityMode);
         findViewById(R.id.titleScrollView).setVisibility(visibilityMode);
         findViewById(R.id.priceListRow).setVisibility(visibilityMode);
-        findViewById(R.id.titleScrollView).setVisibility(visibilityMode);
+        findViewById(R.id.locationRow).setVisibility(visibilityMode);
     }
 
     private void updateBoxQuantityFieldVisibility(boolean boxQuantityVisibility)
@@ -449,24 +447,26 @@ public class ScanHomeActivity extends Activity
         }
     }
 
-    private void alertSoundVibrate()
+    private void resetAllInputs()
     {
-        AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        pullNumberInput.setText("");
+        scanIdInput.setText("");
+        scannerInitialsInput.setText("");
+        titleCountView.setText("");
+        titleView.setText("");
+        priceListView.setText("");
+        ratingView.setText("");
+        wh1LocView.setText("");
+        oLocView.setText("");
+        readingLocView.setText("");
+        manualQuantityModeToggle.setChecked(false);
+        newProductModeToggle.setChecked(false);
+    }
 
-        int minVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
-        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_RING);
-        if(minVolume > currentVolume)
-        {
-            audioManager.setStreamVolume(AudioManager.STREAM_RING, minVolume, AudioManager.FLAG_ALLOW_RINGER_MODES);
-        }
-
-        //Ring and vibrate
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Ringtone ringTone = RingtoneManager.getRingtone(this, notification);
-        ringTone.play();
-        Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-        long[] vibratePattern = {0, 500, 250, 500};
-        vibrator.vibrate(vibratePattern, -1);
+    private void alertUser()
+    {
+        Utilities.alertNotificationSound(this);
+        Utilities.alertVibrate(this, new long[]{0, 500, 250, 500});
     }
 
     private void handleInputs(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue)
@@ -545,7 +545,7 @@ public class ScanHomeActivity extends Activity
         else
         {
             Utilities.makeToast(this, "Invalid Scan");
-            alertSoundVibrate();
+            alertUser();
         }
 
         handleInputs(scannerInitialsInput.getText().toString(), pullNumberInput.getText().toString(), scanIdInput.getText().toString(), quantityInput.getText().toString());

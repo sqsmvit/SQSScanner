@@ -5,10 +5,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Vibrator;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -221,5 +226,60 @@ public class Utilities
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(callingContext, R.layout.spinner_list, spinnerItems);
         adapter.setDropDownViewResource(R.layout.spinner_item);
         return adapter;
+    }
+
+    /**
+     * Sounds the Android device's set notification sound to alert the user.
+     * @param callingContext    The Context for the Activity or Service making the alert.
+     */
+    public static void alertNotificationSound(Context callingContext)
+    {
+        AudioManager audioManager = (AudioManager)callingContext.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_ALLOW_RINGER_MODES);
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        RingtoneManager.getRingtone(callingContext, notification).play();
+    }
+
+    /**
+     * Sounds the Android device's set alarm sound to alert the user.
+     * @param callingContext           The Context for the Activity or Service making the alert.
+     * @param alertTimeMilliseconds    The time in milliseconds that the alarm should ring for.
+     */
+    public static void alertAlarm(Context callingContext, final long alertTimeMilliseconds)
+    {
+        AudioManager audioManager = (AudioManager)callingContext.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_ALLOW_RINGER_MODES);
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        final Ringtone ringTone = RingtoneManager.getRingtone(callingContext, notification);
+        ringTone.play();
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    sleep(alertTimeMilliseconds);
+                }
+                catch(InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                finally
+                {
+                    ringTone.stop();
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * Vibrates the Android device to alert the user.
+     * @param callingContext    The Context for the Activity or Service making the alert.
+     * @param vibratePattern    The long[] containing the pattern the vibration should be performed with.
+     */
+    public static void alertVibrate(Context callingContext, long[] vibratePattern)
+    {
+        ((Vibrator)callingContext.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(vibratePattern, -1);
     }
 }

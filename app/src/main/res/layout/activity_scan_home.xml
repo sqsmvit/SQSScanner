@@ -238,8 +238,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/radTopMar"
-                        android:layout_marginLeft="@dimen/radTopMar"
-                        android:layout_marginRight="@dimen/radTopMar"
                         android:scrollHorizontally="true"
                         android:scrollbarAlwaysDrawHorizontalTrack="true"
                         android:scrollbars="horizontal"
@@ -251,8 +249,6 @@
                     android:id="@+id/priceListRow"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
-                    android:layout_marginLeft="@dimen/radTopMar"
-                    android:layout_marginRight="@dimen/radTopMar"
                     android:layout_marginBottom="2dp">
 
                     <TextView
@@ -269,6 +265,41 @@
                         android:singleLine="true"
                         android:textAppearance="?android:attr/textAppearanceLarge"/>
                 </TableRow>
+
+                <TableRow
+                    android:id="@+id/locationRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_marginBottom="2dp">
+
+                    <TextView
+                        android:id="@+id/wh1Loc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                    <TextView
+                        android:id="@+id/oLoc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                    <TextView
+                        android:id="@+id/readingLoc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                </TableRow>
+
                 <TableRow
                     android:id="@+id/qtyRow"
                     android:layout_width="wrap_content"

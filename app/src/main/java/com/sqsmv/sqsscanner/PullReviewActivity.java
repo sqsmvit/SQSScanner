@@ -201,13 +201,22 @@ public class PullReviewActivity extends Activity
                 try
                 {
                     File exportFile = writeFromDB();
-                    ScanExporter.exportScan(this, exportFile, exportModeChoice, true);
-                    if(exportModeChoice == 6)
+                    if(ScanExporter.exportScan(this, exportFile, exportModeChoice, true))
                     {
-                        appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
+                        if(exportModeChoice == 6)
+                        {
+                            appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
+                        }
+                        Utilities.makeToast(this, "File exported to DropBox");
+                        performMassDelete();
+                        fileExported = true;
                     }
-                    performMassDelete();
-                    fileExported = true;
+                    else
+                    {
+                        Utilities.alertAlarm(this, 2000);
+                        Utilities.alertVibrate(this, new long[] {0, 500, 500, 500, 500});
+                        Utilities.makeToast(this, "Error exporting to DropBox");
+                    }
                 }
                 catch(IOException e)
                 {
