@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.prodloc;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.XMLDBRecord;
+import andoidlibs.db.xml.XMLDBRecord;
 
 public class ProdLocRecord extends XMLDBRecord
 {
@@ -15,7 +15,6 @@ public class ProdLocRecord extends XMLDBRecord
     private String masNum;
     private String locCode;
     private String name;
-    private int ordinal;
 
     public ProdLocRecord(Cursor dbCursor)
     {
@@ -67,11 +66,6 @@ public class ProdLocRecord extends XMLDBRecord
         return name;
     }
 
-    public int getOrdinal()
-    {
-        return ordinal;
-    }
-
     public void setPkLocScanLineId(int pkLocScanLineId)
     {
         this.pkLocScanLineId = pkLocScanLineId;
@@ -121,11 +115,6 @@ public class ProdLocRecord extends XMLDBRecord
         this.name = name;
     }
 
-    public void setOrdinal(int ordinal)
-    {
-        this.ordinal = ordinal;
-    }
-
     @Override
     public void initRecord()
     {
@@ -138,7 +127,6 @@ public class ProdLocRecord extends XMLDBRecord
         setMasNum("");
         setLocCode("");
         setName("");
-        setOrdinal(-1);
         setSha("");
     }
 
@@ -147,59 +135,52 @@ public class ProdLocRecord extends XMLDBRecord
     {
         return new String[] {
                 Integer.toString(getPKLocScanLineId()), getBuildingId(), getRoomId(), getColId(), getRowId(), getScanStamp(),
-                getMasNum(), getLocCode(), getName(), Integer.toString(getOrdinal()), getSha()
+                getMasNum(), getLocCode(), getName(), getSha()
         };
     }
 
     @Override
-    protected void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(ProdLocContract.COLUMN_NAME_PKLOCSCANLINEID))
         {
-            if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_PKLOCSCANLINEID))
-            {
-                setPkLocScanLineId(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_BUILDINGID))
-            {
-                setBuildingId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_ROOMID))
-            {
-                setRoomId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_COLID))
-            {
-                setColId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_ROWID))
-            {
-                setRowId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_SCANSTAMP))
-            {
-                setScanStamp(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_MASNUM))
-            {
-                setMasNum(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_LOCCODE))
-            {
-                setLocCode(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_NAME))
-            {
-                setName(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_ORDINAL))
-            {
-                setOrdinal(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProdLocContract.COLUMN_NAME_SHA))
-            {
-                setSha(dbCursor.getString(count));
-            }
+            setPkLocScanLineId(Integer.parseInt(value));
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_BUILDINGID))
+        {
+            setBuildingId(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_ROOMID))
+        {
+            setRoomId(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_COLID))
+        {
+            setColId(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_ROWID))
+        {
+            setRowId(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_SCANSTAMP))
+        {
+            setScanStamp(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_MASNUM))
+        {
+            setMasNum(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_LOCCODE))
+        {
+            setLocCode(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_NAME))
+        {
+            setName(value);
+        }
+        else if(columnName.equals(ProdLocContract.COLUMN_NAME_SHA))
+        {
+            setSha(value);
         }
     }
 

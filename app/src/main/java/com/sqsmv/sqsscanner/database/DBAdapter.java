@@ -12,12 +12,15 @@ import com.sqsmv.sqsscanner.database.productlens.ProductLensContract;
 import com.sqsmv.sqsscanner.database.scan.ScanContract;
 import com.sqsmv.sqsscanner.database.upc.UPCContract;
 
+import andoidlibs.db.DBContract;
+import andoidlibs.db.xml.XMLDBContract;
+
 
 public class DBAdapter extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "PullDB";
 
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     private static final XMLDBContract[] xmlContracts = {new ProductContract(), new UPCContract(), new PriceListContract(),
                                                          new LensContract(), new ProdLocContract(), new ProductLensContract()};

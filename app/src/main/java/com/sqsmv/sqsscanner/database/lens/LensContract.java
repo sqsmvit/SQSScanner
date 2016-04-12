@@ -1,6 +1,6 @@
 package com.sqsmv.sqsscanner.database.lens;
 
-import com.sqsmv.sqsscanner.database.XMLDBContract;
+import andoidlibs.db.xml.XMLDBContract;
 
 public class LensContract implements XMLDBContract
 {

@@ -25,9 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The Activity that allows access to administrative functions for the app. Users will be able to reset
- * the import tables in the database and force both database updates and app updates from this screen.
- * A list of export backups are also available for reuploading to Dropbox from this screen.
+ * The Activity that allows access to administrative functions for the app. Users will be able to reset the import tables in the database and force
+ * both database updates and app updates from this screen. A list of export backups are also available for reuploading to Dropbox from this screen.
  */
 public class AdminActivity extends Activity
 {
@@ -57,7 +56,7 @@ public class AdminActivity extends Activity
 
         backupAdapter = new SimpleAdapter(this, backupList, R.layout.admin_file_row,
                 new String[] {"fileName","fileDate","fileSize"},
-                new int[]{R.id.adminFileName, R.id.adminFileDate, R.id.adminFileSize});
+                new int[] {R.id.adminFileName, R.id.adminFileDate, R.id.adminFileSize});
 
         listView = (ListView)findViewById(R.id.fileListView);
         listView.setTextFilterEnabled(true);
@@ -119,8 +118,7 @@ public class AdminActivity extends Activity
     }
 
     /**
-     * Checks if there is a new version of the app's apk file on Dropbox and starts the update process
-     * if one exists.
+     * Checks if there is a new version of the app's apk file on Dropbox and starts the update process if one exists.
      */
     private void forceAppUpdate()
     {
@@ -268,7 +266,7 @@ public class AdminActivity extends Activity
             backupEntry = new HashMap<String, String>();
             backupEntry.put("fileName", file.getName());
             backupEntry.put("fileDate", fileDateFormat.format(new Date(file.lastModified())));
-            backupEntry.put("fileSize", String.format("%.2f",(file.length()/1024.0)) + "kb");
+            backupEntry.put("fileSize", String.format("%.2f", (file.length()/1024.0)) + "kb");
             backupList.add(backupEntry);
         }
         sortList("fileDate");

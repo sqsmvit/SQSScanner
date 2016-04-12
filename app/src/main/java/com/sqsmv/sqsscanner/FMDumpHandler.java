@@ -3,8 +3,6 @@ package com.sqsmv.sqsscanner;
 import android.os.Environment;
 import android.util.Log;
 
-import com.sqsmv.sqsscanner.database.XMLDBAccess;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -17,10 +15,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
+import andoidlibs.db.xml.XMLDBAccess;
+
 /**
- * Handler class that takes the export files from FileMaker that have already been downloaded through
- * Dropbox and imports the data into the app's database. It is assumed that the files can be found
- * in the Downloads directory on the phone.
+ * Utility class that takes the export files from FileMaker that have already been downloaded through Dropbox and imports the data into the app's
+ * database. It is assumed that the files can be found in the Downloads directory on the phone. To optimize time, each record stored in the XML file
+ * is assumed to match tha order of the column names retrieved from the getTableColumns() method in XMLDBAccess.
  */
 public class FMDumpHandler extends Thread
 {
@@ -62,7 +62,8 @@ public class FMDumpHandler extends Thread
             }
         }
         Log.d(TAG, "run: start " + xmlDBAccess.getTableName());
-        File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + xmlDBAccess.getXMLFileName());
+        File xmlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" +
+                xmlDBAccess.getXMLFileName());
         try
         {
             InputStreamReader fileInput = new InputStreamReader(new FileInputStream(xmlFile));
@@ -192,8 +193,7 @@ public class FMDumpHandler extends Thread
     }
 
     /**
-     * Checks if a record needs to be inserted by seeing if the primary key and and sha match
-     * any records already in the database.
+     * Checks if a record needs to be inserted by seeing if the primary key and and sha match any records already in the database.
      * @param pKey       The primary key to use for the check.
      * @param shaVal     The sha value to use for the check.
      * @param dbItems    The HashMap containing the primary key mapped to a matching sha for the database.

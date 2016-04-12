@@ -1,6 +1,6 @@
 package com.sqsmv.sqsscanner.database.product;
 
-import com.sqsmv.sqsscanner.database.XMLDBContract;
+import andoidlibs.db.xml.XMLDBContract;
 
 public class ProductContract implements XMLDBContract
 {

@@ -1,7 +1,7 @@
 package com.sqsmv.sqsscanner.database.product;
 
 import com.sqsmv.sqsscanner.database.DBAdapter;
-import com.sqsmv.sqsscanner.database.XMLDBAccess;
+import andoidlibs.db.xml.XMLDBAccess;
 
 public class ProductAccess extends XMLDBAccess
 {

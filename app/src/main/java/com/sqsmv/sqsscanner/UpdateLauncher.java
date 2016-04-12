@@ -78,7 +78,8 @@ public class UpdateLauncher
         {
             appConfig.accessString(DroidConfigManager.CURRENT_APK_REV, dbxFileRev, "");
         }
-        else if(!currentRev.equals(dbxFileRev) || appConfig.accessString(DroidConfigManager.PRIOR_VERSION, null, "").equals(Utilities.getVersion(context)))
+        else if(!currentRev.equals(dbxFileRev) ||
+                appConfig.accessString(DroidConfigManager.PRIOR_VERSION, null, "").equals(Utilities.getVersion(context)))
         {
             needUpdate = true;
         }

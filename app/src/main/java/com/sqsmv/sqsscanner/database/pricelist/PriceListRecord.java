@@ -2,13 +2,13 @@ package com.sqsmv.sqsscanner.database.pricelist;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.XMLDBRecord;
+import andoidlibs.db.xml.XMLDBRecord;
 
 public class PriceListRecord extends XMLDBRecord
 {
     private String priceListId;
     private String priceList;
-    private int active;
+    private String active;
 
     public PriceListRecord()
     {
@@ -16,7 +16,7 @@ public class PriceListRecord extends XMLDBRecord
         initRecord();
     }
 
-    public PriceListRecord(String priceListId, String priceList, int active, String sha)
+    public PriceListRecord(String priceListId, String priceList, String active, String sha)
     {
         super(new PriceListContract());
         setPriceListId(priceListId);
@@ -40,7 +40,7 @@ public class PriceListRecord extends XMLDBRecord
         return priceList;
     }
 
-    public int getActive()
+    public String getActive()
     {
         return active;
     }
@@ -55,7 +55,7 @@ public class PriceListRecord extends XMLDBRecord
         this.priceList = priceList;
     }
 
-    public void setActive(int active)
+    public void setActive(String active)
     {
         this.active = active;
     }
@@ -73,7 +73,7 @@ public class PriceListRecord extends XMLDBRecord
     {
         setPriceListId("");
         setPriceList("");
-        setActive(-1);
+        setActive("");
         setSha("");
     }
 
@@ -81,31 +81,28 @@ public class PriceListRecord extends XMLDBRecord
     public String[] getTableInsertData()
     {
         return new String[] {
-                getPriceListId(), getPriceList(), Integer.toString(getActive()), getSha()
+                getPriceListId(), getPriceList(), getActive(), getSha()
         };
     }
 
     @Override
-    protected void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(PriceListContract.COLUMN_NAME_PRICELISTID))
         {
-            if(dbCursor.getColumnName(count).equals(PriceListContract.COLUMN_NAME_PRICELISTID))
-            {
-                setPriceListId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(PriceListContract.COLUMN_NAME_PRICELIST))
-            {
-                setPriceList(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(PriceListContract.COLUMN_NAME_ACTIVE))
-            {
-                setActive(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(PriceListContract.COLUMN_NAME_SHA))
-            {
-                setSha(dbCursor.getString(count));
-            }
+            setPriceListId(value);
+        }
+        else if(columnName.equals(PriceListContract.COLUMN_NAME_PRICELIST))
+        {
+            setPriceList(value);
+        }
+        else if(columnName.equals(PriceListContract.COLUMN_NAME_ACTIVE))
+        {
+            setActive(value);
+        }
+        else if(columnName.equals(PriceListContract.COLUMN_NAME_SHA))
+        {
+            setSha(value);
         }
     }
 }

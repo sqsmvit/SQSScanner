@@ -8,14 +8,17 @@ import android.os.Environment;
 import java.io.File;
 
 /**
- *
+ * Service that coordinates the steps for downloading and updating the app.
  */
 public class AppUpdateService extends IntentService
 {
     private static final String TAG = "AppUpdateService";
-    private String apkFileName;
+    private String apkFileName, apkStorageLocation;
     private DropboxManager dropboxManager;
 
+    /**
+     * Constructor.
+     */
     public AppUpdateService()
     {
         super(TAG);
@@ -25,6 +28,7 @@ public class AppUpdateService extends IntentService
     protected void onHandleIntent(Intent intent)
     {
         apkFileName = getString(R.string.apk_file_name);
+        apkStorageLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + apkFileName;
 
         DroidConfigManager appConfig = new DroidConfigManager(this);
         dropboxManager = new DropboxManager(this);
@@ -35,17 +39,23 @@ public class AppUpdateService extends IntentService
         updateApp();
     }
 
+    /**
+     * Downloads the new .apk file.
+     */
     private void downloadAPK()
     {
-        dropboxManager.writeToStorage("/out/" + apkFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + apkFileName, false);
+        dropboxManager.writeToStorage("/out/" + apkFileName,
+                apkStorageLocation, false);
     }
 
+    /**
+     * Updates the app using the downloaded .apk file.
+     */
     private void updateApp()
     {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + apkFileName)),
-                              "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
+        intent.setDataAndType(Uri.fromFile(new File(apkStorageLocation)), "application/vnd.android.package-archive");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //Without this flag android returns an intent error!
         startActivity(intent);
     }
 }

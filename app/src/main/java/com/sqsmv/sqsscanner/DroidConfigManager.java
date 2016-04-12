@@ -25,6 +25,7 @@ public class DroidConfigManager
     public final static String LENS_SELECTION_ID = "lensSelectionId";
     public final static String LENS_SELECT_IDX = "lensSelectIdx";
     public final static String LENS_SELECTION = "lensSelection";
+    public final static String LAST_LOCATION = "lastLocation";
 
     private SharedPreferences config;
     private final static String prefName = "scanConfig";
@@ -39,8 +40,7 @@ public class DroidConfigManager
     }
 
     /**
-     * Writes a String value to the config file if the value isn't null, then returns the value stored
-     * at the key even if nothing is written.
+     * Writes a String value to the config file if the value isn't null, then returns the value stored at the key even if nothing is written.
      * @param key           The key to set the value at and get from in the config file.
      * @param value         The value to write to the key, null if nothing needs to be written.
      * @param defaultVal    The default value used if the key is not present in the config file.
@@ -56,8 +56,7 @@ public class DroidConfigManager
     }
 
     /**
-     * Writes an int value to the config file if the value isn't null, then returns the value stored
-     * at the key even if nothing is written.
+     * Writes an int value to the config file if the value isn't null, then returns the value stored at the key even if nothing is written.
      * @param key           The key to set the value at and get from in the config file.
      * @param value         The value to write to the key, null if nothing needs to be written.
      * @param defaultVal    The default value used if the key is not present in the config file.
@@ -73,8 +72,7 @@ public class DroidConfigManager
     }
 
     /**
-     * Writes a float value to the config file if the value isn't null, then returns the value stored
-     * at the key even if nothing is written.
+     * Writes a float value to the config file if the value isn't null, then returns the value stored at the key even if nothing is written.
      * @param key           The key to set the value at and get from in the config file.
      * @param value         The value to write to the key, null if nothing needs to be written.
      * @param defaultVal    The default value used if the key is not present in the config file.
@@ -90,8 +88,7 @@ public class DroidConfigManager
     }
 
     /**
-     * Writes a boolean value to the config file if the value isn't null, then returns the value stored
-     * at the key even if nothing is written.
+     * Writes a boolean value to the config file if the value isn't null, then returns the value stored at the key even if nothing is written.
      * @param key           The key to set the value at and get from in the config file.
      * @param value         The value to write to the key, null if nothing needs to be written.
      * @param defaultVal    The default value used if the key is not present in the config file.

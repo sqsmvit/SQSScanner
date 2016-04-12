@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.product;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.XMLDBRecord;
+import andoidlibs.db.xml.XMLDBRecord;
 
 public class ProductRecord extends XMLDBRecord
 {
@@ -11,18 +11,18 @@ public class ProductRecord extends XMLDBRecord
     private String category;
     private String rating;
     private String streetDate;
-    private int titleFilm;
-    private int noCover;
+    private String titleFilm;
+    private String noCover;
     private String priceList;
-    private int isNew;
-    private int isBoxSet;
-    private int multipack;
+    private String isNew;
+    private String isBoxSet;
+    private String multipack;
     private String mediaFormat;
     private String priceFilters;
     private String specialFields;
     private String studio;
     private String season;
-    private int numberOfDiscs;
+    private String numberOfDiscs;
     private String theaterDate;
     private String studioName;
 
@@ -33,10 +33,10 @@ public class ProductRecord extends XMLDBRecord
     }
 
     public ProductRecord(String masNum, String name, String category, String rating,
-                         String streetDate, int titleFilm, int noCover, String priceList,
-                         int isNew, int isBoxSet, int multipack, String mediaFormat,
+                         String streetDate, String titleFilm, String noCover, String priceList,
+                         String isNew, String isBoxSet, String multipack, String mediaFormat,
                          String priceFilters, String specialFields, String studio, String season,
-                         int numberOfDiscs, String theaterDate, String studioName, String sha)
+                         String numberOfDiscs, String theaterDate, String studioName, String sha)
     {
         super(new ProductContract());
         setMasNum(masNum);
@@ -91,12 +91,12 @@ public class ProductRecord extends XMLDBRecord
         return streetDate;
     }
 
-    public int getTitleFilm()
+    public String getTitleFilm()
     {
         return titleFilm;
     }
 
-    public int getNoCover()
+    public String getNoCover()
     {
         return noCover;
     }
@@ -106,17 +106,17 @@ public class ProductRecord extends XMLDBRecord
         return priceList;
     }
 
-    public int getIsNew()
+    public String getIsNew()
     {
         return isNew;
     }
 
-    public int getIsBoxSet()
+    public String getIsBoxSet()
     {
         return isBoxSet;
     }
 
-    public int getMultipack()
+    public String getMultipack()
     {
         return multipack;
     }
@@ -146,7 +146,7 @@ public class ProductRecord extends XMLDBRecord
         return season;
     }
 
-    public int getNumberOfDiscs()
+    public String getNumberOfDiscs()
     {
         return numberOfDiscs;
     }
@@ -186,12 +186,12 @@ public class ProductRecord extends XMLDBRecord
         this.streetDate = streetDate;
     }
 
-    public void setTitleFilm(int titleFilm)
+    public void setTitleFilm(String titleFilm)
     {
         this.titleFilm = titleFilm;
     }
 
-    public void setNoCover(int noCover)
+    public void setNoCover(String noCover)
     {
         this.noCover = noCover;
     }
@@ -201,17 +201,17 @@ public class ProductRecord extends XMLDBRecord
         this.priceList = priceList;
     }
 
-    public void setIsNew(int isNew)
+    public void setIsNew(String isNew)
     {
         this.isNew = isNew;
     }
 
-    public void setIsBoxSet(int isBoxSet)
+    public void setIsBoxSet(String isBoxSet)
     {
         this.isBoxSet = isBoxSet;
     }
 
-    public void setMultipack(int multipack)
+    public void setMultipack(String multipack)
     {
         this.multipack = multipack;
     }
@@ -241,7 +241,7 @@ public class ProductRecord extends XMLDBRecord
         this.season = season;
     }
 
-    public void setNumberOfDiscs(int numberOfDiscs)
+    public void setNumberOfDiscs(String numberOfDiscs)
     {
         this.numberOfDiscs = numberOfDiscs;
     }
@@ -272,18 +272,18 @@ public class ProductRecord extends XMLDBRecord
         setCategory("");
         setRating("");
         setStreetDate("");
-        setTitleFilm(-1);
-        setNoCover(-1);
+        setTitleFilm("");
+        setNoCover("");
         setPriceList("");
-        setIsNew(-1);
-        setIsBoxSet(-1);
-        setMultipack(-1);
+        setIsNew("");
+        setIsBoxSet("");
+        setMultipack("");
         setMediaFormat("");
         setPriceFilters("");
         setSpecialFields("");
         setStudio("");
         setSeason("");
-        setNumberOfDiscs(-1);
+        setNumberOfDiscs("");
         setTheaterDate("");
         setStudioName("");
         setSha("");
@@ -293,98 +293,94 @@ public class ProductRecord extends XMLDBRecord
     public String[] getTableInsertData()
     {
         return new String[] {
-            getMasNum(), getName(), getCategory(), getRating(), getStreetDate(), Integer.toString(getTitleFilm()),
-            Integer.toString(getNoCover()), getPriceList(), Integer.toString(getIsNew()), Integer.toString(getIsBoxSet()),
-            Integer.toString(getMultipack()), getMediaFormat(), getPriceFilters(), getSpecialFields(), getStudio(), getSeason(),
-            Integer.toString(getNumberOfDiscs()), getTheaterDate(), getStudioName(), getSha()
+            getMasNum(), getName(), getCategory(), getRating(), getStreetDate(), getTitleFilm(), getNoCover(), getPriceList(),
+            getIsNew(), getIsBoxSet(), getMultipack(), getMediaFormat(), getPriceFilters(), getSpecialFields(), getStudio(),
+            getSeason(), getNumberOfDiscs(), getTheaterDate(), getStudioName(), getSha()
         };
     }
 
     @Override
-    public void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(ProductContract.COLUMN_NAME_MASNUM))
         {
-            if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_MASNUM))
-            {
-                setMasNum(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_NAME))
-            {
-                setName(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_CATEGORY))
-            {
-                setCategory(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_RATING))
-            {
-                setRating(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_STREETDATE))
-            {
-                setStreetDate(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_TITLEFILM))
-            {
-                setTitleFilm(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_NOCOVER))
-            {
-                setNoCover(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_PRICELIST))
-            {
-                setPriceList(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_ISNEW))
-            {
-                setIsNew(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_ISBOXSET))
-            {
-                setIsBoxSet(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_MULTIPACK))
-            {
-                setMultipack(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_MEDIAFORMAT))
-            {
-                setMediaFormat(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_PRICEFILTERS))
-            {
-                setPriceFilters(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_SPECIALFIELDS))
-            {
-                setSpecialFields(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_STUDIO))
-            {
-                setStudio(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_SEASON))
-            {
-                setSeason(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_NUMBEROFDISCS))
-            {
-                setNumberOfDiscs(dbCursor.getInt(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_THEATERDATE))
-            {
-                setTheaterDate(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_STUDIONAME))
-            {
-                setStudioName(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductContract.COLUMN_NAME_SHA))
-            {
-                setSha(dbCursor.getString(count));
-            }
+            setMasNum(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_NAME))
+        {
+            setName(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_CATEGORY))
+        {
+            setCategory(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_RATING))
+        {
+            setRating(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_STREETDATE))
+        {
+            setStreetDate(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_TITLEFILM))
+        {
+            setTitleFilm(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_NOCOVER))
+        {
+            setNoCover(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_PRICELIST))
+        {
+            setPriceList(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_ISNEW))
+        {
+            setIsNew(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_ISBOXSET))
+        {
+            setIsBoxSet(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_MULTIPACK))
+        {
+            setMultipack(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_MEDIAFORMAT))
+        {
+            setMediaFormat(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_PRICEFILTERS))
+        {
+            setPriceFilters(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_SPECIALFIELDS))
+        {
+            setSpecialFields(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_STUDIO))
+        {
+            setStudio(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_SEASON))
+        {
+            setSeason(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_NUMBEROFDISCS))
+        {
+            setNumberOfDiscs(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_THEATERDATE))
+        {
+            setTheaterDate(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_STUDIONAME))
+        {
+            setStudioName(value);
+        }
+        else if(columnName.equals(ProductContract.COLUMN_NAME_SHA))
+        {
+            setSha(value);
         }
     }
 }

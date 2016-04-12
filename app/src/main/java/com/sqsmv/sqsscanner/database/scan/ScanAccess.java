@@ -2,11 +2,12 @@ package com.sqsmv.sqsscanner.database.scan;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.DBAccess;
 import com.sqsmv.sqsscanner.database.DBAdapter;
-import com.sqsmv.sqsscanner.database.QueryBuilder;
 
 import java.util.ArrayList;
+
+import andoidlibs.db.DBAccess;
+import andoidlibs.db.QueryBuilder;
 
 public class ScanAccess extends DBAccess
 {

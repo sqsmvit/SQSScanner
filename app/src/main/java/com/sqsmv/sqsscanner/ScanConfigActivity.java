@@ -192,7 +192,8 @@ public class ScanConfigActivity  extends Activity
         }
         else if(autoCountModeToggle.isChecked())
         {
-            if(autoCountSelect.getSelectedItem().toString().equals("...") && (Integer.parseInt(customAutoValue) < 1 || Integer.parseInt(customAutoValue) > 410))
+            if(autoCountSelect.getSelectedItem().toString().equals("...") &&
+                    (Integer.parseInt(customAutoValue) < 1 || Integer.parseInt(customAutoValue) > 410))
             {
                 Utilities.makeLongToast(this, "Auto Quantity must be from 1-410");
                 hasGoodValues = false;
@@ -204,7 +205,8 @@ public class ScanConfigActivity  extends Activity
     private void initGUIElements()
     {
         autoCountModeToggle.setChecked(appConfig.accessBoolean(DroidConfigManager.IS_AUTO_COUNT, null, false));
-        autoCountSelect.setAdapter(Utilities.createSpinnerAdapter(this, new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.autoCounts)))));
+        autoCountSelect.setAdapter(Utilities.createSpinnerAdapter(this,
+                new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.autoCounts)))));
         if(!(appConfig.accessInt(DroidConfigManager.AUTO_COUNT_IDX, null, 0) == (autoCountSelect.getCount() - 1)) || autoCountModeToggle.isChecked())
         {
             autoCountSelect.setSelection(appConfig.accessInt(DroidConfigManager.AUTO_COUNT_IDX, null, 0));

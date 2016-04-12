@@ -2,11 +2,12 @@ package com.sqsmv.sqsscanner.database.scan;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.DBRecord;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import andoidlibs.db.DBAccess;
+import andoidlibs.db.DBRecord;
 
 /**
  * @author ChrisS
@@ -44,12 +45,12 @@ public class ScanRecord extends DBRecord
 
     public ScanRecord(String masNum, String quantity, String fkPullId, String title, String priceList, String rating, String location, String numBoxes, String initials)
     {
-        this("null", masNum, quantity, fkPullId, title, priceList, rating, location, numBoxes, initials);
+        this(DBAccess.NULL_STRING, masNum, quantity, fkPullId, title, priceList, rating, location, numBoxes, initials);
     }
 
     public ScanRecord(String fkPullId, String quantity, String initials)
     {
-        this("null", "", quantity, fkPullId, "Skid", "", "", "", "", initials);
+        this(DBAccess.NULL_STRING, "", quantity, fkPullId, "Skid", "", "", "", "", initials);
     }
 
     public ScanRecord(Cursor dbCursor)
@@ -185,7 +186,7 @@ public class ScanRecord extends DBRecord
     @Override
     public void initRecord()
     {
-        setId("null");
+        setId(DBAccess.NULL_STRING);
         setMasNum("");
         setQuantity("");
         setFkPullId("");
@@ -207,54 +208,51 @@ public class ScanRecord extends DBRecord
     }
 
     @Override
-    protected void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(ScanContract._ID))
         {
-            if(dbCursor.getColumnName(count).equals(ScanContract._ID))
-            {
-                setId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_MASNUM))
-            {
-                setMasNum(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_QUANTITY))
-            {
-                setQuantity(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_FKPULLID))
-            {
-                setFkPullId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_SCANDATE))
-            {
-                setScanDate(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_TITLE))
-            {
-                setTitle(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_PRICELIST))
-            {
-                setPriceList(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_RATING))
-            {
-                setRating(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_LOCATION))
-            {
-                setLocation(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_NUMBOXES))
-            {
-                setNumBoxes(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ScanContract.COLUMN_NAME_INITIALS))
-            {
-                setInitials(dbCursor.getString(count));
-            }
+            setId(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_MASNUM))
+        {
+            setMasNum(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_QUANTITY))
+        {
+            setQuantity(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_FKPULLID))
+        {
+            setFkPullId(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_SCANDATE))
+        {
+            setScanDate(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_TITLE))
+        {
+            setTitle(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_PRICELIST))
+        {
+            setPriceList(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_RATING))
+        {
+            setRating(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_LOCATION))
+        {
+            setLocation(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_NUMBOXES))
+        {
+            setNumBoxes(value);
+        }
+        else if(columnName.equals(ScanContract.COLUMN_NAME_INITIALS))
+        {
+            setInitials(value);
         }
     }
 }

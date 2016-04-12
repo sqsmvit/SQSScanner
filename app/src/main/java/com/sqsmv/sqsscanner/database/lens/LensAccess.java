@@ -3,10 +3,11 @@ package com.sqsmv.sqsscanner.database.lens;
 import android.database.Cursor;
 
 import com.sqsmv.sqsscanner.database.DBAdapter;
-import com.sqsmv.sqsscanner.database.QueryBuilder;
-import com.sqsmv.sqsscanner.database.XMLDBAccess;
 
 import java.util.ArrayList;
+
+import andoidlibs.db.QueryBuilder;
+import andoidlibs.db.xml.XMLDBAccess;
 
 public class LensAccess extends XMLDBAccess
 {

@@ -11,8 +11,8 @@ import java.io.File;
 import java.util.Date;
 
 /**
- * Entry Activity into SQSScanner. Dropbox linking is launched from this screen if it has not been
- * done yet. Automatic app and database updates are also launched from this screen.
+ * Entry Activity into SQSScanner. Dropbox linking is launched from this screen if it has not been done yet. Automatic app and database updates are
+ * also launched from this screen.
  */
 public class LoadActivity extends Activity
 {
@@ -60,9 +60,8 @@ public class LoadActivity extends Activity
     }
 
     /**
-     * Checks if an account has been linked to the app by checking the config for a saved access token.
-     * If one exists, then it sets the token. Otherwise the Dropbox app if it is installed, the browser if not,
-     * to link an account.
+     * Checks if an account has been linked to the app by checking the config for a saved access token. If one exists, then it sets the token.
+     * Otherwise the Dropbox app if it is installed, the browser if not, to link an account.
      */
     private void linkDropboxAccount()
     {
@@ -83,9 +82,9 @@ public class LoadActivity extends Activity
     }
 
     /**
-     * Checks the config file to see when the app was already updated on the current day. If not, it checks
-     * Dropbox for a new update to the app and launches an update if there is one. If there isn't, then it
-     * launches the update for the database. ScanHomeActivity is launched if the update has already been done.
+     * Checks the config file to see when the app was already updated on the current day. If not, it checks Dropbox for a new update to the app and
+     * launches an update if there is one. If there isn't, then it launches the update for the database. ScanHomeActivity is launched if the update
+     * has already been done.
      */
     public void startScan()
     {
@@ -117,8 +116,7 @@ public class LoadActivity extends Activity
 	}
 
     /**
-     * Launches the database update, joining the blocking thread so ScanHomeActivity can be launched
-     * when the blocking thread finishes.
+     * Launches the database update, joining the blocking thread so ScanHomeActivity can be launched when the blocking thread finishes.
      */
     private void launchDBUpdate()
     {

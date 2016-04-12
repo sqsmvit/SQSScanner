@@ -37,8 +37,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The main Activity for the app where all the data input is done. Input can be done either manually
- * or through the Socket Mobile scanner.
+ * The main Activity where all the data input is done. Input can be done either manually by typing in the masnum of the product or through
+ * the Socket Mobile scanner.
  */
 public class ScanHomeActivity extends Activity
 {
@@ -57,8 +57,10 @@ public class ScanHomeActivity extends Activity
 
     private Pattern pullScanRegEx, sqsRegEx, upcRegEx;
 
-    private TextView recordCountView, numPullLinesView, pullPieceCountView, titleCountView, titleView, priceListView, ratingView, wh1LocView, oLocView, readingLocView;
-    private EditText pullNumberInput, scanIdInput, quantityInput, scannerInitialsInput;
+    private TextView recordCountView, numPullLinesView, pullPieceCountView, titleCountView, titleView, priceListView, ratingView, wh1LocView,
+            oLocView, readingLocView;
+    private EditText pullNumberInput, scanIdInput, quantityInput, boxQuantityInput, scannerInitialsInput;
+
     private ToggleButton manualQuantityModeToggle, newProductModeToggle;
 
     private boolean isAutoCountMode, isBoxQtyMode, isManualCountMode, isNewProductMode;
@@ -84,7 +86,6 @@ public class ScanHomeActivity extends Activity
         prodLocAccess = new ProdLocAccess(dbAdapter);
         scanAccess = new ScanAccess(dbAdapter);
 
-
         pullScanRegEx = Pattern.compile("^[pP](\\d+)$");
         upcRegEx = Pattern.compile("^\\d{12,13}(-N)?$");
         sqsRegEx = Pattern.compile("^SQS(\\d+)(\\d{3})$");
@@ -103,6 +104,7 @@ public class ScanHomeActivity extends Activity
         oLocView = (TextView)findViewById(R.id.oLoc);
         readingLocView = (TextView)findViewById(R.id.readingLoc);
         quantityInput = (EditText)findViewById(R.id.qtyNum);
+        boxQuantityInput = (EditText)findViewById(R.id.boxQtyNum);
         scannerInitialsInput = (EditText)findViewById(R.id.scannerInitials);
         manualQuantityModeToggle = (ToggleButton)findViewById(R.id.manualQty);
         newProductModeToggle = (ToggleButton)findViewById(R.id.newProductMode);
@@ -306,8 +308,7 @@ public class ScanHomeActivity extends Activity
     }
 
     /**
-     * Registers the intents that can be received by the Socket Mobile scanner, then alerts the
-     * application to initialize ScanAPI.
+     * Registers the intents that can be received by the Socket Mobile scanner, then alerts the application to initialize ScanAPI.
      */
     private void regBroadCastReceivers()
     {
@@ -316,9 +317,6 @@ public class ScanHomeActivity extends Activity
         registerReceiver(receiver, filter);
 
         filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_ARRIVAL);
-        registerReceiver(receiver, filter);
-
-        filter = new IntentFilter(ScanAPIApplication.NOTIFY_SCANNER_REMOVAL);
         registerReceiver(receiver, filter);
 
         filter = new IntentFilter(ScanAPIApplication.NOTIFY_DECODED_DATA);
@@ -336,8 +334,7 @@ public class ScanHomeActivity extends Activity
     }
 
     /**
-     * Updates Views to display the current location of the Scanner based off of the
-     * default gateway.
+     * Updates Views to display the current location of the Scanner based off of the default gateway.
      */
     private void displayLocation()
     {
@@ -347,10 +344,12 @@ public class ScanHomeActivity extends Activity
         if(defGateway.equals("3.150.168.192"))
         {
             location = "Reading";
+            appConfig.accessString(DroidConfigManager.LAST_LOCATION, "r", "");
         }
         else if(defGateway.equals("1.150.168.192"))
         {
             location = "PTown";
+            appConfig.accessString(DroidConfigManager.LAST_LOCATION, "p", "");
         }
         else
         {
@@ -360,9 +359,8 @@ public class ScanHomeActivity extends Activity
     }
 
     /**
-     * Updates Views to display count information from the Scan table. Information displayed include
-     * the total record count, the number of scans for the currently selected pull, and the total
-     * number of pieces scanned for the currently selected pull.
+     * Updates Views to display count information from the Scan table. Information displayed include the total record count, the number of scans for
+     * the currently selected pull, and the total number of pieces scanned for the currently selected pull.
      */
     private void displayScannedRecordCount()
     {
@@ -372,8 +370,8 @@ public class ScanHomeActivity extends Activity
     }
 
     /**
-     * Updates Views to display information on the most recently scanned product. Information displayed includes the
-     * total number of pieces that have been scanned, the title, the pricelist, and the rating,
+     * Updates Views to display information on the most recently scanned product. Information displayed includes the total number of pieces that have
+     * been scanned, the title, the pricelist, and the rating,
      * @param scanRecord    The ScanRecord containing information on most recently scanned product.
      */
     private void displayProductInfo(ScanRecord scanRecord)
@@ -384,9 +382,13 @@ public class ScanHomeActivity extends Activity
         ratingView.setText(scanRecord.getRating());
         wh1LocView.setText((ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumWH1(scanRecord.getMasNum()))).getLocCode());
         oLocView.setText((ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumOther(scanRecord.getMasNum()))).getLocCode());
-        readingLocView.setText((ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumReading(scanRecord.getMasNum()))).getLocCode());
+        readingLocView.setText(
+                (ProdLocRecord.buildNewProdLocRecordFromCursor(prodLocAccess.selectByMasnumReading(scanRecord.getMasNum()))).getLocCode());
     }
 
+    /**
+     * Updates the visibility of Views depending on the export mode.
+     */
     private void updateExportModeViews()
     {
         ((TextView)findViewById(R.id.homeExportDisplay)).setText(ExportModeHandler.getExportMode(exportMode));
@@ -394,6 +396,10 @@ public class ScanHomeActivity extends Activity
         updateBoxQuantityFieldVisibility(exportMode == 7);
     }
 
+    /**
+     * Updates the visibility of the Views related to product.
+     * @param productVisibility    true if the Views should be visible, otherwise false.
+     */
     private void updateProductModeFieldVisibility(boolean productVisibility)
     {
         int visibilityMode = View.VISIBLE;
@@ -409,6 +415,10 @@ public class ScanHomeActivity extends Activity
         findViewById(R.id.locationRow).setVisibility(visibilityMode);
     }
 
+    /**
+     * Updates the visibility of the Views related to box quantity.
+     * @param boxQuantityVisibility    true if the Views should be visible, otherwise false.
+     */
     private void updateBoxQuantityFieldVisibility(boolean boxQuantityVisibility)
     {
         int visibilityMode = View.VISIBLE;
@@ -420,25 +430,39 @@ public class ScanHomeActivity extends Activity
         findViewById(R.id.boxQtyRow).setVisibility(visibilityMode);
     }
 
+    /**
+     * Displays the pull number, title, and total number of records and total quantity in the current pull for the product that was just scanned.
+     * @param scanRecord    The ScanRecord containing information on the product that was just scanned.
+     */
     private void toastProductTotals(ScanRecord scanRecord)
     {
         int[] counts = scanAccess.getScanTotalCounts(scanRecord.getFkPullId(), scanRecord.getMasNum());
-        String productTotals = "Pull#: " + scanRecord.getFkPullId() + "\nScans: " + counts[0] + "  Quantity: " + counts[1] + "\n" + scanRecord.getTitle();
+        String productTotals = "Pull#: " + scanRecord.getFkPullId() + "\nScans: " + counts[0] + "  Quantity: " + counts[1] + "\n" +
+                scanRecord.getTitle();
         Utilities.makeToast(this, productTotals);
     }
 
+    /**
+     * Enables quantityInput and clears the current contents.
+     */
     private void enableQuantityInput()
     {
         quantityInput.setEnabled(true);
         quantityInput.setText("");
     }
 
+    /**
+     * Disables quantityInput and clears the focus from it.
+     */
     private void disableQuantityInput()
     {
         quantityInput.clearFocus();
         quantityInput.setEnabled(false);
     }
 
+    /**
+     * Clears the contents of quantityInput.
+     */
     private void resetQuantityInput()
     {
         if(!isAutoCountMode || isManualCountMode)
@@ -447,10 +471,14 @@ public class ScanHomeActivity extends Activity
         }
     }
 
+    /**
+     * Resets all inputs in the current Activity to the state they were in when it was just loaded.
+     */
     private void resetAllInputs()
     {
         pullNumberInput.setText("");
         scanIdInput.setText("");
+        boxQuantityInput.setText("");
         scannerInitialsInput.setText("");
         titleCountView.setText("");
         titleView.setText("");
@@ -463,13 +491,16 @@ public class ScanHomeActivity extends Activity
         newProductModeToggle.setChecked(false);
     }
 
-    private void alertUser()
-    {
-        Utilities.alertNotificationSound(this);
-        Utilities.alertVibrate(this, new long[]{0, 500, 250, 500});
-    }
-
-    private void handleInputs(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue)
+    /**
+     * Handles the contents of input fields necessary for committing a record into the database.
+     * @param scannerInitialsValue    The contents of scannerInitialsInput.
+     * @param pullInputValue          The contents of pullNumberInput.
+     * @param scanInputValue          The contents of scanIdInput (optional if exportMode is 6.
+     * @param quantityInputValue      The contents of quantityInput.
+     * @param isFromScan              Whether or not this is called from the barcode scanner.
+     */
+    private void handleInputs(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue,
+                              boolean isFromScan)
     {
         if(pullInputValue.equals("1"))
         {
@@ -480,6 +511,10 @@ public class ScanHomeActivity extends Activity
             scannerInitialsInput.requestFocus();
             imm.showSoftInput(scannerInitialsInput, 0);
             Utilities.makeToast(this, "Enter Scanner Initials.");
+            if(isFromScan)
+            {
+                Utilities.alertVibrate(this, new long[] {0, 1000});
+            }
         }
         else if(pullInputValue.isEmpty())
         {
@@ -516,6 +551,10 @@ public class ScanHomeActivity extends Activity
         }
     }
 
+    /**
+     * Handles the input received from a SocketMobile barcode scanner.
+     * @param scanInput    The input received from a SocketMobile barcode scanner.
+     */
     private void handleScanInput(String scanInput)
     {
         Log.d(TAG, "in handleScanInput");
@@ -545,12 +584,21 @@ public class ScanHomeActivity extends Activity
         else
         {
             Utilities.makeToast(this, "Invalid Scan");
-            alertUser();
+            Utilities.alertNotificationSound(this);
+            Utilities.alertVibrate(this, new long[]{0, 500, 250, 500});
         }
 
-        handleInputs(scannerInitialsInput.getText().toString(), pullNumberInput.getText().toString(), scanIdInput.getText().toString(), quantityInput.getText().toString());
+        handleInputs(scannerInitialsInput.getText().toString(), pullNumberInput.getText().toString(), scanIdInput.getText().toString(),
+                quantityInput.getText().toString(), true);
     }
 
+    /**
+     * Commits the results of a product scan to the database.
+     * @param scannerInitialsValue    The initials of the scanner for the current scan.
+     * @param pullInputValue          The  pull number for the current scan.
+     * @param scanInputValue          The masnum or upc of the current scan.
+     * @param quantityInputValue      The product quantity of the current scan.
+     */
     private void commitProductScan(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue)
     {
         ScanRecord currentScanRecord = buildScanRecord(scannerInitialsValue, pullInputValue, scanInputValue, quantityInputValue, "1");
@@ -569,6 +617,12 @@ public class ScanHomeActivity extends Activity
         resetQuantityInput();
     }
 
+    /**
+     * Commits the result of a skid scan to the database.
+     * @param scannerInitialsValue    The initials of the scanner for the current scan.
+     * @param pullInputValue          The  pull number for the current scan.
+     * @param quantityInputValue      The product quantity of the current scan.
+     */
     private void commitSkidScan(String scannerInitialsValue, String pullInputValue, String quantityInputValue)
     {
         Utilities.makeToast(this, "Skid Scan Inserted");
@@ -578,9 +632,15 @@ public class ScanHomeActivity extends Activity
         resetQuantityInput();
     }
 
+    /**
+     * Commits the results of an inventory reset scan to the database.
+     * @param scannerInitialsValue    The initials of the scanner for the current scan.
+     * @param pullInputValue          The  pull number for the current scan.
+     * @param scanInputValue          The masnum or upc of the current scan.
+     * @param quantityInputValue      The product quantity of the current scan.
+     */
     private void commitResetScan(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue)
     {
-        EditText boxQuantityInput = (EditText)findViewById(R.id.boxQtyNum);
         String boxQuantityInputValue = boxQuantityInput.getText().toString();
         int boxQuantity = 1;
         if(!boxQuantityInputValue.isEmpty() && Integer.parseInt(boxQuantityInputValue) > 1)
@@ -589,7 +649,8 @@ public class ScanHomeActivity extends Activity
         }
         int quantity = Integer.parseInt(quantityInputValue) * boxQuantity;
 
-        ScanRecord currentScanRecord = buildScanRecord(scannerInitialsValue, pullInputValue, scanInputValue, Integer.toString(quantity), Integer.toString(boxQuantity));
+        ScanRecord currentScanRecord = buildScanRecord(scannerInitialsValue, pullInputValue, scanInputValue, Integer.toString(quantity),
+                Integer.toString(boxQuantity));
         scanAccess.insertRecord(currentScanRecord);
         displayScannedRecordCount();
         displayProductInfo(currentScanRecord);
@@ -600,7 +661,17 @@ public class ScanHomeActivity extends Activity
         resetQuantityInput();
     }
 
-    private ScanRecord buildScanRecord(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue, String boxQuantityInputValue)
+    /**
+     * Builds the ScanRecord for a scan related to product for insertion to the database, doing the necessary queries to populate information.
+     * @param scannerInitialsValue     The initials of the scanner for the current scan.
+     * @param pullInputValue           The  pull number for the current scan.
+     * @param scanInputValue           The masnum or upc of the current scan.
+     * @param quantityInputValue       The product quantity of the current scan.
+     * @param boxQuantityInputValue    The number of boxes for the current scan.
+     * @return The built ScanRecord.
+     */
+    private ScanRecord buildScanRecord(String scannerInitialsValue, String pullInputValue, String scanInputValue, String quantityInputValue,
+                                       String boxQuantityInputValue)
     {
         ProductRecord scannedProduct = new ProductRecord();
         PriceListRecord scannedProductPriceList = new PriceListRecord();
@@ -623,10 +694,12 @@ public class ScanHomeActivity extends Activity
 
         if(!scannedProduct.getMasNum().isEmpty())
         {
-            ProductLensRecord productPriceListJoin = ProductLensRecord.buildNewProductLensRecordFromCursor(productLensAccess.selectByMasNumLensId(scannedProduct.getMasNum(), selectedLensId));
+            ProductLensRecord productPriceListJoin = ProductLensRecord.buildNewProductLensRecordFromCursor(
+                    productLensAccess.selectByMasNumLensId(scannedProduct.getMasNum(), selectedLensId));
             if(!productPriceListJoin.getProductLensId().isEmpty())
             {
-                scannedProductPriceList = PriceListRecord.buildNewPriceListRecordFromCursor(priceListAccess.selectByPk(productPriceListJoin.getPriceListId()));
+                scannedProductPriceList =
+                        PriceListRecord.buildNewPriceListRecordFromCursor(priceListAccess.selectByPk(productPriceListJoin.getPriceListId()));
             }
         }
         else
@@ -635,46 +708,61 @@ public class ScanHomeActivity extends Activity
             Utilities.makeToast(this, "Bring Copy of Title to Dave Kinn");
         }
 
-        String location = createScanLocationString();
+        String location = getScanLocationLetter();
 
-        return new ScanRecord(scannedProduct.getMasNum(), quantityInputValue, pullInputValue, scannedProduct.getName(), scannedProductPriceList.getPriceList(),
-                scannedProduct.getRating(), location, boxQuantityInputValue, scannerInitialsValue);
+        return new ScanRecord(scannedProduct.getMasNum(), quantityInputValue, pullInputValue, scannedProduct.getName(),
+                scannedProductPriceList.getPriceList(), scannedProduct.getRating(), location, boxQuantityInputValue, scannerInitialsValue);
     }
 
-    private String createScanLocationString()
+    /**
+     * Gets the scan location from the config, updating it if a default gateway matching a location is found.
+     * @return The scan location.
+     */
+    private String getScanLocationLetter()
     {
-        String location = "o";
         String defGateway = Utilities.getDefaultGateway(this);
         if(defGateway.equals("3.150.168.192"))
         {
-            location = "r";
+            appConfig.accessString(DroidConfigManager.LAST_LOCATION, "r", "");
         }
         else if(defGateway.equals("1.150.168.192"))
         {
-            location = "p";
+            appConfig.accessString(DroidConfigManager.LAST_LOCATION, "p", "");
         }
 
-        return location;
+        return appConfig.accessString(DroidConfigManager.LAST_LOCATION, null, "o");
     }
 
+    /**
+     * Launches PullReviewActivity.
+     */
     private void goToReview()
     {
         Intent intent = new Intent(this, PullReviewActivity.class);
         startActivityForResult(intent, 1);
     }
 
+    /**
+     * Launches ScanConfigActivity.
+     */
     private void goToConfig()
     {
         Intent intent = new Intent(this, ScanConfigActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Launches AdminActivity.
+     */
     private void goToAdmin()
     {
         Intent intent = new Intent(this, AdminActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * The BroadcastReceiver for receiving information from the SocketMobile barcode scanner.
+     */
     private final BroadcastReceiver receiver = new BroadcastReceiver()
     {
         private static final String TAG = "BroadcastReceiver";
@@ -707,6 +795,10 @@ public class ScanHomeActivity extends Activity
         }
     };
 
+    /**
+     * The OnEditorActionListener for the EditText fields in ScanHomeActivity. The listener will shift focus of the cursor to the next required field
+     * that is empty when Done is pressed on the on screen keyboard.
+     */
     private final OnEditorActionListener scanHomeFieldListener = new OnEditorActionListener()
     {
         @Override
@@ -715,7 +807,7 @@ public class ScanHomeActivity extends Activity
             if(actionId == EditorInfo.IME_ACTION_DONE && !v.getText().toString().isEmpty())
             {
                 handleInputs(scannerInitialsInput.getText().toString(), pullNumberInput.getText().toString(), scanIdInput.getText().toString(),
-                        quantityInput.getText().toString());
+                        quantityInput.getText().toString(), false);
             }
             return true;
         }

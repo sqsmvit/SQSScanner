@@ -35,7 +35,7 @@ import java.util.Locale;
 public class Utilities
 {
     /**
-     * Checks and deletes files in a directory that are older than a number of days
+     * Checks and deletes files in a directory that are older than a number of days.
      * @param dir     The directory to delete files from.
      * @param days    The age in number of days a file has to be for deletion.
      */
@@ -206,7 +206,7 @@ public class Utilities
 
     /**
      * Builds a timestamp for the time the method was called.
-     * @return The built timestamp.
+     * @return The timestamp that was built.
      */
     public static String buildCurrentTimestamp()
     {
@@ -235,7 +235,8 @@ public class Utilities
     public static void alertNotificationSound(Context callingContext)
     {
         AudioManager audioManager = (AudioManager)callingContext.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_ALLOW_RINGER_MODES);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING),
+                AudioManager.FLAG_ALLOW_RINGER_MODES);
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         RingtoneManager.getRingtone(callingContext, notification).play();
     }
@@ -248,7 +249,8 @@ public class Utilities
     public static void alertAlarm(Context callingContext, final long alertTimeMilliseconds)
     {
         AudioManager audioManager = (AudioManager)callingContext.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_ALLOW_RINGER_MODES);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM),
+                AudioManager.FLAG_ALLOW_RINGER_MODES);
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         final Ringtone ringTone = RingtoneManager.getRingtone(callingContext, notification);
         ringTone.play();

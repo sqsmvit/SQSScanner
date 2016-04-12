@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.lens;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.XMLDBRecord;
+import andoidlibs.db.xml.XMLDBRecord;
 
 public class LensRecord extends XMLDBRecord
 {
@@ -80,26 +80,23 @@ public class LensRecord extends XMLDBRecord
     }
 
     @Override
-    protected void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(LensContract.COLUMN_NAME_LENSID))
         {
-            if(dbCursor.getColumnName(count).equals(LensContract.COLUMN_NAME_LENSID))
-            {
-                setLensId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(LensContract.COLUMN_NAME_NAME))
-            {
-                setName(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(LensContract.COLUMN_NAME_DESCRIPTION))
-            {
-                setDescription(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(LensContract.COLUMN_NAME_SHA))
-            {
-                setSha(dbCursor.getString(count));
-            }
+            setLensId(value);
+        }
+        else if(columnName.equals(LensContract.COLUMN_NAME_NAME))
+        {
+            setName(value);
+        }
+        else if(columnName.equals(LensContract.COLUMN_NAME_DESCRIPTION))
+        {
+            setDescription(value);
+        }
+        else if(columnName.equals(LensContract.COLUMN_NAME_SHA))
+        {
+            setSha(value);
         }
     }
 }

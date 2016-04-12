@@ -1,6 +1,6 @@
 package com.sqsmv.sqsscanner.database.pricelist;
 
-import com.sqsmv.sqsscanner.database.XMLDBContract;
+import andoidlibs.db.xml.XMLDBContract;
 
 public class PriceListContract implements XMLDBContract
 {

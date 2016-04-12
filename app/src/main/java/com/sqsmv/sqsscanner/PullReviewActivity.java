@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The Activity that allows the user to review, commit, and mass delete their scans. Review information in this Activity is divided by pull number,
+ * displaying how many records have been created for that pull and how many pieces have been scanned for product in that pull.
+ */
 public class PullReviewActivity extends Activity
 {
     private static final String TAG = "PullReviewActivity";
@@ -63,7 +67,7 @@ public class PullReviewActivity extends Activity
         pullListView.setAdapter(pullAdapter);
 
         setListeners();
-        showDisplayMode();
+        showExportMode();
     }
 
     @Override
@@ -92,6 +96,9 @@ public class PullReviewActivity extends Activity
         super.onBackPressed();
     }
 
+    /**
+     * Sets the listeners used for the current Activity's GUI elements.
+     */
     private void setListeners()
     {
         findViewById(R.id.pullHeadBack).setOnClickListener(new View.OnClickListener()
@@ -132,17 +139,26 @@ public class PullReviewActivity extends Activity
         });
     }
 
+    /**
+     * Initializes the value of config related variables based off of the config file.
+     */
     private void setConfig()
     {
         exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
         invAdjChoice = appConfig.accessInt(DroidConfigManager.INVENTORY_MODE_CHOICE, null, 1);
     }
 
-    private void showDisplayMode()
+    /**
+     * Displays the export mode the app is currently in.
+     */
+    private void showExportMode()
     {
         ((TextView)findViewById(R.id.commitMode)).setText(ExportModeHandler.getExportMode(exportModeChoice));
     }
 
+    /**
+     * Creates the ArrayList of HashMaps of pull information for display.
+     */
     private void createAdapterDataset()
     {
         pullNumberList.clear();
@@ -160,6 +176,9 @@ public class PullReviewActivity extends Activity
         }
     }
 
+    /**
+     * Prompts the user for mass deletion of all scan records.
+     */
     private void onClickDelete()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -185,6 +204,9 @@ public class PullReviewActivity extends Activity
                 .show();
     }
 
+    /**
+     * Deletes all records in the scan table.
+     */
     private void performMassDelete()
     {
         scanAccess.deleteAll();
@@ -192,6 +214,9 @@ public class PullReviewActivity extends Activity
         pullAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Commits
+     */
     private void onClickCommit()
     {
         if(!pullNumberList.isEmpty())

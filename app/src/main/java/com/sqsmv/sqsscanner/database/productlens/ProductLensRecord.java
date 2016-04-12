@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.productlens;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.XMLDBRecord;
+import andoidlibs.db.xml.XMLDBRecord;
 
 public class ProductLensRecord extends XMLDBRecord
 {
@@ -93,30 +93,27 @@ public class ProductLensRecord extends XMLDBRecord
     }
 
     @Override
-    protected void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(ProductLensContract.COLUMN_NAME_PRODUCTLENSID))
         {
-            if(dbCursor.getColumnName(count).equals(ProductLensContract.COLUMN_NAME_PRODUCTLENSID))
-            {
-                setProductLensId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductLensContract.COLUMN_NAME_MASNUM))
-            {
-                setMasNum(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductLensContract.COLUMN_NAME_LENSID))
-            {
-                setLensId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductLensContract.COLUMN_NAME_PRICELISTID))
-            {
-                setPriceListId(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(ProductLensContract.COLUMN_NAME_SHA))
-            {
-                setSha(dbCursor.getString(count));
-            }
+            setProductLensId(value);
+        }
+        else if(columnName.equals(ProductLensContract.COLUMN_NAME_MASNUM))
+        {
+            setMasNum(value);
+        }
+        else if(columnName.equals(ProductLensContract.COLUMN_NAME_LENSID))
+        {
+            setLensId(value);
+        }
+        else if(columnName.equals(ProductLensContract.COLUMN_NAME_PRICELISTID))
+        {
+            setPriceListId(value);
+        }
+        else if(columnName.equals(ProductLensContract.COLUMN_NAME_SHA))
+        {
+            setSha(value);
         }
     }
 }

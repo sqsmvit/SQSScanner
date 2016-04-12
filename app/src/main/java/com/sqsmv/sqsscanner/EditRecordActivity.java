@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,6 +19,9 @@ import com.sqsmv.sqsscanner.database.scan.ScanRecord;
 
 import java.util.ArrayList;
 
+/**
+ * The Activity that allows uers to edit the product quantity and pull number of a specific scan.
+ */
 public class EditRecordActivity extends Activity
 {
     private DBAdapter dbAdapter;
@@ -61,17 +65,26 @@ public class EditRecordActivity extends Activity
         setListeners();
     }
 
+    /**
+     * Resets the screen to the original scan.
+     */
     private void resetRecord()
     {
         quantityEdit.setText(currentScanRecord.getQuantity());
         resetPullSpinner();
     }
 
+    /**
+     * Resets the pull spinner to point at the original pull number.
+     */
     private void resetPullSpinner()
     {
         pullSpinner.setSelection(pullList.indexOf(currentScanRecord.getFkPullId()));
     }
 
+    /**
+     * Sets the listeners used for the current Activity's GUI elements.
+     */
     private void setListeners()
     {
         findViewById(R.id.editDoneBtn).setOnClickListener(new View.OnClickListener()
@@ -100,12 +113,16 @@ public class EditRecordActivity extends Activity
         });
     }
 
+    /**
+     * Displays a dialog to prompt user for a new pull number value that hasn't been used for the current set of scans.
+     */
     private void displayNewPullDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setGravity(Gravity.CENTER);
 
         alertDialogBuilder
                 .setTitle("Pull Number")
@@ -115,8 +132,20 @@ public class EditRecordActivity extends Activity
                 {
                     public void onClick(DialogInterface dialog, int whichButton)
                     {
-                        pullList.add(pullList.size() - 1, input.getText().toString());
-                        pullListSpinnerAdapter.notifyDataSetChanged();
+                        String inputValue = input.getText().toString();
+                        if(inputValue.isEmpty())
+                        {
+                            resetPullSpinner();
+                        }
+                        else if(pullList.indexOf(inputValue) == -1)
+                        {
+                            pullList.add(pullList.size() - 1, inputValue);
+                            pullListSpinnerAdapter.notifyDataSetChanged();
+                        }
+                        else
+                        {
+                            pullSpinner.setSelection(pullList.indexOf(inputValue));
+                        }
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener()
@@ -129,9 +158,14 @@ public class EditRecordActivity extends Activity
                 .show();
     }
 
+    /**
+     * Prompts user to commit edit if any changes have been made. Otherwise it acts as if the back button was pressed.
+     */
     private void onClickDone()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final String pullSpinnerValue = pullSpinner.getSelectedItem().toString();
+        final String quantityInputValue = quantityEdit.getText().toString();
 
         alertDialogBuilder
                 .setTitle("Confirm Edit")
@@ -140,16 +174,15 @@ public class EditRecordActivity extends Activity
                 {
                     public void onClick(DialogInterface dialog, int id)
                     {
-                        if(pullSpinner.getSelectedItem().toString().equals("..."))
+                        if(pullSpinnerValue.equals("..."))
                         {
                             resetPullSpinner();
                         }
-                        currentScanRecord.setFkPullId(pullSpinner.getSelectedItem().toString());
-                        currentScanRecord.setQuantity(quantityEdit.getText().toString());
+                        currentScanRecord.setFkPullId(pullSpinnerValue);
+                        currentScanRecord.setQuantity(quantityInputValue);
 
                         scanAccess.open();
                         scanAccess.insertRecord(currentScanRecord);
-                        //.updateRecordByID(recordID, editRecord);
                         dbAdapter.close();
                         onBackPressed();
                     }
@@ -160,8 +193,8 @@ public class EditRecordActivity extends Activity
                     {
                         // if this button is clicked, just close
                         // the dialog box and do nothing
-                        dialog.cancel();
                         resetRecord();
+                        dialog.cancel();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener()
@@ -174,7 +207,7 @@ public class EditRecordActivity extends Activity
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
 
-        if(quantityEdit.getText().toString().equals(currentScanRecord.getQuantity()) && pullSpinner.getSelectedItem().toString().equals(currentScanRecord.getFkPullId()))
+        if(quantityInputValue.equals(currentScanRecord.getQuantity()) && pullSpinnerValue.equals(currentScanRecord.getFkPullId()))
         {
             onBackPressed();
         }
@@ -183,132 +216,4 @@ public class EditRecordActivity extends Activity
             alertDialog.show();
         }
     }
-        /*
-
-
-        spPullNumbers.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
-            {
-                //last item in list
-                if(spPullNumbers.getSelectedItem().toString().matches("..."))
-                {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
-
-                    alert.setTitle("Pull Number");
-                    alert.setMessage("Enter PullNumber");
-
-                    // Set an EditText view to get user input
-                    final EditText input = new EditText(context);
-                    alert.setView(input);
-                    input.setText(customValue);
-
-                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int whichButton)
-                        {
-                            if(input.getText().toString().matches(""))
-                            {
-                                input.setText(customValue);
-                            }
-                            customValue = input.getText().toString();
-                        }
-                    });
-                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int whichButton)
-                        {
-                            // Canceled.
-                        }
-                    });
-                    alert.show();
-                }
-                else
-                {
-                    customValue = spPullNumbers.getSelectedItem().toString();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {}
-        });
-    }
-
-    public void onClickDone(View v)
-    {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        // set title
-        alertDialogBuilder.setTitle("Confirm Edit");
-
-        // set dialog message
-        alertDialogBuilder
-                .setMessage("Confirm Edit?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        String newQty = qty.getText().toString();
-                        editRecord.setPullNumber(customValue);
-                        editRecord.setQuantity(newQty);
-
-                        scanDataSource.open();
-                        scanDataSource.updateRecordByID(recordID, editRecord);
-                        scanDataSource.close();
-                        commitChange();
-                    }
-                })
-                .setNeutralButton("No", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        // if this button is clicked, just close
-                        // the dialog box and do nothing
-                        dialog.cancel();
-                        setSpinner(pullNum);
-                        qty.setText(editOldQty);
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        // if this button is clicked, just close
-                        // the dialog box and do nothing
-                        cancelEdit();
-                    }
-                });
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        if((qty.getText().toString().equals(editOldQty)) && (pullNum.equals(spPullNumbers.getSelectedItem().toString())))
-        {
-            cancelEdit();
-        }
-        else
-        {
-            alertDialog.show();
-        }
-    }
-
-    public void cancelEdit()
-    {
-        Intent returnData = new Intent();
-        setResult(RESULT_CANCELED, returnData);
-
-        finish();
-    }
-
-    public void commitChange()
-    {
-        //Bundle bundle = new Bundle();
-        Intent returnData = new Intent();
-        setResult(RESULT_OK, returnData);
-
-        finish();
-    }
-    */
 }

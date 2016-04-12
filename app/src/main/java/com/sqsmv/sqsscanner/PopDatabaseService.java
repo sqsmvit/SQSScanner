@@ -10,7 +10,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.sqsmv.sqsscanner.database.DBAdapter;
-import com.sqsmv.sqsscanner.database.XMLDBAccess;
 import com.sqsmv.sqsscanner.database.lens.LensAccess;
 import com.sqsmv.sqsscanner.database.pricelist.PriceListAccess;
 import com.sqsmv.sqsscanner.database.prodloc.ProdLocAccess;
@@ -29,14 +28,17 @@ import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import andoidlibs.db.xml.XMLDBAccess;
+
 /**
- * Service that coordinates the steps for updating the database using the export files on FileMaker.
+ * Service that coordinates the steps for updating the database using the export files from FileMaker.
  */
 public class PopDatabaseService extends IntentService
 {
 	private static final String TAG = "PopDatabaseService";
 
     private String zipFileName = "files.zip";
+    private String zipStorageLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName;
 
     /**
      * Constructor.
@@ -46,11 +48,7 @@ public class PopDatabaseService extends IntentService
 		super(TAG);
 	}
 
-    /**
-     *
-     * @param intent
-     */
-	@Override
+    @Override
 	protected void onHandleIntent(Intent intent)
     {
         makeNotification("Dropbox Download Started", false);
@@ -61,7 +59,7 @@ public class PopDatabaseService extends IntentService
 
         //Download files.zip from Dropbox
         downloadDBXZip();
-        File zipFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName);
+        File zipFile = new File(zipStorageLocation);
         try
         {
             unzip(zipFile);
@@ -70,8 +68,9 @@ public class PopDatabaseService extends IntentService
             resetTables(dbAdapter);
             makeNotification("Database Update Started", false);
 
-            XMLDBAccess[] xmlDBAccesses = new XMLDBAccess[]{new LensAccess(dbAdapter), new ProductAccess(dbAdapter), new UPCAccess(dbAdapter),
-                                                            new PriceListAccess(dbAdapter), new ProdLocAccess(dbAdapter), new ProductLensAccess(dbAdapter)};
+            XMLDBAccess[] xmlDBAccesses = new XMLDBAccess[]{new LensAccess(dbAdapter), new ProductAccess(dbAdapter),
+                                                            new UPCAccess(dbAdapter), new PriceListAccess(dbAdapter),
+                                                            new ProdLocAccess(dbAdapter), new ProductLensAccess(dbAdapter)};
             ArrayList<Thread> updateThreads = new ArrayList<Thread>();
             for(XMLDBAccess xmlDBAccess : xmlDBAccesses)
             {
@@ -96,7 +95,7 @@ public class PopDatabaseService extends IntentService
         Log.d(TAG, "in copyDBXFile");
         DropboxManager dbxMan = new DropboxManager(this);
 
-        dbxMan.writeToStorage("/out/" + zipFileName, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + zipFileName, false);
+        dbxMan.writeToStorage("/out/" + zipFileName, zipStorageLocation, false);
     }
 
     /**
@@ -173,7 +172,6 @@ public class PopDatabaseService extends IntentService
      */
     private void startUpdateThreads(ArrayList<Thread> updateThreads)
     {
-        Log.d(TAG, "Fast Update");
         for(Thread updateThread : updateThreads)
         {
             updateThread.start();
@@ -192,8 +190,7 @@ public class PopDatabaseService extends IntentService
     }
 
     /**
-     * Controls the resetting of tables that need to be recreated to compensate for records that were
-     * deleted from the FileMaker database.
+     * Controls the resetting of tables that need to be recreated to compensate for records that were deleted from the FileMaker database.
      * @param dbAdapter    The DBAdapter to use for access to the database.
      */
     private void resetTables(DBAdapter dbAdapter)

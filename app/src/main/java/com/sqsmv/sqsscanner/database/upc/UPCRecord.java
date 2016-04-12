@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.upc;
 
 import android.database.Cursor;
 
-import com.sqsmv.sqsscanner.database.XMLDBRecord;
+import andoidlibs.db.xml.XMLDBRecord;
 
 public class UPCRecord extends XMLDBRecord
 {
@@ -67,22 +67,19 @@ public class UPCRecord extends XMLDBRecord
     }
 
     @Override
-    protected void setFromCursor(Cursor dbCursor)
+    protected void setByColumnName(String columnName, String value)
     {
-        for(int count = 0; count < dbCursor.getColumnCount(); count++)
+        if(columnName.equals(UPCContract.COLUMN_NAME_UPC))
         {
-            if(dbCursor.getColumnName(count).equals(UPCContract.COLUMN_NAME_UPC))
-            {
-                setUPC(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(UPCContract.COLUMN_NAME_MASNUM))
-            {
-                setMasNum(dbCursor.getString(count));
-            }
-            else if(dbCursor.getColumnName(count).equals(UPCContract.COLUMN_NAME_SHA))
-            {
-                setSha(dbCursor.getString(count));
-            }
+            setUPC(value);
+        }
+        else if(columnName.equals(UPCContract.COLUMN_NAME_MASNUM))
+        {
+            setMasNum(value);
+        }
+        else if(columnName.equals(UPCContract.COLUMN_NAME_SHA))
+        {
+            setSha(value);
         }
     }
 }

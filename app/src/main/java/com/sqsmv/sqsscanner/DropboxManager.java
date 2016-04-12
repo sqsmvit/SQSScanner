@@ -46,8 +46,8 @@ public class DropboxManager
     }
 
     /**
-     * Launches the Dropbox app if it is installed, the browser if not, for linking a Dropbox
-     * account. Access token is set when an account is successfully linked.
+     * Launches the Dropbox app if it is installed, the browser if not, for linking a Dropbox account. Access token is set when an account is
+     * successfully linked.
      */
     public void linkDropboxAccount()
     {

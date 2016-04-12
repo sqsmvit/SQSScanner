@@ -5,8 +5,8 @@ import android.content.Context;
 import java.io.File;
 
 /**
- * Utility class for exporting a file to Dropbox. This class contains the functionality determining which
- * directory the file should go into based off of settings used.
+ * Utility class for exporting a file to Dropbox. This class contains the functionality determining which directory the file should go into based off
+ * of settings used.
  */
 public class ScanExporter
 {
