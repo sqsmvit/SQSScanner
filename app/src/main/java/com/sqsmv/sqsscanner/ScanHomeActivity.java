@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.ToggleButton;
 
-import com.socketmobile.apiintegration.ScanAPIApplication;
 import com.sqsmv.sqsscanner.database.DBAdapter;
 import com.sqsmv.sqsscanner.database.pricelist.PriceListAccess;
 import com.sqsmv.sqsscanner.database.pricelist.PriceListRecord;
@@ -35,6 +34,8 @@ import com.sqsmv.sqsscanner.database.upc.UPCRecord;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import socketmobile.apiintegration.ScanAPIApplication;
 
 /**
  * The main Activity where all the data input is done. Input can be done either manually by typing in the masnum of the product or through

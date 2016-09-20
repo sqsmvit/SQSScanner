@@ -13,7 +13,10 @@ import com.onbarcode.barcode.android.AndroidFont;
 import com.onbarcode.barcode.android.Code128;
 import com.onbarcode.barcode.android.IBarcode;
 
-
+/**
+ * The Activity that contains barcodes, both the SPP and the barcode with the phone's bluetooth address, for pairing SocketMobile scanners with the
+ * phone. From this Activity, the scanner can also be locked to this app.
+ */
 public class SocketMobilePairActivity extends Activity
 {
     private DroidConfigManager appConfig;
@@ -30,9 +33,6 @@ public class SocketMobilePairActivity extends Activity
         String sppData = "#FNB00F40000#";
         String btAddr = "#FNI" + getBTAddr() + "#";
 
-        Code128 sppBarcode = new Code128();
-        Code128 btaddrBarcode = new Code128();
-
         appConfig = new DroidConfigManager(this);
 
         sppBarcodeView = (BarcodeView)findViewById(R.id.SPPBarcodeView);
@@ -41,11 +41,9 @@ public class SocketMobilePairActivity extends Activity
 
         scannerLockToggle.setChecked(appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, null, false));
 
-        makeBarcode(sppBarcode, sppData, 0);
-        sppBarcodeView.drawBarcode(sppBarcode);
+        sppBarcodeView.drawBarcode(makeBarcode(sppData, 0));
 
-        makeBarcode(btaddrBarcode, btAddr, 0);
-        btaddrBarcodeView.drawBarcode(btaddrBarcode);
+        btaddrBarcodeView.drawBarcode(makeBarcode(sppData, 0));
 
         findViewById(R.id.pairBackButton).setOnClickListener(new View.OnClickListener()
         {
@@ -64,14 +62,25 @@ public class SocketMobilePairActivity extends Activity
         super.onDestroy();
     }
 
+    /**
+     * Gets the phone's bluetooth address and cleans out the
+     * @return The phone's bluetooth
+     */
     private String getBTAddr()
     {
         String deviceAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
         return deviceAddress.replace(":", "");
     }
 
-    private void makeBarcode(Code128 barcode, String data, float width)
+    /**
+     * 
+     * @param data
+     * @param width
+     * @return
+     */
+    private Code128 makeBarcode(String data, float width)
     {
+        Code128 barcode = new Code128();
         /*
            Code 128 Valid data char set:
                 all 128 ASCII characters (Char from 0 to 127)
@@ -122,8 +131,13 @@ public class SocketMobilePairActivity extends Activity
         // barcode bar color and background color in Android device
         barcode.setForeColor(AndroidColor.black);
         barcode.setBackColor(AndroidColor.white);
+
+        return barcode;
     }
 
+    /**
+     * Writes the scanner lock preference to the config file.
+     */
     private void saveScanLock()
     {
         appConfig.accessBoolean(DroidConfigManager.SCANNER_LOCK, scannerLockToggle.isChecked(), false);

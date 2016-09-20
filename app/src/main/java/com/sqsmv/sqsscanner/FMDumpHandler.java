@@ -150,7 +150,6 @@ public class FMDumpHandler extends Thread
                         {
                             for(String tag : xmlDBAccess.getTableColumns())
                             {
-                                //1st field
                                 eventType = xpp.nextTag();
                                 if(eventType == XmlPullParser.END_TAG)
                                 {
@@ -171,7 +170,7 @@ public class FMDumpHandler extends Thread
                                     return;
                                 }
                                 objVars.add(value);
-                            }//end for
+                            }
 
                             if(canInsert(objVars.get(0), shaVal, dbItems))
                             {

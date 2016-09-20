@@ -23,6 +23,9 @@ import com.sqsmv.sqsscanner.database.scan.ScanAccess;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * The Activity that allows a user to modify and activate various modes and values for the app.
+ */
 public class ScanConfigActivity  extends Activity
 {
     private DroidConfigManager appConfig;
@@ -39,6 +42,7 @@ public class ScanConfigActivity  extends Activity
     private String customAutoValue;
     private int exportModeChoice, invModeChoice;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         setContentView(R.layout.activity_scan_config);
@@ -92,6 +96,9 @@ public class ScanConfigActivity  extends Activity
         }
     }
 
+    /**
+     * Sets the listeners used for the current Activity's GUI elements.
+     */
     private void setListeners()
     {
         autoCountSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -174,6 +181,10 @@ public class ScanConfigActivity  extends Activity
         });
     }
 
+    /**
+     * Checks the values for boxQuantityInput and customAutoValue if the matching modes are on/selected.
+     * @return true if the values are valid, otherwise false.
+     */
     private boolean checkValues()
     {
         boolean hasGoodValues = true;
@@ -190,7 +201,7 @@ public class ScanConfigActivity  extends Activity
                 hasGoodValues = false;
             }
         }
-        else if(autoCountModeToggle.isChecked())
+        if(autoCountModeToggle.isChecked())
         {
             if(autoCountSelect.getSelectedItem().toString().equals("...") &&
                     (Integer.parseInt(customAutoValue) < 1 || Integer.parseInt(customAutoValue) > 410))
@@ -202,6 +213,9 @@ public class ScanConfigActivity  extends Activity
         return hasGoodValues;
     }
 
+    /**
+     * Populates and initializes the screen using information saved in the app's config file.
+     */
     private void initGUIElements()
     {
         autoCountModeToggle.setChecked(appConfig.accessBoolean(DroidConfigManager.IS_AUTO_COUNT, null, false));
@@ -235,11 +249,18 @@ public class ScanConfigActivity  extends Activity
         }
     }
 
+    /**
+     * Selects the last valid exportMode that was specified by exportModeChoice.
+     */
     private void initExportChoice()
     {
         exportModeSelect.setSelection(exportModeChoice - 1);
     }
 
+    /**
+     * Sets the exportModeChoice value, adjusting the GUI and reverting the switch if necessary.
+     * @param modeChoice    The int value to set exportModeChoice to.
+     */
     private void setExportMode(int modeChoice)
     {
         switch(modeChoice)
@@ -273,6 +294,7 @@ public class ScanConfigActivity  extends Activity
                 }
                 break;
             case 6:
+                //Skid scans do not have masnums scanned.
                 if(exportModeChoice != 6 && scanAccess.getTotalScans() > 0)
                 {
                     Utilities.makeToast(this, "Please commit scans first.");
@@ -287,6 +309,9 @@ public class ScanConfigActivity  extends Activity
         }
     }
 
+    /**
+     * Writes settings out to the config file.
+     */
     public void writePref()
     {
         if(lensSelect.getSelectedItem() != null)
@@ -315,6 +340,9 @@ public class ScanConfigActivity  extends Activity
         appConfig.accessInt(DroidConfigManager.INVENTORY_MODE_CHOICE, invModeChoice, 1);
     }
 
+    /**
+     * Prompts the user for the custom value they would like to use if the option is selected in the Spinner.
+     */
     private void displayCustomAutoCountDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -349,16 +377,25 @@ public class ScanConfigActivity  extends Activity
                 .show();
     }
 
+    /**
+     * Shows the Reading Inventory Adjust area.
+     */
     private void showInvAdjust()
     {
         invModeRGroup.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Hides the Reading Inventory Adjust area.
+     */
     private void hideInvAdjust()
     {
         invModeRGroup.setVisibility(View.GONE);
     }
 
+    /**
+     * Launches SocketMobilePairActivity.
+     */
     private void goToPairActivity()
     {
         Intent intent = new Intent(this, SocketMobilePairActivity.class);

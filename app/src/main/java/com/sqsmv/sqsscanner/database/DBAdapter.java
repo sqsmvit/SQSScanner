@@ -15,7 +15,9 @@ import com.sqsmv.sqsscanner.database.upc.UPCContract;
 import andoidlibs.db.DBContract;
 import andoidlibs.db.xml.XMLDBContract;
 
-
+/**
+ * DBAdapter is a SQLiteOpenHelper subclass specific to this app.
+ */
 public class DBAdapter extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "PullDB";
@@ -44,6 +46,9 @@ public class DBAdapter extends SQLiteOpenHelper
         resetTables(db, xmlContracts);
     }
 
+    /**
+     * Drops and recreates all tables with import data.
+     */
     public void resetImportData()
     {
         SQLiteDatabase db = getWritableDatabase();
@@ -51,6 +56,11 @@ public class DBAdapter extends SQLiteOpenHelper
         db.close();
     }
 
+    /**
+     * Creates the tables specified by an array of DBContracts.
+     * @param db             The SQLiteDabase to create the tables on.
+     * @param dbContracts    The array of DBContracts specifying which tables to create.
+     */
     private void createTables(SQLiteDatabase db, DBContract[] dbContracts)
     {
         for(DBContract dbContract : dbContracts)
@@ -59,6 +69,11 @@ public class DBAdapter extends SQLiteOpenHelper
         }
     }
 
+    /**
+     * Drops and recreates tables specified by an array of DBContracts.
+     * @param db             The SQLiteDabase to create the tables on.
+     * @param dbContracts    The array of DBContracts specifying which tables to drop and recreate.
+     */
     private void resetTables(SQLiteDatabase db, DBContract[] dbContracts)
     {
         for(DBContract dbContract : dbContracts)

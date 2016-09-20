@@ -25,8 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The Activity that allows access to administrative functions for the app. Users will be able to reset the import tables in the database and force
- * both database updates and app updates from this screen. A list of export backups are also available for reuploading to Dropbox from this screen.
+ * The AdminActivity is the Activity that allows access to administrative functions for the app. Users will be able to reset the import tables in the
+ * database and force both database updates and app updates from this screen. A list of export backups are also available for reuploading to Dropbox
+ * from this screen.
  */
 public class AdminActivity extends Activity
 {
@@ -324,7 +325,7 @@ public class AdminActivity extends Activity
     {
         if(Utilities.checkWifi(this))
         {
-            ScanExporter.exportScan(this, backupFile, 0, false);
+            ScanExporter.exportScan(this, backupFile, 0);
         }
         else
         {

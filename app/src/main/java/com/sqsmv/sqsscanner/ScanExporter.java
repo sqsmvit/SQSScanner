@@ -17,12 +17,11 @@ public class ScanExporter
      * @param context       The Context of the Activity or Service making the method call.
      * @param exportFile    The File to export.
      * @param exportMode    The export mode being used.
-     * @param fromCommit    Whether the call is being made from the initial commit or not.
      * @return true if the File was successfully exported, otherwise false.
      */
-    public static boolean exportScan(Context context, File exportFile, int exportMode, boolean fromCommit)
+    public static boolean exportScan(Context context, File exportFile, int exportMode)
     {
-        return exportDBX(context, exportFile, exportMode, fromCommit);
+        return exportDBX(context, exportFile, exportMode);
     }
 
     /**
@@ -30,13 +29,12 @@ public class ScanExporter
      * @param context       The Context of the Activity or Service making the method call.
      * @param exportFile    The File to export.
      * @param exportMode    The export mode being used.
-     * @param fromCommit    Whether the call is being made from the initial commit or not.
      * @return true if the File was successfully exported, otherwise false.
      */
-    private static boolean exportDBX(Context context, File exportFile, int exportMode, boolean fromCommit)
+    private static boolean exportDBX(Context context, File exportFile, int exportMode)
     {
         String exportFilePath = ExportModeHandler.getExportDirectory(exportMode) + exportFile.getName();
         DropboxManager dropboxManager = new DropboxManager(context);
-        return dropboxManager.writeToDropbox(exportFile, exportFilePath, fromCommit);
+        return dropboxManager.writeToDropbox(exportFile, exportFilePath);
     }
 }

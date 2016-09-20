@@ -215,7 +215,7 @@ public class PullReviewActivity extends Activity
     }
 
     /**
-     * Commits
+     * Attempts to commit the scan to Dropbox, alerting the error if it is unsuccessful and clearing the scan table if successful.
      */
     private void onClickCommit()
     {
@@ -226,12 +226,13 @@ public class PullReviewActivity extends Activity
                 try
                 {
                     File exportFile = writeFromDB();
-                    if(ScanExporter.exportScan(this, exportFile, exportModeChoice, true))
+                    if(ScanExporter.exportScan(this, exportFile, exportModeChoice))
                     {
                         if(exportModeChoice == 6)
                         {
                             appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
                         }
+                        ScanWriter.writeBackupFile(exportFile);
                         Utilities.makeToast(this, "File exported to DropBox");
                         performMassDelete();
                         fileExported = true;
@@ -242,6 +243,7 @@ public class PullReviewActivity extends Activity
                         Utilities.alertVibrate(this, new long[] {0, 500, 500, 500, 500});
                         Utilities.makeToast(this, "Error exporting to DropBox");
                     }
+                    exportFile.delete();
                 }
                 catch(IOException e)
                 {
@@ -260,15 +262,23 @@ public class PullReviewActivity extends Activity
         }
     }
 
+    /**
+     * Creates the export file from the Scan Table.
+     * @return The created export file.
+     * @throws IOException
+     */
     private File writeFromDB() throws IOException
     {
         Cursor exportCursor = scanAccess.selectScansForPrint(exportModeChoice);
         File exportFile = ScanWriter.createExportFile(this, exportCursor, exportModeChoice, invAdjChoice);
-        ScanWriter.writeBackupFile(exportFile);
 
         return exportFile;
     }
 
+    /**
+     * Launches ScanReviewActivity to review scans of the selected pull number.
+     * @param pullNum    The pull number to review scans of.
+     */
     private void goToScans(String pullNum)
     {
         Intent intent = new Intent(this, ScanReviewActivity.class);

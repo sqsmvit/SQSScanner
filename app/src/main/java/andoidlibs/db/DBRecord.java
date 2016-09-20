@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Abstract class used for storing and handling information for database records. It defines methods that need to be handled for interaction with the
- * DBAccess class.
+ * The DBRecord abstract class is used for storing and handling information for database records for a single table. It also contains methods that
+ * need to be implemented for interaction with the DBAccess class.
  */
 public abstract class DBRecord
 {

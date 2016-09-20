@@ -1,7 +1,7 @@
 package andoidlibs.db;
 
 /**
- * Interface used primarily for providing information related to a specific table to DBAccess and DBRecord objects.
+ * The DBContract interface is used for storing and providing information related to a specific table to DBAccess and DBRecord objects.
  */
 public interface DBContract
 {

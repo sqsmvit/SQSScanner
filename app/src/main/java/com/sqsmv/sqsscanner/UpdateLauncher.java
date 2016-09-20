@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * Utility class for starting updates for the app.
+ * The UpdateLauncher class provides functionality for updates in the app, for both the app itself as well as the import database for the app.
  */
 public class UpdateLauncher
 {

@@ -8,7 +8,7 @@ import android.os.Environment;
 import java.io.File;
 
 /**
- * Service that coordinates the steps for downloading and updating the app.
+ * The AppUpdateService is an IntentService that coordinates the steps for downloading and updating the app to a version stored on Dropbox.
  */
 public class AppUpdateService extends IntentService
 {

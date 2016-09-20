@@ -11,8 +11,8 @@ import andoidlibs.db.DBAccess;
 import andoidlibs.db.QueryBuilder;
 
 /**
- * Abstract class used to control access between the user and the database for tables that require an import from an XML file. All records stored in
- * the XML file are assumed to have a SHA value that are used to figure out when a change has been made to the record.
+ * The XMLDBAccess abstract class is used to control access between the user and the database for tables that require an import from an XML file. All
+ * records stored in the XML file are assumed to have a SHA value that are used to figure out when a change has been made to the record.
  */
 public abstract class XMLDBAccess extends DBAccess
 {

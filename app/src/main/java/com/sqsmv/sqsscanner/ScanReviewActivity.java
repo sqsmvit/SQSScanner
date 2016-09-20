@@ -20,6 +20,9 @@ import com.sqsmv.sqsscanner.database.scan.ScanRecord;
 
 import java.util.ArrayList;
 
+/**
+ * The Activity that allows user to review and/or delete the scans for a specific pull number.
+ */
 public class ScanReviewActivity extends Activity
 {
     private String pullKey;
@@ -70,6 +73,9 @@ public class ScanReviewActivity extends Activity
         super.onPause();
     }
 
+    /**
+     * Sets the listeners used for the current Activity's GUI elements.
+     */
     private void setListeners()
     {
         findViewById(R.id.scanHeadBack).setOnClickListener(new View.OnClickListener()
@@ -82,6 +88,9 @@ public class ScanReviewActivity extends Activity
         });
     }
 
+    /**
+     * Creates the ArrayList of ScanRecords for display.
+     */
     private void createAdapterDataset()
     {
         scanRecordList.clear();
@@ -92,6 +101,10 @@ public class ScanReviewActivity extends Activity
         }
     }
 
+    /**
+     * Deletes the record of the selected row from the database.
+     * @param scanRecord    The record
+     */
     private void deleteRow(final ScanRecord scanRecord)
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -119,6 +132,10 @@ public class ScanReviewActivity extends Activity
                 .show();
     }
 
+    /**
+     * Launches EditRecordActivity to edit the specified record in the database..
+     * @param scanRecord    The ScanRecord containing information to edit.
+     */
     private void editRow(ScanRecord scanRecord)
     {
         Intent intent = new Intent(this, EditRecordActivity.class);
@@ -126,6 +143,9 @@ public class ScanReviewActivity extends Activity
         startActivity(intent);
     }
 
+    /**
+     * The BaseExpandableListAdapter subclass used to populate the ListView in ScanReviewActivity.
+     */
     private class ScanRecordExpandableListAdapter extends BaseExpandableListAdapter
     {
         private Context context;

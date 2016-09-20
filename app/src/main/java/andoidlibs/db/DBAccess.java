@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
 /**
- * Abstract class used to control access between the user and the database. Ideally each DBAccess object controls access to a specific table at a time
- * for the best interaction between the DBContract and DBRecord classes.
+ * The DBAccess abstract class is used to control access between the user and the database. Ideally each DBAccess object controls access to a single
+ * table at a time, as this provides the best interaction between it and the DBRecord class associated with the same table.
  */
 public abstract class DBAccess
 {

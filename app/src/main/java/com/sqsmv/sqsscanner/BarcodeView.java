@@ -10,7 +10,7 @@ import android.view.View;
 import com.onbarcode.barcode.android.Code128;
 
 /**
- * View subclass for use with the Barcode API.
+ * BarcodeView is a View subclass for use with the Barcode API.
  */
 public class BarcodeView extends View
 {
@@ -26,10 +26,6 @@ public class BarcodeView extends View
 	    super(context, attrs);
 	}
 
-    /**
-     * Overridden onDraw method for displaying the barcode.
-     * @param canvas    The Canvas to display the barcode on.
-     */
     @Override
 	protected void onDraw(Canvas canvas)
     {

@@ -155,10 +155,9 @@ public class DropboxManager
      * Writes a file from local storage to Dropbox.
      * @param fileToWrite        The File to write to Dropbox.
      * @param dbxFilePath        The path to the write location on Dropbox.
-     * @param shouldSteal        Whether the file should be removed from local storage when the write is complete.
      * @return true if the write to Dropbox was successful, otherwise false.
      */
-    public boolean writeToDropbox(final File fileToWrite, final String dbxFilePath, final boolean shouldSteal)
+    public boolean writeToDropbox(final File fileToWrite, final String dbxFilePath)
     {
         final boolean[] writeSuccessful = new boolean[1];
         writeSuccessful[0] = false;
@@ -191,10 +190,6 @@ public class DropboxManager
         catch(InterruptedException e)
         {
             e.printStackTrace();
-        }
-        if(shouldSteal)
-        {
-            fileToWrite.delete();
         }
 
         return writeSuccessful[0];

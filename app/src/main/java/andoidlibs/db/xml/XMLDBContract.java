@@ -3,8 +3,8 @@ package andoidlibs.db.xml;
 import andoidlibs.db.DBContract;
 
 /**
- * Interface used primarily for providing information related to a specific table and the import file for that table to XMLDBAccess and XMLDBRecord
- * objects.
+ * The XMLDBContract interface is used for providing information related to a specific table and the import file for that table to XMLDBAccess
+ * and XMLDBRecord objects.
  */
 public interface XMLDBContract extends DBContract
 {

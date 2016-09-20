@@ -8,8 +8,8 @@ import java.util.List;
 import andoidlibs.db.DBRecord;
 
 /**
- * Abstract class used for storing and handling information for database records. It defines methods that need to be handled for interaction with the
- * XMLDBAccess class.
+ * The XMLDBRecord abstract class used for storing and handling information for database records for a single table. It also contains methods that
+ * need to be implemented for interaction with the XMLDBAccess class.
  */
 public abstract class XMLDBRecord extends DBRecord
 {
