@@ -64,9 +64,9 @@ public class ScanAccess extends DBAccess
             groupBy = ScanContract.COLUMN_NAME_MASNUM;
             orderBy = ScanContract.COLUMN_NAME_TITLE;
         }
-        else if(exportMode == 5)
+        else if(exportMode == 5 || exportMode == 8)
         {
-            //RI Mode
+            //RI and Reset Modes
             columns = new String[]{ScanContract.COLUMN_NAME_MASNUM, ScanContract.COLUMN_NAME_QUANTITY, ScanContract.COLUMN_NAME_INITIALS,
                     ScanContract.COLUMN_NAME_TITLE};
         }
@@ -84,7 +84,7 @@ public class ScanAccess extends DBAccess
                                    ScanContract.COLUMN_NAME_TITLE};
             orderBy = ScanContract._ID;
         }
-        return getDB().query(ScanContract.TABLE_NAME, columns, null, null, groupBy, null, orderBy);
+        return getDB().query(getTableName(), columns, null, null, groupBy, null, orderBy);
     }
 
     public int getTotalScans()
@@ -109,7 +109,7 @@ public class ScanAccess extends DBAccess
 
     public int getTotalByPull(String pullId)
     {
-        Cursor cursor = getDB().query(ScanContract.TABLE_NAME, new String[]{"SUM(" + ScanContract.COLUMN_NAME_QUANTITY + ") As Total"},
+        Cursor cursor = getDB().query(getTableName(), new String[]{"SUM(" + ScanContract.COLUMN_NAME_QUANTITY + ") As Total"},
         ScanContract.COLUMN_NAME_FKPULLID + " = ?", new String[]{pullId}, null, null, null, null);
         int total = 0;
         if(cursor.moveToFirst())
@@ -122,7 +122,7 @@ public class ScanAccess extends DBAccess
 
     public int getProductCountForPull(String pullNum, String scanEntry)
     {
-        String query = "SELECT SUM(" + ScanContract.COLUMN_NAME_QUANTITY + ") AS Total FROM " + ScanContract.TABLE_NAME + " WHERE " +
+        String query = "SELECT SUM(" + ScanContract.COLUMN_NAME_QUANTITY + ") AS Total FROM " + getTableName() + " WHERE " +
                 ScanContract.COLUMN_NAME_MASNUM + " = ? AND " + ScanContract.COLUMN_NAME_FKPULLID +" = ?";
         Cursor cursor = getDB().rawQuery(query, new String[]{scanEntry, pullNum});
         int productCount = 0;
@@ -138,7 +138,7 @@ public class ScanAccess extends DBAccess
     public int[] getScanTotalCounts(String pullNum, String scanEntry)
     {
         String query = "SELECT COUNT(*) AS Lines, SUM(" + ScanContract.COLUMN_NAME_QUANTITY + ") AS Total FROM " +
-        ScanContract.TABLE_NAME + " WHERE "+ ScanContract.COLUMN_NAME_MASNUM + " = ? AND " + ScanContract.COLUMN_NAME_FKPULLID +" = ?";
+        getTableName() + " WHERE "+ ScanContract.COLUMN_NAME_MASNUM + " = ? AND " + ScanContract.COLUMN_NAME_FKPULLID +" = ?";
         Cursor cursor = getDB().rawQuery(query, new String[]{scanEntry, pullNum});
         int[] counts = new int[2];
         if(cursor.moveToFirst())
@@ -151,7 +151,7 @@ public class ScanAccess extends DBAccess
 
     public ArrayList<String> getPullNums()
     {
-        Cursor cursor = getDB().query(true, ScanContract.TABLE_NAME, new String[]{ScanContract.COLUMN_NAME_FKPULLID}, null, null, null, null, null, null);
+        Cursor cursor = getDB().query(true, getTableName(), new String[]{ScanContract.COLUMN_NAME_FKPULLID}, null, null, null, null, null, null);
         ArrayList<String> pulls = new ArrayList<String>();
         while(cursor.moveToNext())
         {

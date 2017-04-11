@@ -53,7 +53,7 @@ public class PopDatabaseService extends IntentService
     {
         makeNotification("Dropbox Download Started", false);
         DBAdapter dbAdapter = new DBAdapter(this);
-        Semaphore popDBSemaphore = new Semaphore(2);
+        Semaphore popDBSemaphore = new Semaphore(1);
 
         boolean isSlowUpdate = Utilities.totalDeviceMemory(this) <= 1024;
 

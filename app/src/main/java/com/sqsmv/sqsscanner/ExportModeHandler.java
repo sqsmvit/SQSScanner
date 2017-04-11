@@ -10,10 +10,10 @@ public class ExportModeHandler
 {
     private final static ArrayList<String> exportModes =
             new ArrayList<String>(Arrays.asList(new String[] {"", "Normal Pull", "Consolidated Pull", "Bill B", "Drew",
-                                                              "RI", "Skid", "Inventory Reset"}));
-    private final static String[] filePrefixes = new String[] {"", "", "", "BB_", "DR_", "RI_", "S_", "IR_"};
+                                                              "RI", "Skid", "Inventory Reset", "Returns"}));
+    private final static String[] filePrefixes = new String[] {"", "", "", "BB_", "DR_", "RI_", "S_", "IR_", "R_"};
     private final static String[] exportDirectories = new String[] {"/Default/", "/PullScan/", "/PullScan/", "/BB/", "/Drew/",
-                                                                    "/RI/", "/Skid/", "/Reset/"};
+                                                                    "/RI/", "/Skid/", "/Reset/", "/Returns/"};
 
     /**
      * Gets the ArrayList<String> listing all the export modes for the app.

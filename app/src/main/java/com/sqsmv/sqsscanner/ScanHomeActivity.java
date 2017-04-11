@@ -685,13 +685,11 @@ public class ScanHomeActivity extends Activity
             UPCRecord upcRecord = UPCRecord.buildNewUPCRecordFromCursor(upcAccess.selectByPk(scanInputValue));
             if(!upcRecord.getMasNum().isEmpty())
             {
-                scannedProduct = ProductRecord.buildNewProductRecordFromCursor(productAccess.selectByPk(upcRecord.getMasNum()));
+                scanInputValue = upcRecord.getMasNum();
             }
         }
-        else
-        {
-            scannedProduct = ProductRecord.buildNewProductRecordFromCursor(productAccess.selectByPk(scanInputValue));
-        }
+
+        scannedProduct = ProductRecord.buildNewProductRecordFromCursor(productAccess.selectByPk(scanInputValue));
 
         if(!scannedProduct.getMasNum().isEmpty())
         {

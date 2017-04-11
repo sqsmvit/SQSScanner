@@ -270,6 +270,7 @@ public class ScanConfigActivity  extends Activity
             case 3:
             case 4:
             case 7:
+            case 8:
                 if(exportModeChoice == 6 && scanAccess.getTotalScans() > 0)
                 {
                     Utilities.makeToast(this, "Please commit scans first.");
