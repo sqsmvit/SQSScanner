@@ -64,11 +64,11 @@ public class ScanAccess extends DBAccess
             groupBy = ScanContract.COLUMN_NAME_MASNUM;
             orderBy = ScanContract.COLUMN_NAME_TITLE;
         }
-        else if(exportMode == 5 || exportMode == 8)
+        else if(exportMode == 5)
         {
-            //RI and Reset Modes
-            columns = new String[]{ScanContract.COLUMN_NAME_MASNUM, ScanContract.COLUMN_NAME_QUANTITY, ScanContract.COLUMN_NAME_INITIALS,
-                    ScanContract.COLUMN_NAME_TITLE};
+            //BI Mode
+            columns = new String[]{ScanContract.COLUMN_NAME_MASNUM, ScanContract.COLUMN_NAME_QUANTITY, ScanContract.COLUMN_NAME_LOCATION,
+                    ScanContract.COLUMN_NAME_INITIALS, ScanContract.COLUMN_NAME_TITLE};
         }
         else if(exportMode == 6)
         {
@@ -83,6 +83,12 @@ public class ScanAccess extends DBAccess
                                    ScanContract.COLUMN_NAME_SCANDATE, ScanContract.COLUMN_NAME_NUMBOXES, ScanContract.COLUMN_NAME_INITIALS,
                                    ScanContract.COLUMN_NAME_TITLE};
             orderBy = ScanContract._ID;
+        }
+        else if(exportMode == 8)
+        {
+            //Return Mode
+            columns = new String[]{ScanContract.COLUMN_NAME_MASNUM, ScanContract.COLUMN_NAME_QUANTITY, ScanContract.COLUMN_NAME_INITIALS,
+                                   ScanContract.COLUMN_NAME_TITLE};
         }
         return getDB().query(getTableName(), columns, null, null, groupBy, null, orderBy);
     }

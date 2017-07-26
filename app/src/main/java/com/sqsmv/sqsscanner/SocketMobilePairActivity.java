@@ -43,7 +43,7 @@ public class SocketMobilePairActivity extends Activity
 
         sppBarcodeView.drawBarcode(makeBarcode(sppData, 0));
 
-        btaddrBarcodeView.drawBarcode(makeBarcode(sppData, 0));
+        btaddrBarcodeView.drawBarcode(makeBarcode(btAddr, 0));
 
         findViewById(R.id.pairBackButton).setOnClickListener(new View.OnClickListener()
         {
