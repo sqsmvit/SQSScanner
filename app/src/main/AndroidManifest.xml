@@ -61,9 +61,9 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.dropbox.client2.android.AuthActivity"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|keyboard">
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask">
             <intent-filter>
                 <data android:scheme="db-nau5nnk7gnhddc0" />
                 <action android:name="android.intent.action.VIEW" />

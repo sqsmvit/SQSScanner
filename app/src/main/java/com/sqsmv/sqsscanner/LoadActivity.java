@@ -7,6 +7,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
+import com.dropbox.core.android.Auth;
+
 import java.io.File;
 import java.util.Date;
 
@@ -29,10 +31,10 @@ public class LoadActivity extends Activity
         setContentView(R.layout.activity_load);
 		Log.d(TAG, "in onCreate and starting the LoadActivity!");
 
-        appConfig = new DroidConfigManager(this);
-        dropboxManager = new DropboxManager(this);
         setTitle(getTitle() + " v" + Utilities.getVersion(this));
 
+        appConfig = new DroidConfigManager(this);
+        dropboxManager = new DropboxManager(this);
         updateLauncher = new UpdateLauncher(this);
 
         findViewById(R.id.scanHomeButton).setOnClickListener(new View.OnClickListener()
@@ -50,34 +52,31 @@ public class LoadActivity extends Activity
     {
         super.onResume();
 
-        if(dropboxManager.finishAuthentication())
+        String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, null);
+        if (accessToken == null)
         {
-            //Entered if the app is resumed after linking with a Dropbox account
-            String accessToken = dropboxManager.getOAuth2AccessToken();
-            appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, "");
-        }
-        linkDropboxAccount();
-    }
-
-    /**
-     * Checks if an account has been linked to the app by checking the config for a saved access token. If one exists, then it sets the token.
-     * Otherwise the Dropbox app if it is installed, the browser if not, to link an account.
-     */
-    private void linkDropboxAccount()
-    {
-        String accessToken = appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, null, "");
-        if(!accessToken.isEmpty())
-        {
-            dropboxManager.setStaticOAuth2AccessToken(accessToken);
-        }
-        else if(Utilities.checkWifi(this))
-        {
-            dropboxManager.linkDropboxAccount();
+            accessToken = Auth.getOAuth2Token();
+            if (accessToken != null)
+            {
+                appConfig.accessString(DroidConfigManager.DROPBOX_ACCESS_TOKEN, accessToken, null);
+                dropboxManager.initDbxClient(accessToken);
+            }
+            else
+            {
+                if(Utilities.checkWifi(this))
+                {
+                    dropboxManager.linkDropboxAccount();
+                }
+                else
+                {
+                    Utilities.makeLongToast(this, "Must be connected to WiFi to link to Dropbox!");
+                    finish();
+                }
+            }
         }
         else
         {
-            Utilities.makeLongToast(this, "Must be connected to WiFi to link to Dropbox!");
-            finish();
+            dropboxManager.initDbxClient(accessToken);
         }
     }
 
