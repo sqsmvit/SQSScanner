@@ -12,8 +12,8 @@ import com.sqsmv.sqsscanner.database.productlens.ProductLensContract;
 import com.sqsmv.sqsscanner.database.scan.ScanContract;
 import com.sqsmv.sqsscanner.database.upc.UPCContract;
 
-import andoidlibs.db.DBContract;
-import andoidlibs.db.xml.XMLDBContract;
+import androidlibs.db.DBContract;
+import androidlibs.db.xml.XMLDBContract;
 
 /**
  * DBAdapter is a SQLiteOpenHelper subclass specific to this app.

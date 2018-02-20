@@ -1,4 +1,4 @@
-package andoidlibs.db;
+package androidlibs.db;
 
 /**
  * The QueryBuilder class is a class containing static methods for building basic insert and select queries for SQL.

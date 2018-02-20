@@ -44,15 +44,6 @@ public class DropboxManager
     }
 
     /**
-     * Gets the access token stored in the API session.
-     * @return The access token stored in the API session.
-     */
-    public String getOAuth2AccessToken()
-    {
-        return "";//dropboxAPI.getSession().getOAuth2AccessToken();
-    }
-
-    /**
      * Initializes the client connection to a Dropbox account.
      * @param accessToken     The Dropbox access token for the Dropbox account
      */

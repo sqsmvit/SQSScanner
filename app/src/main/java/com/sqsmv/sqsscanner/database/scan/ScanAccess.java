@@ -6,8 +6,8 @@ import com.sqsmv.sqsscanner.database.DBAdapter;
 
 import java.util.ArrayList;
 
-import andoidlibs.db.DBAccess;
-import andoidlibs.db.QueryBuilder;
+import androidlibs.db.DBAccess;
+import androidlibs.db.QueryBuilder;
 
 public class ScanAccess extends DBAccess
 {

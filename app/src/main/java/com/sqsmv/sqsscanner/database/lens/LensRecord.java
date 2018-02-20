@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.lens;
 
 import android.database.Cursor;
 
-import andoidlibs.db.xml.XMLDBRecord;
+import androidlibs.db.xml.XMLDBRecord;
 
 public class LensRecord extends XMLDBRecord
 {

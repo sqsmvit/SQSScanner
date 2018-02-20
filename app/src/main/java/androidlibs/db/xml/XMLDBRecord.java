@@ -1,11 +1,11 @@
-package andoidlibs.db.xml;
+package androidlibs.db.xml;
 
 import android.database.Cursor;
 
 import java.util.Arrays;
 import java.util.List;
 
-import andoidlibs.db.DBRecord;
+import androidlibs.db.DBRecord;
 
 /**
  * The XMLDBRecord abstract class used for storing and handling information for database records for a single table. It also contains methods that

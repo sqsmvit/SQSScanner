@@ -1,6 +1,6 @@
-package andoidlibs.db.xml;
+package androidlibs.db.xml;
 
-import andoidlibs.db.DBContract;
+import androidlibs.db.DBContract;
 
 /**
  * The XMLDBContract interface is used for providing information related to a specific table and the import file for that table to XMLDBAccess

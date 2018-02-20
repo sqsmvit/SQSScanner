@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".CheckDBX" >
+    tools:context=".LoadActivity" >
 
     <TextView
         android:id="@+id/testTitle"
@@ -44,4 +44,14 @@
         android:layout_alignLeft="@+id/reminder"
         android:layout_alignRight="@+id/reminder"
         android:text="@string/startScan" />
+
+    <Button
+        android:id="@+id/killUpdateLoopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/scanHomeButton"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:text="@string/killUpdate" />
+
 </RelativeLayout>

@@ -7,7 +7,7 @@
     android:focusableInTouchMode="false"
     android:longClickable="false"
     android:orientation="vertical"
-    tools:context=".EditRecord" >
+    tools:context=".EditRecordActivity" >
 
     <Button
         android:id="@+id/editDoneBtn"

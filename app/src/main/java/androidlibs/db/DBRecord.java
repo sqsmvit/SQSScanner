@@ -1,4 +1,4 @@
-package andoidlibs.db;
+package androidlibs.db;
 
 import android.database.Cursor;
 

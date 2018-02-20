@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
-import andoidlibs.db.xml.XMLDBAccess;
+import androidlibs.db.xml.XMLDBAccess;
 
 /**
  * Utility class that takes the export files from FileMaker that have already been downloaded through Dropbox and imports the data into the app's

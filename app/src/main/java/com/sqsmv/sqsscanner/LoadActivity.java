@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.dropbox.core.android.Auth;
 
@@ -45,6 +46,21 @@ public class LoadActivity extends Activity
                 startScan();
             }
         });
+
+        if(!appConfig.accessString(DroidConfigManager.PRIOR_VERSION, null, "").isEmpty())
+        {
+            final Button killUpdateLoopButton = findViewById(R.id.killUpdateLoopButton);
+            killUpdateLoopButton.setVisibility(View.VISIBLE);
+            killUpdateLoopButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    appConfig.accessString(DroidConfigManager.PRIOR_VERSION, "", "");
+                    killUpdateLoopButton.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     @Override

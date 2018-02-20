@@ -3,8 +3,8 @@ package com.sqsmv.sqsscanner.database.prodloc;
 import android.database.Cursor;
 
 import com.sqsmv.sqsscanner.database.DBAdapter;
-import andoidlibs.db.QueryBuilder;
-import andoidlibs.db.xml.XMLDBAccess;
+import androidlibs.db.QueryBuilder;
+import androidlibs.db.xml.XMLDBAccess;
 
 
 public class ProdLocAccess extends XMLDBAccess

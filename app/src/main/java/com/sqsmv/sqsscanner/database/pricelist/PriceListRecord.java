@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.pricelist;
 
 import android.database.Cursor;
 
-import andoidlibs.db.xml.XMLDBRecord;
+import androidlibs.db.xml.XMLDBRecord;
 
 public class PriceListRecord extends XMLDBRecord
 {

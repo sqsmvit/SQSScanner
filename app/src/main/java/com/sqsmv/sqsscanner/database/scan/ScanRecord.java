@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import andoidlibs.db.DBAccess;
-import andoidlibs.db.DBRecord;
+import androidlibs.db.DBAccess;
+import androidlibs.db.DBRecord;
 
 /**
  * @author ChrisS

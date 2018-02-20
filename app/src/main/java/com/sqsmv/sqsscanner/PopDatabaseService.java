@@ -28,7 +28,7 @@ import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import andoidlibs.db.xml.XMLDBAccess;
+import androidlibs.db.xml.XMLDBAccess;
 
 /**
  * Service that coordinates the steps for updating the database using the export files from FileMaker.

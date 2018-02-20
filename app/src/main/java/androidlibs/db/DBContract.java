@@ -1,4 +1,4 @@
-package andoidlibs.db;
+package androidlibs.db;
 
 /**
  * The DBContract interface is used for storing and providing information related to a specific table to DBAccess and DBRecord objects.

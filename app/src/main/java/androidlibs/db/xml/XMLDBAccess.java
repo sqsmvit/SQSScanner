@@ -1,4 +1,4 @@
-package andoidlibs.db.xml;
+package androidlibs.db.xml;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import andoidlibs.db.DBAccess;
-import andoidlibs.db.QueryBuilder;
+import androidlibs.db.DBAccess;
+import androidlibs.db.QueryBuilder;
 
 /**
  * The XMLDBAccess abstract class is used to control access between the user and the database for tables that require an import from an XML file. All

@@ -1,6 +1,6 @@
 package com.sqsmv.sqsscanner.database.prodloc;
 
-import andoidlibs.db.xml.XMLDBContract;
+import androidlibs.db.xml.XMLDBContract;
 
 public class ProdLocContract implements XMLDBContract
 {

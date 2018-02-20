@@ -19,6 +19,7 @@
     <string name="err_scan">"***ERR: NOT FOUND***"</string>
     <string name="err">ERR_</string>
     <string name="startScan">Start Scanning</string>
+    <string name="killUpdate">Kill Update Loop</string>
     <string name="checkDefaults">Reminder: Check config before scanning!</string>
     <string name="instrTitle">Instructions:</string>
     <string name="instrBody">1. Scan Pull Number barcode on pull sheet.\n2. Begin Scanning titles.\n3. Multiple Pulls can be done on one scan session.\n4. Depending on configuration UPC will need quantities entered.\n5. When finished review Pull.\n6. Commit when in range of WIFI.</string>

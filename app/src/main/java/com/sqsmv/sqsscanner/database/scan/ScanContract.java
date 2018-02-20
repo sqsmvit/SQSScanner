@@ -2,7 +2,7 @@ package com.sqsmv.sqsscanner.database.scan;
 
 import android.provider.BaseColumns;
 
-import andoidlibs.db.DBContract;
+import androidlibs.db.DBContract;
 
 public class ScanContract implements DBContract, BaseColumns
 {
