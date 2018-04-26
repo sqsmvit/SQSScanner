@@ -90,6 +90,15 @@ public class ScanAccess extends DBAccess
             columns = new String[]{ScanContract.COLUMN_NAME_MASNUM, ScanContract.COLUMN_NAME_QUANTITY, ScanContract.COLUMN_NAME_INITIALS,
                                    ScanContract.COLUMN_NAME_TITLE};
         }
+        else if(exportMode == -1)
+        {
+            //Raw Data
+            columns = new String[]{ScanContract.COLUMN_NAME_MASNUM, ScanContract.COLUMN_NAME_QUANTITY, ScanContract.COLUMN_NAME_FKPULLID,
+                                   ScanContract.COLUMN_NAME_SCANDATE, ScanContract.COLUMN_NAME_LOCATION, ScanContract.COLUMN_NAME_NUMBOXES,
+                                   ScanContract.COLUMN_NAME_INITIALS, ScanContract.COLUMN_NAME_TITLE, ScanContract.COLUMN_NAME_RATING,
+                                   ScanContract.COLUMN_NAME_PRICELIST};
+        }
+
         return getDB().query(getTableName(), columns, null, null, groupBy, null, orderBy);
     }
 

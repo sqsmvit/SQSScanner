@@ -45,7 +45,7 @@ public class DropboxManager
 
     /**
      * Initializes the client connection to a Dropbox account.
-     * @param accessToken     The Dropbox access token for the Dropbox account
+     * @param accessToken     The Dropbox access token for the Dropbox account14
      */
     public void initDbxClient(String accessToken)
     {

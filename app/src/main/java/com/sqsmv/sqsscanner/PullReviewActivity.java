@@ -225,14 +225,15 @@ public class PullReviewActivity extends Activity
             {
                 try
                 {
-                    File exportFile = writeFromDB();
-                    if(ScanExporter.exportScan(this, exportFile, exportModeChoice))
+                    File[] exportFiles = writeFromDB();
+                    if(ScanExporter.exportScan(this, exportFiles[0], exportModeChoice))
                     {
                         if(exportModeChoice == 6)
                         {
                             appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, 1, 1);
                         }
-                        ScanWriter.writeBackupFile(exportFile);
+                        ScanWriter.writeBackupFile(exportFiles[0]);
+                        ScanWriter.writeBackupFile(exportFiles[1]);
                         Utilities.makeToast(this, "File exported to DropBox");
                         performMassDelete();
                         fileExported = true;
@@ -243,7 +244,8 @@ public class PullReviewActivity extends Activity
                         Utilities.alertVibrate(this, new long[] {0, 500, 500, 500, 500});
                         Utilities.makeToast(this, "Error exporting to DropBox");
                     }
-                    exportFile.delete();
+                    exportFiles[0].delete();
+                    exportFiles[1].delete();
                 }
                 catch(IOException e)
                 {
@@ -263,16 +265,21 @@ public class PullReviewActivity extends Activity
     }
 
     /**
-     * Creates the export file from the Scan Table.
-     * @return The created export file.
+     * Creates export files from the Scan Table.
+     * @return An array of created export files, index 0 uses the selected mode, index 1 is raw data.
      * @throws IOException
      */
-    private File writeFromDB() throws IOException
+    private File[] writeFromDB() throws IOException
     {
-        Cursor exportCursor = scanAccess.selectScansForPrint(exportModeChoice);
-        File exportFile = ScanWriter.createExportFile(this, exportCursor, exportModeChoice, invAdjChoice);
+        File[] exportFiles = new File[2];
+        String currentTimestamp = Utilities.buildCurrentTimestamp();
 
-        return exportFile;
+        Cursor exportCursor = scanAccess.selectScansForPrint(exportModeChoice);
+        exportFiles[0] = ScanWriter.createExportFile(this, exportCursor, exportModeChoice, invAdjChoice, currentTimestamp);
+        exportCursor = scanAccess.selectScansForPrint(-1);
+        exportFiles[1] = ScanWriter.createExportFile(this, exportCursor, -1, invAdjChoice, currentTimestamp);
+
+        return exportFiles;
     }
 
     /**

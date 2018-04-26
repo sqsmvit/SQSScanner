@@ -15,18 +15,40 @@ public class ScanWriter
 {
     /**
      * Creates an export File in the file storage area for the app.
-     * @param context         The Context for the Activity or Service making the method call.
-     * @param dbCursor        The Cursor containing the export information.
-     * @param exportMode      The export mode being used.
-     * @param invAdjChoice    The inventory adjustment choice, relevant if the export is in RI mode.
+     * @param context             The Context for the Activity or Service making the method call.
+     * @param dbCursor            The Cursor containing the export information.
+     * @param exportMode          The export mode being used.
+     * @param invAdjChoice        The inventory adjustment choice, relevant if the export is in RI mode.
+     * @param currentTimestamp    The timestamp used for naming the file.
      * @return The File to be used for exporting.
      * @throws IOException
      */
-    public static File createExportFile(Context context, Cursor dbCursor, int exportMode, int invAdjChoice) throws IOException
+    public static File createExportFile(Context context, Cursor dbCursor, int exportMode, int invAdjChoice, String currentTimestamp)
+            throws IOException
     {
-        String fileName = buildFileName(exportMode);
+        String fileName = buildFileName(exportMode, currentTimestamp);
         File exportFile = new File(context.getFilesDir() + "/" + fileName);
         FileOutputStream output = new FileOutputStream(exportFile, true);
+
+        if(exportMode == -1)
+        {
+            String header = "";
+            int columnCount = dbCursor.getColumnCount();
+
+            for(int count = 0; count < columnCount ; count++)
+            {
+                if(count < columnCount - 1)
+                {
+                    header += dbCursor.getColumnName(count) + "\t";
+                }
+                else
+                {
+                    header += dbCursor.getColumnName(count) + "\n";
+                }
+            }
+
+            output.write(header.getBytes());
+        }
 
         while(dbCursor.moveToNext())
         {
@@ -42,7 +64,6 @@ public class ScanWriter
                     writeString = "sub\t" + writeString;
                 }
             }
-
             output.write(writeString.getBytes());
         }
 
@@ -77,13 +98,24 @@ public class ScanWriter
 
     /**
      * Builds the name of the export file.
-     * @param exportMode    The export mode being used.
+     * @param exportMode          The export mode being used.
+     * @param currentTimestamp    The timestamp used for naming the file.
      * @return The name of the export file.
      */
-    private static String buildFileName(int exportMode)
+    private static String buildFileName(int exportMode, String currentTimestamp)
     {
-        return ExportModeHandler.getFilePrefix(exportMode) + Utilities.getDeviceName() + "_" +
-                Utilities.buildCurrentTimestamp() + ".txt";
+        String fileNamePrefix;
+
+        if(exportMode != -1)
+        {
+            fileNamePrefix  = ExportModeHandler.getFilePrefix(exportMode);
+        }
+        else
+        {
+            fileNamePrefix = "RAW_";
+        }
+
+        return fileNamePrefix + Utilities.getDeviceName() + "_" + currentTimestamp + ".txt";
     }
 
     /**
@@ -95,7 +127,7 @@ public class ScanWriter
     {
         File root = new File(Environment.getExternalStorageDirectory().toString() + "/backups");
         root.mkdirs();
-        File backupFile = new File(root.getAbsolutePath(), "B_" + exportFile.getName());
+        File backupFile = new File(root.getAbsolutePath(), exportFile.getName());
         Utilities.copyFile(exportFile, backupFile);
     }
 }

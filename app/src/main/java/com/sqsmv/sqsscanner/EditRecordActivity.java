@@ -50,8 +50,8 @@ public class EditRecordActivity extends Activity
         pullList.add("...");
         dbAdapter.close();
 
-        pullSpinner = (Spinner)findViewById(R.id.spinPullNumbers);
-        quantityEdit = (EditText)findViewById(R.id.editQtyNum);
+        pullSpinner = findViewById(R.id.spinPullNumbers);
+        quantityEdit = findViewById(R.id.editQtyNum);
 
         pullListSpinnerAdapter = Utilities.createSpinnerAdapter(this, pullList);
         pullSpinner.setAdapter(pullListSpinnerAdapter);
@@ -95,6 +95,7 @@ public class EditRecordActivity extends Activity
                 onClickDone();
             }
         });
+
         pullSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
@@ -178,11 +179,20 @@ public class EditRecordActivity extends Activity
                         {
                             resetPullSpinner();
                         }
-                        currentScanRecord.setFkPullId(pullSpinnerValue);
-                        currentScanRecord.setQuantity(quantityInputValue);
 
                         scanAccess.open();
-                        scanAccess.insertRecord(currentScanRecord);
+
+                        if(!quantityInputValue.isEmpty() && Integer.parseInt(quantityInputValue) > 0)
+                        {
+                            currentScanRecord.setFkPullId(pullSpinnerValue);
+                            currentScanRecord.setQuantity(quantityInputValue);
+                            scanAccess.insertRecord(currentScanRecord);
+                        }
+                        else
+                        {
+                            scanAccess.deleteByPk(currentScanRecord.getId());
+                        }
+
                         dbAdapter.close();
                         onBackPressed();
                     }
