@@ -54,13 +54,13 @@ public class ScanConfigActivity  extends Activity
         lensAccess = new LensAccess(dbAdapter);
         scanAccess = new ScanAccess(dbAdapter);
 
-        autoCountModeToggle = (ToggleButton)findViewById(R.id.togAutoQuan);
-        boxQuantityModeToggle = (ToggleButton)findViewById(R.id.togAutoBox);
-        autoCountSelect = (Spinner)findViewById(R.id.autoCountSelect);
-        boxQuantityInput = (EditText)findViewById(R.id.boxQty);
-        lensSelect = (Spinner)findViewById(R.id.LensSelect);
-        exportModeSelect = (Spinner)findViewById(R.id.exportModeSelect);
-        invModeRGroup = (RadioGroup)findViewById(R.id.invModeGroup);
+        autoCountModeToggle = findViewById(R.id.togAutoQuan);
+        boxQuantityModeToggle = findViewById(R.id.togAutoBox);
+        autoCountSelect = findViewById(R.id.autoCountSelect);
+        boxQuantityInput = findViewById(R.id.boxQty);
+        lensSelect = findViewById(R.id.LensSelect);
+        exportModeSelect = findViewById(R.id.exportModeSelect);
+        invModeRGroup = findViewById(R.id.invModeGroup);
 
         customAutoValue = appConfig.accessString(DroidConfigManager.CUSTOM_AUTO_COUNT, null, "1");
         exportModeChoice = appConfig.accessInt(DroidConfigManager.EXPORT_MODE_CHOICE, null, 1);
@@ -237,7 +237,14 @@ public class ScanConfigActivity  extends Activity
         lensAccess.open();
         lensSelect.setAdapter(Utilities.createSpinnerAdapter(this, lensAccess.getAllLensNames()));
         dbAdapter.close();
-        lensSelect.setSelection(appConfig.accessInt(DroidConfigManager.LENS_SELECT_IDX, null, 0));
+        if(appConfig.accessInt(DroidConfigManager.LENS_SELECT_IDX, null, 0) <= lensSelect.getCount())
+        {
+            lensSelect.setSelection(appConfig.accessInt(DroidConfigManager.LENS_SELECT_IDX, null, 0));
+        }
+        else
+        {
+            lensSelect.setSelection(0);
+        }
 
         if(invModeChoice == 1)
         {

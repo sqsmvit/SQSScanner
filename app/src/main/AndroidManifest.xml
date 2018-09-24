@@ -84,7 +84,7 @@
             android:exported="true" >
         </service>
         <service
-            android:name=".AppUpdateService"
+            android:name="com.sqsmv.sqsscanner.AppUpdateService"
             android:enabled="true" >
         </service>
     </application>
